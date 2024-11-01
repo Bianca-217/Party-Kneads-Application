@@ -76,6 +76,11 @@ public class ShopFragment extends Fragment {
         // Fetch products
         fetchProducts();
 
+        binding.btnAddress.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
+            navController.navigate(R.id.action_homePageFragment_to_addressFragment);
+        });
+
         // Set up click listener to hide the keyboard when tapping outside
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> {

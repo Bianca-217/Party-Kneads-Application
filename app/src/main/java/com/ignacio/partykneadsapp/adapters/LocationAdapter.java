@@ -14,12 +14,15 @@ import com.ignacio.partykneadsapp.R;
 import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.LocationViewHolder> {
-    private List<String> locationList;
-    private String userName; // Store userName as a member variable
 
-    public LocationAdapter(List<String> locationList, String userName) {
+    private List<String> locationList;
+    private String userName;
+    private OnEditClickListener onEditClickListener;
+
+    public LocationAdapter(List<String> locationList, String userName, OnEditClickListener onEditClickListener) {
         this.locationList = locationList;
         this.userName = userName;
+        this.onEditClickListener = onEditClickListener;
     }
 
     @NonNull
@@ -33,9 +36,14 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         String location = locationList.get(position);
         holder.locationTextView.setText(location);
-
-        // Optionally set user name if you want to display it alongside locations
         holder.userNameTextView.setText(userName);
+
+        // Set click listener for btnEdit
+        holder.btnEdit.setOnClickListener(v -> {
+            if (onEditClickListener != null) {
+                onEditClickListener.onEditClick(position);
+            }
+        });
     }
 
     @Override
@@ -44,18 +52,25 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     }
 
     public void setUserName(String userName) {
-        this.userName = userName; // Update userName
-        notifyDataSetChanged(); // Notify adapter of data change
+        this.userName = userName;
+        notifyDataSetChanged();
+    }
+
+    // Interface for edit button click
+    public interface OnEditClickListener {
+        void onEditClick(int position);
     }
 
     static class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView locationTextView;
-        TextView userNameTextView; // If displaying user name
+        TextView userNameTextView;
+        TextView btnEdit;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
             locationTextView = itemView.findViewById(R.id.location);
-            userNameTextView = itemView.findViewById(R.id.txtUserName); // Assuming you have a TextView for user name
+            userNameTextView = itemView.findViewById(R.id.txtUserName);
+            btnEdit = itemView.findViewById(R.id.btnEdit); // Find btnEdit
         }
     }
 }

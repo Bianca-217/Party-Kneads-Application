@@ -28,7 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
-import com.ignacio.partykneadsapp.adapters.LocationAdapter;
+import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter; // Import the new adapter
 import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -47,10 +47,9 @@ public class CheckoutFragment extends Fragment {
     private FirebaseUser cUser;
     private ImageView btnBack;
     private RecyclerView locationRecyclerView;
-    private LocationAdapter locationAdapter;
+    private CheckoutLocationAdapter locationAdapter; // Use the new adapter
     private List<String> activeLocations;
     private TextView txtUserName;
-    private CustomGridLayoutManager layoutManager;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -74,15 +73,6 @@ public class CheckoutFragment extends Fragment {
         // Retrieve selected items from arguments if provided
         selectedItems = getArguments() != null ? getArguments().getParcelableArrayList("selectedItems") : new ArrayList<>();
 
-        recyclerView.setHasFixedSize(true);
-        // Initialize CustomLinearLayoutManager and set it to the RecyclerView
-//        layoutManager = new CustomGridLayoutManager(getContext()) {
-//            @Override
-//            public boolean canScrollVertically() {
-//                return false;
-//            }
-//        };
-
         // Log received selected items for debugging
         if (selectedItems != null && !selectedItems.isEmpty()) {
             for (CartItemModel item : selectedItems) {
@@ -99,7 +89,7 @@ public class CheckoutFragment extends Fragment {
         // Initialize RecyclerView for locations
         locationRecyclerView = view.findViewById(R.id.locationRecycler);
         activeLocations = new ArrayList<>();
-        locationAdapter = new LocationAdapter(activeLocations, ""); // Initialize with an empty userName
+        locationAdapter = new CheckoutLocationAdapter(activeLocations); // Use new adapter
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         locationRecyclerView.setAdapter(locationAdapter);
 
@@ -134,19 +124,15 @@ public class CheckoutFragment extends Fragment {
                 // Combine first name and last name to form the user's full name
                 String userName = firstName + " " + lastName;
 
-                // Update the location adapter with user's name
-                locationAdapter.setUserName(userName);
-                locationAdapter.notifyDataSetChanged();
-
                 // Fetch active locations after getting the user's name
-                fetchActiveLocations();
+                fetchActiveLocations(userName);
             }).addOnFailureListener(e -> {
                 Log.w("CheckoutFragment", "Error fetching user name", e);
             });
         }
     }
 
-    private void fetchActiveLocations() {
+    private void fetchActiveLocations(String userName) {
         if (cUser != null) {
             String userId = cUser.getUid();
             db.collection("Users").document(userId).collection("Locations")
@@ -160,6 +146,7 @@ public class CheckoutFragment extends Fragment {
                                     activeLocations.add(location);
                                 }
                             }
+                            locationAdapter.setUserName(userName); // Set username in the adapter
                             locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
                         } else {
                             Log.w("CheckoutFragment", "Error getting active locations.", task.getException());
@@ -257,13 +244,20 @@ public class CheckoutFragment extends Fragment {
                         db.collection("Users").document(userDocId).collection("Orders")
                                 .add(orderData)
                                 .addOnSuccessListener(documentReference -> {
-                                    Toast.makeText(getActivity(), "Order placed successfully!", Toast.LENGTH_SHORT).show();
-                                    Log.d("CheckoutFragment", "Order successfully written with ID: " + documentReference.getId());
+                                    Log.d("CheckoutFragment", "Order placed successfully: " + documentReference.getId());
+                                    clearCart();
                                 })
-                                .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error adding document", e));
+                                .addOnFailureListener(e -> {
+                                    Log.w("CheckoutFragment", "Error placing order", e);
+                                });
                     } else {
-                        Log.w("CheckoutFragment", "No user found with the specified email.");
+                        Log.w("CheckoutFragment", "Admin user not found or no documents returned.");
                     }
                 });
+    }
+
+    private void clearCart() {
+        // Implement logic to clear items from the cart in Firestore
+        // You may need to get user-specific cart items and remove them here
     }
 }

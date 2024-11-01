@@ -122,8 +122,12 @@ public class Cake_Description extends Fragment {
         updateQuantityAndPrice(); // Initialize price display
 
         btnBack.setOnClickListener(v -> {
+            Bundle args1 = new Bundle();
+            args1.putBoolean("loadShop", true);
+
+            // Replace the current fragment with the menu page fragment and pass the argument
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_cake_Description_to_homePageFragment);
+            navController.navigate(R.id.action_cake_Description_to_homePageFragment, args1);
         });
 
 
@@ -256,8 +260,6 @@ public class Cake_Description extends Fragment {
     }
 
     private void goToShop() {
-
-        Fragment menuPageFragment = new HomePageFragment(); // replace with the name of your menu page fragment class
 
         // Create a bundle with the flag to load ShopFragment
         Bundle args = new Bundle();
