@@ -28,7 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
-import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter; // Import the new adapter
+import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -47,7 +47,7 @@ public class CheckoutFragment extends Fragment {
     private FirebaseUser cUser;
     private ImageView btnBack;
     private RecyclerView locationRecyclerView;
-    private CheckoutLocationAdapter locationAdapter; // Use the new adapter
+    private CheckoutLocationAdapter locationAdapter;
     private List<String> activeLocations;
     private TextView txtUserName;
 
@@ -89,7 +89,7 @@ public class CheckoutFragment extends Fragment {
         // Initialize RecyclerView for locations
         locationRecyclerView = view.findViewById(R.id.locationRecycler);
         activeLocations = new ArrayList<>();
-        locationAdapter = new CheckoutLocationAdapter(activeLocations); // Use new adapter
+        locationAdapter = new CheckoutLocationAdapter(activeLocations);
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         locationRecyclerView.setAdapter(locationAdapter);
 
@@ -106,7 +106,6 @@ public class CheckoutFragment extends Fragment {
         Button btnCheckout = view.findViewById(R.id.btncheckout);
         btnCheckout.setOnClickListener(v -> {
             saveOrderToDatabase();
-            showSuccessDialog();
         });
 
         // Update totals based on selectedItems
@@ -120,8 +119,6 @@ public class CheckoutFragment extends Fragment {
             db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
                 String firstName = documentSnapshot.getString("First Name");
                 String lastName = documentSnapshot.getString("Last Name");
-
-                // Combine first name and last name to form the user's full name
                 String userName = firstName + " " + lastName;
 
                 // Fetch active locations after getting the user's name
@@ -146,8 +143,8 @@ public class CheckoutFragment extends Fragment {
                                     activeLocations.add(location);
                                 }
                             }
-                            locationAdapter.setUserName(userName); // Set username in the adapter
-                            locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
+                            locationAdapter.setUserName(userName);
+                            locationAdapter.notifyDataSetChanged();
                         } else {
                             Log.w("CheckoutFragment", "Error getting active locations.", task.getException());
                         }
@@ -158,52 +155,29 @@ public class CheckoutFragment extends Fragment {
         }
     }
 
-    private void showSuccessDialog() {
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog, null);
-        TextView btnContinue = dialogView.findViewById(R.id.btnContinue);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(dialogView);
-        AlertDialog alertDialog = builder.create();
-
-        // Set the dialog background to transparent
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
-
-        btnContinue.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_checkoutFragment_to_homePageFragment);
-        });
-
-        alertDialog.show();
-    }
-
-    private void updateTotals() {
-        double itemTotal = 0;
-        double discount = 0; // Set discount value if applicable
-
-        for (CartItemModel item : selectedItems) {
-            itemTotal += item.getTotalPriceAsDouble(); // Assuming getTotalPriceAsDouble() is implemented correctly
-        }
-
-        double totalCost = itemTotal - discount;
-
-        // Update TextViews
-        itemTotalTextView.setText("₱" + String.format("%.2f", itemTotal));
-        totalCostTextView.setText("₱" + String.format("%.2f", totalCost));
-
-        // Toggle TextView visibility
-        toggleTextViewVisibility(!selectedItems.isEmpty());
-    }
-
-    private void toggleTextViewVisibility(boolean hasItems) {
-        itemTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
-        totalCostTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
-    }
-
     private void saveOrderToDatabase() {
+        // Check for user's address first
+        if (cUser != null) {
+            String userId = cUser.getUid();
+            db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+                String userAddress = documentSnapshot.getString("address");
+
+                if (userAddress == null || userAddress.isEmpty()) {
+                    // Show address dialog if address is empty
+                    showAddressDialog();
+                } else {
+                    // Proceed to save order if address exists
+                    proceedToSaveOrder();
+                }
+            }).addOnFailureListener(e -> {
+                Log.w("CheckoutFragment", "Error fetching user address", e);
+            });
+        } else {
+            Log.w("CheckoutFragment", "Current user is null. Unable to retrieve address.");
+        }
+    }
+
+    private void proceedToSaveOrder() {
         // Create a map to store order details
         HashMap<String, Object> orderData = new HashMap<>();
         orderData.put("status", "placed");
@@ -246,6 +220,7 @@ public class CheckoutFragment extends Fragment {
                                 .addOnSuccessListener(documentReference -> {
                                     Log.d("CheckoutFragment", "Order placed successfully: " + documentReference.getId());
                                     clearCart();
+                                    showSuccessDialog(); // Show success dialog after order placement
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.w("CheckoutFragment", "Error placing order", e);
@@ -254,6 +229,78 @@ public class CheckoutFragment extends Fragment {
                         Log.w("CheckoutFragment", "Admin user not found or no documents returned.");
                     }
                 });
+    }
+
+    private void showSuccessDialog() {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog, null);
+        TextView btnContinue = dialogView.findViewById(R.id.btnContinue);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog alertDialog = builder.create();
+
+        // Set the dialog background to transparent
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnContinue.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_checkoutFragment_to_homePageFragment);
+        });
+
+        alertDialog.show();
+    }
+
+    private void showAddressDialog() {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.addressdialog, null);
+        Button btnFinishSetup = dialogView.findViewById(R.id.btnFinishsetup);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel); // Make sure this ID matches your layout
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog alertDialog = builder.create();
+
+        // Set the dialog background to transparent
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnFinishSetup.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_checkoutFragment_to_addressFragment);
+        });
+
+        btnCancel.setOnClickListener(v -> {
+            alertDialog.dismiss(); // Just dismiss the dialog
+        });
+
+        alertDialog.show();
+    }
+
+
+    private void updateTotals() {
+        double itemTotal = 0;
+        double discount = 0; // Set discount value if applicable
+
+        for (CartItemModel item : selectedItems) {
+            itemTotal += item.getTotalPriceAsDouble(); // Assuming getTotalPriceAsDouble() is implemented correctly
+        }
+
+        double totalCost = itemTotal - discount;
+
+        // Update TextViews
+        itemTotalTextView.setText("₱" + String.format("%.2f", itemTotal));
+        totalCostTextView.setText("₱" + String.format("%.2f", totalCost));
+
+        // Toggle TextView visibility
+        toggleTextViewVisibility(!selectedItems.isEmpty());
+    }
+
+    private void toggleTextViewVisibility(boolean hasItems) {
+        itemTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        totalCostTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
     }
 
     private void clearCart() {

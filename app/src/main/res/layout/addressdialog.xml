@@ -56,7 +56,7 @@
             app:layout_constraintTop_toBottomOf="@+id/successfullyAdded">
 
             <Button
-                android:id="@+id/btnCart"
+                android:id="@+id/btnCancel"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/semiwhite"
@@ -69,7 +69,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/successfullyAdded"/>
 
             <Button
-                android:id="@+id/btnContinue"
+                android:id="@+id/btnFinishsetup"
                 android:layout_width="160dp"
                 android:layout_height="match_parent"
                 android:text="Finish Setup"

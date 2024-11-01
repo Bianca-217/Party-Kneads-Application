@@ -198,6 +198,9 @@
         <action
             android:id="@+id/action_checkoutFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_checkoutFragment_to_addressFragment"
+            app:destination="@id/addressFragment" />
     </fragment>
     <fragment
         android:id="@+id/addressFragment"
