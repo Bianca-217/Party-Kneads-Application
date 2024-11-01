@@ -110,10 +110,18 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
                                 String phoneNumber = document.getString("phoneNumber");
                                 userName = document.getString("userName");
 
-
-                                // Create a LocationModel instance
-                                LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber);
-                                activeLocations.add(location); // Add the LocationModel to the list
+                                // Check if any of the address components are null
+                                if (houseNum == null || barangay == null || city == null || postalCode == null) {
+                                    String location = document.getString("location");
+                                    if (location != null) {
+                                        // Directly set the location string to your TextView or use it for the LocationModel
+                                        activeLocations.add(new LocationModel(location));
+                                    }
+                                } else {
+                                    // Create a LocationModel instance with available address components
+                                    LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber);
+                                    activeLocations.add(location); // Add the LocationModel to the list
+                                }
                             }
                             locationAdapter.setUserName(userName);
                             locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
@@ -126,5 +134,7 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
                     });
         }
     }
+
+
 }
 

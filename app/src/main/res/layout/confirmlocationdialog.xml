@@ -34,12 +34,13 @@
             android:id="@+id/successfullyAdded"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/montserrat_medium"
             android:text="Do you want to proceed with this address?"
             android:textAlignment="center"
             android:textColor="@color/grey"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:layout_marginHorizontal="15dp"
             app:layout_constraintBottom_toTopOf="@+id/linearlayout"
             app:layout_constraintTop_toBottomOf="@id/great"
             tools:layout_editor_absoluteX="20dp" />
@@ -51,6 +52,7 @@
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_marginTop="20dp"
+            android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/successfullyAdded">

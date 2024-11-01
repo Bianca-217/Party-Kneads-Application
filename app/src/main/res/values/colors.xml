@@ -14,5 +14,6 @@
     <color name="footerpink">#fcdbe6</color>
     <color name="footericon">#fc6090</color>
     <color name="cardColor">#fdebf1</color>
+    <color name="dialogOpacity">#BFFD9FC1</color>
 
 </resources>
