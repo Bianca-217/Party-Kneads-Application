@@ -81,7 +81,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     class CartViewHolder extends RecyclerView.ViewHolder {
-        private TextView productName, quantity, totalPrice, ratePercent, numReviews;
+        private TextView productName, quantity, totalPrice, ratePercent, numReviews, cakeSize;
         private ImageView cakeImage;
         private CheckBox checkBox;
 
@@ -95,14 +95,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             numReviews = itemView.findViewById(R.id.numReviews);
             cakeImage = itemView.findViewById(R.id.cakeImage);
             checkBox = itemView.findViewById(R.id.checkbox);
+            cakeSize = itemView.findViewById(R.id.cakeSize);
+
         }
 
         public void bind(CartItemModel item, int position) {
             productName.setText(item.getProductName());
             quantity.setText(String.valueOf(item.getQuantity()));
             totalPrice.setText(item.getTotalPrice()); // Updated method call
-            ratePercent.setText(item.getRate() != null ? item.getRate() : "test");
-            numReviews.setText(item.getNumReviews() != null ? item.getNumReviews() : "test");
+//            ratePercent.setText(item.getRate() != null ? item.getRate() : "test");
+//            numReviews.setText(item.getNumReviews() != null ? item.getNumReviews() : "test");
+            cakeSize.setText(item.getCakeSize());
 
             Glide.with(itemView.getContext())
                     .load(item.getImageUrl())

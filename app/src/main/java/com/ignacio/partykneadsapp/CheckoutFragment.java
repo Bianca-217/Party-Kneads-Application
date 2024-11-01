@@ -137,10 +137,13 @@ public class CheckoutFragment extends Fragment {
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            activeLocations.clear(); // Clear the list before adding new items
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String location = document.getString("location");
-                                if (location != null) {
-                                    activeLocations.add(location);
+                                String phoneNumber = document.getString("phoneNumber"); // Fetch the phone number
+                                if (location != null && phoneNumber != null) {
+                                    // Add both location and phone number as a single string
+                                    activeLocations.add(location + " - " + phoneNumber); // Combine them for display
                                 }
                             }
                             locationAdapter.setUserName(userName);

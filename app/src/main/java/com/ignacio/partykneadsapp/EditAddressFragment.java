@@ -9,6 +9,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.databinding.FragmentEditAddressBinding;
 
 public class EditAddressFragment extends Fragment {
@@ -34,6 +39,12 @@ public class EditAddressFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String username = getArguments().getString("username");
+        String phonenumber = getArguments().getString("phonenumber");
+
+        binding.txtUserName.setText(username);
+        binding.contactNum.setText(phonenumber);
+
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
 
@@ -43,10 +54,55 @@ public class EditAddressFragment extends Fragment {
         });
 
         binding.btndeleteAddress.setOnClickListener(v -> clearInputFields());
-
+        numberMaxDigit();
         binding.btnSave.setOnClickListener(v -> {
             if (validateFields()) {
-                Toast.makeText(getContext(), "All fields are valid!", Toast.LENGTH_SHORT).show();
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String location = getArguments().getString("location");  // Get location from bundle
+                String userName = binding.txtUserName.getText().toString().trim();
+                String phoneNumber = binding.contactNum.getText().toString().trim();
+                String city = binding.cities.getText().toString().trim();
+                String barangay = binding.barangays.getText().toString().trim();
+                String postalCode = binding.postalCode.getText().toString().trim();
+                String houseNum = binding.houseNum.getText().toString().trim();
+
+                Toast.makeText(getContext(), location, Toast.LENGTH_SHORT).show();
+                String loc = houseNum + ", " + barangay + ", " + city + ", Laguna, " + postalCode;
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("Users").document(userId).collection("Locations")
+                        .whereEqualTo("location", location)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            if (!querySnapshot.isEmpty()) {
+                                // Assuming there's only one document per location
+                                String docId = querySnapshot.getDocuments().get(0).getId();
+
+                                db.collection("Users").document(userId).collection("Locations")
+                                        .document(docId)
+                                        .update(
+                                                "userName", userName,
+                                                "phoneNumber", phoneNumber,
+                                                "city", city,
+                                                "barangay", barangay,
+                                                "postalCode", postalCode,
+                                                "houseNum", houseNum,
+                                                "location", loc
+                                        )
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(getContext(), "Address updated successfully!", Toast.LENGTH_SHORT).show();
+                                            NavController navController = Navigation.findNavController(requireView());
+                                            navController.navigate(R.id.action_editAddressFragment_to_addressFragment);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(getContext(), "Failed to update address", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to fetch address", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                Toast.makeText(getContext(),"error", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -205,6 +261,14 @@ public class EditAddressFragment extends Fragment {
     private boolean validateFields() {
         boolean isValid = true;
 
+        // Clear existing error messages
+        binding.txtUserName.setError(null);
+        binding.contactNum.setError(null);
+        binding.cities.setError(null);
+        binding.barangays.setError(null);
+        binding.postalCode.setError(null);
+        binding.houseNum.setError(null);
+
         if (binding.txtUserName.getText().toString().trim().isEmpty()) {
             binding.txtUserName.setError("Full Name is required");
             isValid = false;
@@ -213,8 +277,15 @@ public class EditAddressFragment extends Fragment {
             binding.contactNum.setError("Phone Number is required");
             isValid = false;
         } else {
+            String phoneNumber = binding.contactNum.getText().toString().trim();
             try {
-                Long.parseLong(binding.contactNum.getText().toString().trim());
+                Long.parseLong(phoneNumber); // Check if it's numeric
+
+                // Validate that it starts with "09" and has a length of 11
+                if (!phoneNumber.startsWith("09") || phoneNumber.length() != 11) {
+                    binding.contactNum.setError("Phone Number must start with '09' and be 11 digits long");
+                    isValid = false;
+                }
             } catch (NumberFormatException e) {
                 binding.contactNum.setError("Phone Number must be numeric");
                 isValid = false;
@@ -239,4 +310,28 @@ public class EditAddressFragment extends Fragment {
 
         return isValid;
     }
+
+    public void numberMaxDigit() {
+        binding.contactNum.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed here
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Clear error message when the user starts typing
+                binding.contactNum.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Prevent typing more than 11 digits
+                if (s.length() > 11) {
+                    s.delete(11, s.length()); // Remove excess characters
+                }
+            }
+        });
+    }
+
 }

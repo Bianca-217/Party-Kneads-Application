@@ -1,29 +1,30 @@
 package com.ignacio.partykneadsapp.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.ignacio.partykneadsapp.R;
-
+import com.ignacio.partykneadsapp.model.LocationModel;
 import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.LocationViewHolder> {
 
-    private List<String> locationList;
-    private String userName;
+    private List<LocationModel> locationList;
     private OnEditClickListener onEditClickListener;
+    private String userName; // Add userName field
 
-    public LocationAdapter(List<String> locationList, String userName, OnEditClickListener onEditClickListener) {
+    public LocationAdapter(List<LocationModel> locationList, OnEditClickListener onEditClickListener) {
         this.locationList = locationList;
-        this.userName = userName;
         this.onEditClickListener = onEditClickListener;
     }
+
+    public void setUserName(String userName) { // Method to set the user name
+        this.userName = userName;
+    }
+
 
     @NonNull
     @Override
@@ -34,9 +35,13 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
 
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
-        String location = locationList.get(position);
-        holder.locationTextView.setText(location);
-        holder.userNameTextView.setText(userName);
+        LocationModel location = locationList.get(position);
+
+        // Concatenate address and set to TextView
+        String fullAddress = location.getFullAddress();
+        holder.locationTextView.setText(fullAddress);
+        holder.phoneNumberTextView.setText(location.getPhoneNumber());
+        holder.userNameTextView.setText(userName); // Set the user name here
 
         // Set click listener for btnEdit
         holder.btnEdit.setOnClickListener(v -> {
@@ -51,26 +56,22 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         return locationList.size();
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-        notifyDataSetChanged();
-    }
-
-    // Interface for edit button click
     public interface OnEditClickListener {
         void onEditClick(int position);
     }
 
     static class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView locationTextView;
-        TextView userNameTextView;
+        TextView phoneNumberTextView;
+        TextView userNameTextView; // TextView for user name
         TextView btnEdit;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
             locationTextView = itemView.findViewById(R.id.location);
-            userNameTextView = itemView.findViewById(R.id.txtUserName);
-            btnEdit = itemView.findViewById(R.id.btnEdit); // Find btnEdit
+            phoneNumberTextView = itemView.findViewById(R.id.contactNum);
+            userNameTextView = itemView.findViewById(R.id.txtUserName); // Finding the user name TextView
+            btnEdit = itemView.findViewById(R.id.btnEdit);
         }
     }
 }

@@ -343,15 +343,15 @@
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:backgroundTint="@color/pink"
-                app:cornerRadius="10dp"
-                android:text="Save"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
+                android:backgroundTint="@color/pink"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Save"
                 android:textAlignment="center"
                 android:textColor="@color/semiwhite"
-                android:fontFamily="@font/montserrat_bold"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:cornerRadius="10dp" />
 
         </LinearLayout>
     </LinearLayout>
