@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
 import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter;
@@ -159,26 +160,40 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void saveOrderToDatabase() {
-        // Check for user's address first
+        // Check for user's address and phone number first
         if (cUser != null) {
             String userId = cUser.getUid();
-            db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-                String userAddress = documentSnapshot.getString("address");
 
-                if (userAddress == null || userAddress.isEmpty()) {
-                    // Show address dialog if address is empty
-                    showAddressDialog();
-                } else {
-                    // Proceed to save order if address exists
-                    proceedToSaveOrder();
-                }
-            }).addOnFailureListener(e -> {
-                Log.w("CheckoutFragment", "Error fetching user address", e);
-            });
+            // Access the Locations sub-collection within the Users collection
+            db.collection("Users").document(userId)
+                    .collection("Locations")
+                    .limit(1) // Fetch the first document in the Locations collection
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        if (!querySnapshot.isEmpty()) {
+                            DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                            String userLocation = documentSnapshot.getString("location");
+                            String phoneNumber = documentSnapshot.getString("phoneNumber");
+
+                            if (userLocation == null || userLocation.isEmpty() ||
+                                    phoneNumber == null || phoneNumber.isEmpty()) {
+                                showAddressDialog();
+                            } else {
+                                proceedToSaveOrder();
+                            }
+                        } else {
+                            Log.w("CheckoutFragment", "No documents found in Locations collection.");
+                            showAddressDialog(); // Show dialog if no document is found
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("CheckoutFragment", "Error fetching user location or phone number", e);
+                    });
         } else {
-            Log.w("CheckoutFragment", "Current user is null. Unable to retrieve address.");
+            Log.w("CheckoutFragment", "Current user is null. Unable to retrieve location and phone number.");
         }
     }
+
 
     private void proceedToSaveOrder() {
         // Create a map to store order details
