@@ -8,16 +8,15 @@
     tools:context=".sellermenus.SellerOrderFragment">
 
     <FrameLayout
-        android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
         <ImageView
+            android:id="@+id/btnBack"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/back_bg" />
@@ -25,10 +24,8 @@
         <ImageView
             android:layout_width="25dp"
             android:layout_height="35dp"
-            android:layout_marginRight="2dp"
             android:layout_gravity="center"
-            android:src="@drawable/back"
-            />
+            android:src="@drawable/back" />
 
     </FrameLayout>
 
@@ -133,7 +130,6 @@
             tools:listitem="@layout/pending_orders_items"
             tools:itemCount="1"
             android:layout_marginHorizontal="20dp"
-            android:paddingBottom="80dp"
             android:clipToPadding="false"
             android:layout_marginTop="20dp" />
 
