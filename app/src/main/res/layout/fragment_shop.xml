@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="7dp"
     android:id="@+id/clayout"
-    tools:context=".menus.ShopFragment">
+    tools:context=".customermenus.ShopFragment">
 
     <!-- Search bar that remains fixed -->
     <LinearLayout

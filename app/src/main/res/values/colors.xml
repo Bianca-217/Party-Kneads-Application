@@ -15,5 +15,7 @@
     <color name="footericon">#fc6090</color>
     <color name="cardColor">#fdebf1</color>
     <color name="dialogOpacity">#BFFD9FC1</color>
+    <color name="lightgrey">#d9d9d9</color>
+    <color name="green">#1db817</color>
 
 </resources>

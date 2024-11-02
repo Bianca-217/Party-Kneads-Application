@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:background="@drawable/plainbg"
-    tools:context=".SellerHome">
+    tools:context=".sellermenus.SellerHome">
 
     <LinearLayout
         android:id="@+id/linearLayout7"

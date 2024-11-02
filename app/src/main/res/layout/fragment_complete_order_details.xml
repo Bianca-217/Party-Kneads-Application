@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/pinkbg"
+    tools:context=".CompleteOrderDetailsFragment">
+
+    <FrameLayout
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/back_bg" />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="2dp"
+            android:layout_gravity="center"
+            android:src="@drawable/back"
+            />
+
+    </FrameLayout>
+
+
+    <ImageView
+        android:id="@+id/whitecont"
+        android:layout_width="match_parent"
+        android:layout_height="760dp"
+        android:layout_gravity="bottom"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/whitecont"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/whitecont"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/addtextview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="@+id/whitecont"
+            tools:layout_editor_absoluteX="0dp">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="25dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/darkpink" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_weight="0"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:text="ORDER DETAILS"
+                android:textAlignment="center"
+                android:textColor="@color/darkpink"
+                android:textSize="26sp" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="25dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/darkpink" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btnToShip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/semiwhite"
+                android:text="To Ship"
+                android:textColor="@color/pink"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_semibold" />
+
+            <Button
+                android:id="@+id/btnToReceive"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="To Receive"
+                android:backgroundTint="@color/semiwhite"
+                android:textColor="@color/pink"
+                android:fontFamily="@font/montserrat_semibold"
+                android:textSize="15sp"
+                app:cornerRadius="0dp"
+                android:layout_weight="1"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/btnCompleted"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/semiwhite"
+                android:text="Completed"
+                android:textColor="@color/pink"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_semibold" />
+
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/toshipitems"
+            tools:itemCount="1"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

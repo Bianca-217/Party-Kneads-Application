@@ -1,4 +1,4 @@
-package com.ignacio.partykneadsapp.menus;
+package com.ignacio.partykneadsapp.customermenus;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 

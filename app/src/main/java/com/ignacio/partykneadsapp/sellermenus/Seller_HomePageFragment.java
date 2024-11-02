@@ -1,4 +1,4 @@
-package com.ignacio.partykneadsapp;
+package com.ignacio.partykneadsapp.sellermenus;
 
 import android.os.Bundle;
 
@@ -12,13 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ignacio.partykneadsapp.databinding.FragmentHomePageBinding;
+import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentSellerHomePageBinding;
-import com.ignacio.partykneadsapp.menus.Add_Items;
-import com.ignacio.partykneadsapp.menus.LikesFragment;
-import com.ignacio.partykneadsapp.menus.NotificationFragment;
-import com.ignacio.partykneadsapp.menus.ProfileFragment;
-import com.ignacio.partykneadsapp.menus.ShopFragment;
+import com.ignacio.partykneadsapp.customermenus.LikesFragment;
+import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 
 
 public class Seller_HomePageFragment extends Fragment {

@@ -1,4 +1,4 @@
-package com.ignacio.partykneadsapp;
+package com.ignacio.partykneadsapp.sellermenus;
 
 import android.os.Bundle;
 
@@ -12,8 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentSellerHomeBinding;
 
 public class SellerHome extends Fragment {

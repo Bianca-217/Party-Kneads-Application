@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/clayout"
     android:background="@drawable/whitebg"
-    tools:context=".menus.Add_Items">
+    tools:context=".customermenus.Add_Items">
 
 
     <FrameLayout

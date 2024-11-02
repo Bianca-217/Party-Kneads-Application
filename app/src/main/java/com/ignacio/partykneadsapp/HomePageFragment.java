@@ -12,12 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ignacio.partykneadsapp.databinding.FragmentHomePageBinding;
-import com.ignacio.partykneadsapp.menus.LikesFragment;
-import com.ignacio.partykneadsapp.menus.NotificationFragment;
-import com.ignacio.partykneadsapp.menus.ProfileFragment;
-import com.ignacio.partykneadsapp.menus.ShopFragment;
+import com.ignacio.partykneadsapp.customermenus.LikesFragment;
+import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
+import com.ignacio.partykneadsapp.customermenus.ShopFragment;
 
 public class HomePageFragment extends Fragment {
 

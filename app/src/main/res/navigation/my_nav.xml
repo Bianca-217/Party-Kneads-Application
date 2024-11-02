@@ -119,7 +119,7 @@
 
     <fragment
         android:id="@+id/seller_HomePageFragment"
-        android:name="com.ignacio.partykneadsapp.Seller_HomePageFragment"
+        android:name="com.ignacio.partykneadsapp.sellermenus.Seller_HomePageFragment"
         android:label="Seller_HomePageFragment" >
         <action
             android:id="@+id/action_seller_HomePageFragment_to_loginFragment"
@@ -137,12 +137,12 @@
 
     <fragment
         android:id="@+id/myProductFragment"
-        android:name="com.ignacio.partykneadsapp.MyProductFragment"
+        android:name="com.ignacio.partykneadsapp.sellermenus.MyProductFragment"
         android:label="fragment_my_product"
         tools:layout="@layout/fragment_my_product" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.ignacio.partykneadsapp.menus.ProfileFragment"
+        android:name="com.ignacio.partykneadsapp.customermenus.ProfileFragment"
         android:label="ProfileFragment" >
         <action
             android:id="@+id/action_profileFragment_to_homePageFragment"
@@ -156,7 +156,7 @@
     </fragment>
     <fragment
         android:id="@+id/add_Items"
-        android:name="com.ignacio.partykneadsapp.menus.Add_Items"
+        android:name="com.ignacio.partykneadsapp.customermenus.Add_Items"
         android:label="fragment_add__items"
         tools:layout="@layout/fragment_add__items" >
         <action
