@@ -81,7 +81,6 @@ public class SellerOrderFragment extends Fragment {
 
 
     private void processOrder(QueryDocumentSnapshot doc) {
-
         String userName = doc.getString("userName"); // Assuming userName is in the document
         String contactNum = doc.getString("phoneNumber"); // Assuming contactNum is in the document
         String location = doc.getString("location");
@@ -90,8 +89,9 @@ public class SellerOrderFragment extends Fragment {
         // Retrieve the 'items' array from the document
         List<Map<String, Object>> items = (List<Map<String, Object>>) doc.get("items");
         if (items != null) {
+            Log.d("SellerOrderFragment", "Number of items: " + items.size()); // Log the number of items
             for (Map<String, Object> item : items) {
-                 // Assuming location is in the document
+                // Assuming location is in the document
                 String productName = (String) item.get("productName");
                 String cakeSize = (String) item.get("cakeSize");
                 long quantity = (long) item.get("quantity"); // Assuming quantity is stored as long
@@ -104,7 +104,10 @@ public class SellerOrderFragment extends Fragment {
                         productName, cakeSize, (int) quantity, totalPrice, imageUrl, status, refID);
                 ordersList.add(order); // Add order to list
             }
+        } else {
+            Log.w("SellerOrderFragment", "No items found in the order document");
         }
     }
+
 
 }

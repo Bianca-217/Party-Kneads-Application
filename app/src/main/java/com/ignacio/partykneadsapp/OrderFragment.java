@@ -43,11 +43,10 @@ public class OrderFragment extends Fragment {
 
         setupBackButton();
         initializeAdapter();
-        fetchOrders("placed");
+        fetchOrders();
 
-        binding.btnToShip.setOnClickListener(v -> { fetchOrders("placed"); });
+        binding.btnToShip.setOnClickListener(v -> { fetchOrders(); });
 
-        binding.btnToReceive.setOnClickListener(v -> { fetchOrders("preparing order"); });
     }
 
     private void setupBackButton() {
@@ -67,7 +66,7 @@ public class OrderFragment extends Fragment {
         binding.toShipRecycler.setAdapter(orderAdapter);
     }
 
-    private void fetchOrders(String status) {
+    private void fetchOrders() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
         String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
@@ -81,8 +80,7 @@ public class OrderFragment extends Fragment {
                         String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
                         db.collection("Users").document(adminUid)
                                 .collection("Orders")
-                                .whereEqualTo("userEmail", currentUserEmail) // Filter by user's email
-                                .whereEqualTo("status", status) // Filter by status
+                                .whereEqualTo("userEmail", currentUserEmail) // Filter by status
                                 .get()
                                 .addOnSuccessListener(orderSnapshots -> {
                                     orderList.clear();
