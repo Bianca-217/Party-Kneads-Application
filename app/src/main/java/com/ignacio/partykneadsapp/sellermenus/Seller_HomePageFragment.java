@@ -42,9 +42,9 @@ public class Seller_HomePageFragment extends Fragment {
                     .replace(R.id.fragment_contseller, new SellerHome())
                     .commit();
         });
-        binding.likes.setOnClickListener(v -> {
+        binding.orders.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new LikesFragment())
+                    .replace(R.id.fragment_contseller, new SellerOrderFragment())
                     .commit();
         });
 

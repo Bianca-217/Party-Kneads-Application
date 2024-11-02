@@ -4,6 +4,7 @@ import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
 import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter;
 import com.ignacio.partykneadsapp.model.CartItemModel;
@@ -139,15 +141,17 @@ public class CheckoutFragment extends Fragment {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             activeLocations.clear(); // Clear the list before adding new items
+                            String userNameInLocation = "";
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String location = document.getString("location");
                                 String phoneNumber = document.getString("phoneNumber"); // Fetch the phone number
+                               userNameInLocation = document.getString("userName"); // Fetch the userName
                                 if (location != null && phoneNumber != null) {
                                     // Add both location and phone number as a single string
                                     activeLocations.add(location + " - " + phoneNumber); // Combine them for display
                                 }
                             }
-                            locationAdapter.setUserName(userName);
+                            locationAdapter.setUserName(userNameInLocation);
                             locationAdapter.notifyDataSetChanged();
                         } else {
                             Log.w("CheckoutFragment", "Error getting active locations.", task.getException());
@@ -196,8 +200,12 @@ public class CheckoutFragment extends Fragment {
 
 
     private void proceedToSaveOrder() {
+        // Generate a random reference ID
+        String orderRefId = "REF-" + System.currentTimeMillis();
+
         // Create a map to store order details
         HashMap<String, Object> orderData = new HashMap<>();
+        orderData.put("referenceId", orderRefId); // Store the reference ID
         orderData.put("status", "placed");
 
         // Get the current user's email
@@ -209,7 +217,6 @@ public class CheckoutFragment extends Fragment {
 
         // List to hold item details
         List<HashMap<String, Object>> itemsList = new ArrayList<>();
-
         for (CartItemModel item : selectedItems) {
             HashMap<String, Object> itemData = new HashMap<>();
             itemData.put("productId", item.getProductId());
@@ -218,36 +225,62 @@ public class CheckoutFragment extends Fragment {
             itemData.put("totalPrice", item.getTotalPrice());
             itemData.put("imageUrl", item.getImageUrl());
             itemData.put("cakeSize", item.getCakeSize());
-
             itemsList.add(itemData);
         }
-
         orderData.put("items", itemsList);
 
-        // Save order under the admin document's ID
-        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
-        db.collection("Users")
-                .whereEqualTo("email", adminEmail)
+        // Fetch location, phone number, and user name from the active location
+        db.collection("Users").document(cUser.getUid()).collection("Locations")
+                .whereEqualTo("status", "Active")
+                .limit(1) // Get only one active location
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        String userDocId = task.getResult().getDocuments().get(0).getId();
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        String location = documentSnapshot.getString("location");
+                        String phoneNumber = documentSnapshot.getString("phoneNumber");
+                        String userName = documentSnapshot.getString("userName");
 
-                        db.collection("Users").document(userDocId).collection("Orders")
-                                .add(orderData)
-                                .addOnSuccessListener(documentReference -> {
-                                    Log.d("CheckoutFragment", "Order placed successfully: " + documentReference.getId());
-                                    clearCart();
-                                    showSuccessDialog(); // Show success dialog after order placement
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.w("CheckoutFragment", "Error placing order", e);
+                        if (location != null) orderData.put("location", location);
+                        if (phoneNumber != null) orderData.put("phoneNumber", phoneNumber);
+                        if (userName != null) orderData.put("userName", userName);
+
+                        // Save order under the admin document's ID
+                        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
+                        db.collection("Users")
+                                .whereEqualTo("email", adminEmail)
+                                .get()
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                        String userDocId = task.getResult().getDocuments().get(0).getId();
+
+                                        // Use document(orderRefId) to set the order data
+                                        db.collection("Users").document(userDocId).collection("Orders")
+                                                .document(orderRefId) // Use the reference ID as the document ID
+                                                .set(orderData, SetOptions.merge()) // Use merge to avoid overwriting
+                                                .addOnSuccessListener(documentReference -> {
+                                                    Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
+                                                    clearCart();
+                                                    showSuccessDialog(); // Show success dialog after order placement
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.w("CheckoutFragment", "Error placing order", e);
+                                                });
+                                    } else {
+                                        Log.w("CheckoutFragment", "Admin user not found or no documents returned.");
+                                    }
                                 });
                     } else {
-                        Log.w("CheckoutFragment", "Admin user not found or no documents returned.");
+                        Log.w("CheckoutFragment", "No active locations found.");
+                        showAddressDialog(); // Show dialog if no active location is found
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("CheckoutFragment", "Error fetching active location details", e);
                 });
     }
+
+
 
     private void showSuccessDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog, null);
@@ -259,7 +292,7 @@ public class CheckoutFragment extends Fragment {
 
         // Set the dialog background to transparent
         if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
         btnContinue.setOnClickListener(v -> {
@@ -292,7 +325,7 @@ public class CheckoutFragment extends Fragment {
 
         // Set the dialog background to transparent
         if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
         btnFinishSetup.setOnClickListener(v -> {
@@ -333,7 +366,44 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void clearCart() {
-        // Implement logic to clear items from the cart in Firestore
-        // You may need to get user-specific cart items and remove them here
-    }
+            // Get the current user
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                // Get the current user's document ID
+                String currentUserId = currentUser.getUid();
+
+                // Reference to the cart items collection for the current user
+                db.collection("Users")
+                        .document(currentUserId)
+                        .collection("cartItems")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                // Loop through the cart items and delete the ones that match the checked-out product IDs
+                                for (CartItemModel item : selectedItems) {
+                                    String productIdToDelete = item.getProductId();
+
+                                    // Check if the product ID matches any in the cart
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        CartItemModel cartItem = document.toObject(CartItemModel.class);
+                                        if (cartItem.getProductId().equals(productIdToDelete)) {
+                                            // Delete the matching cart item
+                                            document.getReference().delete()
+                                                    .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item with ID " + productIdToDelete + " deleted successfully"))
+                                                    .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error deleting cart item", e));
+                                        }
+                                    }
+                                }
+                            } else {
+                                Log.w("CheckoutFragment", "No cart items found for the current user.");
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.w("CheckoutFragment", "Error fetching cart items", e);
+                        });
+            } else {
+                Log.w("CheckoutFragment", "No current user is logged in.");
+            }
+        }
+
 }
