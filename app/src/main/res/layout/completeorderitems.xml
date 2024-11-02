@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:backgroundTint="@color/white"
+    android:background="@drawable/whitecont"
     android:layout_marginBottom="20dp"
     android:layout_height="wrap_content">
 
@@ -10,13 +10,13 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/completeorder_bg">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:background="@color/lightgrey"/>
+            android:layout_gravity="center" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
             android:textSize="14sp"
             android:layout_gravity="start|center"
             android:fontFamily="@font/montserrat_semibold"
-            android:textColor="@color/green"
+            android:textColor="@color/semiwhite"
             android:layout_marginLeft="30dp"
             />
 
@@ -33,10 +33,10 @@
     </FrameLayout>
 
     <FrameLayout
-        android:layout_width="80dp"
-        android:layout_height="130dp"
+        android:layout_width="60dp"
+        android:layout_height="100dp"
         android:layout_gravity="end|top"
-        android:layout_marginTop="0dp">
+        android:layout_marginTop="27dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -154,9 +154,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Buy Again"
-                    android:textColor="@color/semiwhite"
-
-                    />
+                    android:textColor="@color/semiwhite" />
 
             </LinearLayout>
 
