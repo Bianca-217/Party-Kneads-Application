@@ -252,6 +252,7 @@ public class CheckoutFragment extends Fragment {
     private void showSuccessDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog, null);
         TextView btnContinue = dialogView.findViewById(R.id.btnContinue);
+        TextView btnShopMore = dialogView.findViewById(R.id.btnShopMore);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView);
         AlertDialog alertDialog = builder.create();
@@ -266,6 +267,16 @@ public class CheckoutFragment extends Fragment {
             Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_checkoutFragment_to_homePageFragment);
+        });
+
+        btnShopMore.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            Bundle args = new Bundle();
+            args.putBoolean("loadShop", true);
+
+            // Replace the current fragment with the menu page fragment and pass the argument
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_checkoutFragment_to_homePageFragment, args);
         });
 
         alertDialog.show();
