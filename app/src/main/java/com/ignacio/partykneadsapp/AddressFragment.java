@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.LocationAdapter;
@@ -92,49 +93,71 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         navController.navigate(R.id.action_addressFragment_to_editAddressFragment, bundle);
     }
 
-
-
     private void fetchActiveLocations() {
         if (cUser != null) {
             String userId = cUser.getUid();
-            db.collection("Users").document(userId).collection("Locations")
-                    .whereEqualTo("status", "Active")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String houseNum = document.getString("houseNum");
-                                String barangay = document.getString("barangay");
-                                String city = document.getString("city");
-                                String postalCode = document.getString("postalCode");
-                                String phoneNumber = document.getString("phoneNumber");
-                                userName = document.getString("userName");
+            // First, try to fetch the username
+            fetchUserName(userId, () -> {
+                // After fetching username, fetch active locations
+                db.collection("Users").document(userId).collection("Locations")
+                        .whereEqualTo("status", "Active")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    String houseNum = document.getString("houseNum");
+                                    String barangay = document.getString("barangay");
+                                    String city = document.getString("city");
+                                    String postalCode = document.getString("postalCode");
+                                    String phoneNumber = document.getString("phoneNumber");
 
-                                // Check if any of the address components are null
-                                if (houseNum == null || barangay == null || city == null || postalCode == null) {
-                                    String location = document.getString("location");
-                                    if (location != null) {
-                                        // Directly set the location string to your TextView or use it for the LocationModel
-                                        activeLocations.add(new LocationModel(location));
+                                    // Check if any of the address components are null
+                                    if (houseNum == null || barangay == null || city == null || postalCode == null) {
+                                        String location = document.getString("location");
+                                        if (location != null) {
+                                            // Directly set the location string to your TextView or use it for the LocationModel
+                                            activeLocations.add(new LocationModel(location));
+                                        }
+                                    } else {
+                                        // Create a LocationModel instance with available address components
+                                        LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber);
+                                        activeLocations.add(location); // Add the LocationModel to the list
                                     }
-                                } else {
-                                    // Create a LocationModel instance with available address components
-                                    LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber);
-                                    activeLocations.add(location); // Add the LocationModel to the list
                                 }
+                                locationAdapter.setUserName(userName); // Set userName after fetching
+                                locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
+                            } else {
+                                Log.w("AddressFragment", "Error getting active locations.", task.getException());
                             }
-                            locationAdapter.setUserName(userName);
-                            locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
-                        } else {
-                            Log.w("AddressFragment", "Error getting active locations.", task.getException());
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("AddressFragment", "Error fetching active locations", e);
-                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.w("AddressFragment", "Error fetching active locations", e);
+                        });
+            });
         }
     }
 
+    private void fetchUserName(String userId, Runnable onComplete) {
+        db.collection("Users").document(userId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            String firstName = document.getString("First Name");
+                            String lastName = document.getString("Last Name");
+                            userName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                            locationAdapter.setUserName(userName); // Set userName after fetching
+                        }
+                    } else {
+                        Log.w("AddressFragment", "Error fetching user name", task.getException());
+                    }
+                    onComplete.run(); // Run the onComplete callback
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("AddressFragment", "Error fetching user name", e);
+                    onComplete.run(); // Ensure to run the callback even on failure
+                });
+    }
 
 }
 

@@ -1,6 +1,7 @@
 package com.ignacio.partykneadsapp;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class OTPFragment extends Fragment {
     private String lname = "";
     private String fname = "";
     private int random;
+    private CountDownTimer resendCountDownTimer;
 
     @Nullable
     @Override
@@ -60,6 +62,38 @@ public class OTPFragment extends Fragment {
         setupOtpInputFields();
         binding.tvEmail.setText(email);
         binding.btnsubmitOTP.setOnClickListener(v -> verifyOtp());
+
+
+        binding.resendCount.setVisibility(View.INVISIBLE);
+
+        binding.btnResend.setOnClickListener(v -> {
+            // Regenerate OTP, show toast message, and start countdown
+            random();
+            Toast.makeText(getActivity(), "A new OTP has been sent to your email", Toast.LENGTH_SHORT).show();
+
+            // Show countdown text and start countdown timer
+            binding.resendCount.setVisibility(View.VISIBLE);
+            startResendCountdown();
+        });
+
+    }
+
+    private void startResendCountdown() {
+        binding.btnResend.setEnabled(false); // Disable resend button during countdown
+
+        resendCountDownTimer = new CountDownTimer(120000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                binding.resendCount.setText("(" + (millisUntilFinished / 1000) + " sec)");
+            }
+
+            @Override
+            public void onFinish() {
+                binding.resendCount.setText(""); // Clear the countdown text
+                binding.resendCount.setVisibility(View.INVISIBLE); // Hide countdown text
+                binding.btnResend.setEnabled(true); // Re-enable resend button
+            }
+        }.start();
     }
 
     private void saveName() {
@@ -70,8 +104,6 @@ public class OTPFragment extends Fragment {
             userMap.put("First Name", fname);  // Store first name
             userMap.put("Last Name", lname);  // Store last name
             userMap.put("email", email);
-
-            Toast.makeText(getActivity(), fname + lname, Toast.LENGTH_SHORT).show();
 
             // Save user details to Firestore
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -165,17 +197,25 @@ public class OTPFragment extends Fragment {
         if (otp.isEmpty() || otp.length() < 6) {
             Toast.makeText(getActivity(), "Enter OTP", Toast.LENGTH_SHORT).show();
         } else if (!otp.equals(String.valueOf(random))) {
-            Toast.makeText(getActivity(), "Wrong OTP", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Incorrect OTP", Toast.LENGTH_SHORT).show();
         } else {
             auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     saveName();
                 } else {
-                    Toast.makeText(getActivity(), "Error occurred", Toast.LENGTH_SHORT).show();
+                    // Log the specific error from Firebase
+                    Exception e = task.getException();
+                    if (e != null) {
+                        Log.e("OTPFragment", "Error: " + e.getMessage());
+                        Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Unknown error occurred", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
     }
+
 
     private void random() {
         random = new Random().nextInt(900000) + 100000; // Generate 6-digit OTP
@@ -185,6 +225,15 @@ public class OTPFragment extends Fragment {
         String message = "Your OTP is -> " + random;
 
         new JavaMailSender(email, subject, message).execute(); // Send email
+    }
+
+    // Don't forget to cancel the timer in onDestroy to avoid leaks
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (resendCountDownTimer != null) {
+            resendCountDownTimer.cancel();
+        }
     }
 
     private abstract class SimpleTextWatcher implements TextWatcher {
