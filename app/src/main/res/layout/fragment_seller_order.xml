@@ -127,11 +127,14 @@
 
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pendingOrders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:listitem="@layout/pending_orders_items"
             tools:itemCount="1"
             android:layout_marginHorizontal="20dp"
+            android:paddingBottom="80dp"
+            android:clipToPadding="false"
             android:layout_marginTop="20dp" />
 
     </LinearLayout>

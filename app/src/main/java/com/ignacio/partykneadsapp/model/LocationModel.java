@@ -7,15 +7,17 @@ public class LocationModel {
     private String postalCode;
     private String phoneNumber;
     private String location; // Keep location field for future use
+    private String userName;
 
     // Constructor
-    public LocationModel(String houseNum, String barangay, String city, String postalCode, String phoneNumber) {
+    public LocationModel(String houseNum, String barangay, String city, String postalCode, String phoneNumber, String userName) {
         this.houseNum = houseNum;
         this.barangay = barangay;
         this.city = city;
         this.postalCode = postalCode;
         this.phoneNumber = phoneNumber;
         this.location = null; // Initialize location as null
+        this.userName = userName;
     }
 
     public LocationModel(String location) {
@@ -25,8 +27,12 @@ public class LocationModel {
         this.city = null;
         this.postalCode = null;
         this.phoneNumber = null;
-    }
 
+    }
+    // Getter for userName
+    public String getUserName() {
+        return userName;
+    }
     // Getters
     public String getHouseNum() {
         return houseNum;

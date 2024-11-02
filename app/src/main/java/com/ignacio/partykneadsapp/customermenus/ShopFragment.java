@@ -80,6 +80,12 @@ public class ShopFragment extends Fragment {
             navController.navigate(R.id.action_homePageFragment_to_addressFragment);
         });
 
+        binding.btnOrders.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
+            navController.navigate(R.id.action_homePageFragment_to_orderFragment);
+        });
+
+
         // Set up click listener to hide the keyboard when tapping outside
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> {

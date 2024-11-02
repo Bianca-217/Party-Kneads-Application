@@ -96,46 +96,49 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
     private void fetchActiveLocations() {
         if (cUser != null) {
             String userId = cUser.getUid();
-            // First, try to fetch the username
-            fetchUserName(userId, () -> {
-                // After fetching username, fetch active locations
-                db.collection("Users").document(userId).collection("Locations")
-                        .whereEqualTo("status", "Active")
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    String houseNum = document.getString("houseNum");
-                                    String barangay = document.getString("barangay");
-                                    String city = document.getString("city");
-                                    String postalCode = document.getString("postalCode");
-                                    String phoneNumber = document.getString("phoneNumber");
 
-                                    // Check if any of the address components are null
-                                    if (houseNum == null || barangay == null || city == null || postalCode == null) {
-                                        String location = document.getString("location");
-                                        if (location != null) {
-                                            // Directly set the location string to your TextView or use it for the LocationModel
-                                            activeLocations.add(new LocationModel(location));
-                                        }
-                                    } else {
-                                        // Create a LocationModel instance with available address components
-                                        LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber);
+            // First, fetch active locations
+            db.collection("Users").document(userId).collection("Locations")
+                    .whereEqualTo("status", "Active")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            activeLocations.clear();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String houseNum = document.getString("houseNum");
+                                String barangay = document.getString("barangay");
+                                String city = document.getString("city");
+                                String postalCode = document.getString("postalCode");
+                                String phoneNumber = document.getString("phoneNumber");
+                                String userNameInLocation = document.getString("userName");
+
+                                // Check if the location entry has a userName, else fetch from main user profile
+                                if (userNameInLocation == null || userNameInLocation.isEmpty()) {
+                                    fetchUserName(userId, () -> {
+                                        // This will be used as a fallback if userName in location is null or empty
+                                        LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber, userName);
                                         activeLocations.add(location); // Add the LocationModel to the list
-                                    }
+                                        locationAdapter.setUserName(userName); // Set the userName in the adapter
+                                        locationAdapter.notifyDataSetChanged();
+                                    });
+                                } else {
+                                    // If userName is available in location entry, use it directly
+                                    LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber, userNameInLocation);
+                                    locationAdapter.setUserName(userNameInLocation);
+                                    activeLocations.add(location); // Add the LocationModel to the list
                                 }
-                                locationAdapter.setUserName(userName); // Set userName after fetching
-                                locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
-                            } else {
-                                Log.w("AddressFragment", "Error getting active locations.", task.getException());
                             }
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.w("AddressFragment", "Error fetching active locations", e);
-                        });
-            });
+                            locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
+                        } else {
+                            Log.w("AddressFragment", "Error getting active locations.", task.getException());
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("AddressFragment", "Error fetching active locations", e);
+                    });
         }
     }
+
 
     private void fetchUserName(String userId, Runnable onComplete) {
         db.collection("Users").document(userId).get()

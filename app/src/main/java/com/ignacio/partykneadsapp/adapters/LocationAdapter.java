@@ -40,6 +40,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         String fullAddress = location.getFullAddress();
         holder.locationTextView.setText(fullAddress);
         holder.phoneNumberTextView.setText(location.getPhoneNumber());
+        holder.userNameTextView.setText(location.getUserName());
 
         // Set user name only if it's available
         if (userName != null && !userName.isEmpty()) {
