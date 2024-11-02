@@ -38,8 +38,7 @@
                 android:layout_height="35dp"
                 android:layout_marginRight="2dp"
                 android:layout_gravity="center"
-                android:src="@drawable/back"
-                />
+                android:src="@drawable/back" />
 
         </FrameLayout>
 

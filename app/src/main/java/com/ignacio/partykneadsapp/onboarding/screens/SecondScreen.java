@@ -28,6 +28,7 @@ public class SecondScreen extends Fragment {
             }
         });
 
+
         return view;
     }
 }

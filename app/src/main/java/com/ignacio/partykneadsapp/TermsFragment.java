@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +27,7 @@ public class TermsFragment extends Fragment {
 
     Switch switchTerms;
     Button btnCont;
-    TextView btnBack;
+    ImageView btnBack;
     TextView btnTerms;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class TermsFragment extends Fragment {
                     NavController navController = Navigation.findNavController(view);
                     navController.navigate(R.id.action_termsFragment2_to_personaldetailsFragment);
                 } else {
-                    Toast.makeText(getActivity(), "Read pls", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please read the Terms and Conditions before proceeding.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
