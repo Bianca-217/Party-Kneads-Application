@@ -200,7 +200,6 @@ public class Cake_Description extends Fragment {
         db.collection("Users").document(userId).collection("cartItems").add(cartItem)
                 .addOnSuccessListener(documentReference -> {
                     // Successfully added to cart
-                    Toast.makeText(getActivity(), "Item added to cart.", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     // Handle failure
