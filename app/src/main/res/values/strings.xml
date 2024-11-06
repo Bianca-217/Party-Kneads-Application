@@ -810,14 +810,19 @@
 
     <string-array name="Categories">
         <item>Cakes</item>
-        <item>Breads</item>
-        <item>Desserts</item>
-        <item>Custom Cakes</item>
-        <item>Balloons</item>
-        <item>Banners</item>
+        <item>Dessert - Cupcakes</item>
+        <item>Dessert - Donuts</item>
+        <item>Dessert - Cookies</item>
+        <item>Balloons - Classic</item>
+        <item>Balloons - Latex</item>
+        <item>Balloons - Number</item>
+        <item>Balloons - Letter</item>
+        <item>Balloons - LED</item>
         <item>Party Hats</item>
-        <item>Confetti</item>
-        <item>Candles</item>
+        <item>Banners</item>
+        <item>Toppers</item>
+        <item>Backdrop</item>
+        <item>Customize</item>
 
     </string-array>
 

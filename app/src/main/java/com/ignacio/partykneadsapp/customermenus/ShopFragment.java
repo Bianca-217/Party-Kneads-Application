@@ -73,7 +73,7 @@ public class ShopFragment extends Fragment {
         setupCategories();
 
         // Fetch products
-        fetchProducts();
+        fetchProducts("Cakes");
 
         binding.btnAddress.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
@@ -100,51 +100,57 @@ public class ShopFragment extends Fragment {
 
         // Add categories to the list (Images should exist in drawable folder)
         categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.breads, "Breads"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Desserts"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.candles, "Candles"));
         categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.confetti, "Confetti"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.toppers, "Toppers"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.backdrop, "Backdrop"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
 
         // Initialize adapter and layout manager for categories
-        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList);
+        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {
+            fetchProducts(category); // Fetch products for the selected category
+        });
         categories.setAdapter(categoriesAdapter);
         categories.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
         categories.setHasFixedSize(true);
         categories.setNestedScrollingEnabled(false);
     }
 
-    private void fetchProducts() {
+
+
+    private void fetchProducts(String categoryFilter) {
+        // Set up the range for categories that start with the given category filter
+        String startAt = categoryFilter;
+        String endAt = categoryFilter + "\uf8ff"; // Unicode character to include anything starting with the prefix
+
         productsRef
+                .whereGreaterThanOrEqualTo("categories", startAt)
+                .whereLessThan("categories", endAt)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         List<ProductShopModel> productsList = new ArrayList<>();
 
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Retrieve the document ID
-                            String id = document.getId(); // Get the document ID
-
-                            // Retrieve the necessary fields from the document
+                            String id = document.getId();
                             String imageUrl = document.getString("imageUrl");
                             String name = document.getString("name");
-                            String price = document.getString("price"); // Price as String
-                            String description = document.getString("description"); // Get description
-                            String rate = document.getString("rate"); // Get rate
-                            String numreviews = document.getString("numreviews"); // Get number of reviews
+                            String price = document.getString("price");
+                            String description = document.getString("description");
+                            String rate = document.getString("rate");
+                            String numreviews = document.getString("numreviews");
+                            String category = document.getString("categories");
 
-                            // Create a ProductShopModel
-                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews));
+                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
                         }
 
-                        // Update the adapter with the fetched data
                         productShopAdapter.updateData(productsList);
                     } else {
                         Log.d("Firestore", "Error getting products: ", task.getException());
                     }
                 });
     }
+
 }

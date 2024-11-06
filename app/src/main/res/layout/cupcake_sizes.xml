@@ -1,5 +1,5 @@
 <androidx.cardview.widget.CardView
-    android:id="@+id/cakeCardView"
+    android:id="@+id/cupcakeCardView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:cardCornerRadius="60dp"
@@ -8,7 +8,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <LinearLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -16,16 +16,16 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/cakeSizes"
+            android:id="@+id/cupcakeSizes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_semibold"
             android:padding="8dp"
-            android:text="6'' Cake: Serves 6-8"
+            android:text="Single: 1 Piece"
             android:textAlignment="center"
             android:textColor="@color/semiblack"
             android:textSize="14sp" />
 
-        </LinearLayout>
+    </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+</androidx.cardview.widget.CardView>

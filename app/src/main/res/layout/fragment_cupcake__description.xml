@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/pinkbg"
     android:orientation="vertical"
-    tools:context=".Cake_Description">
+    tools:context=".Cupcake_Description">
 
 
     <FrameLayout
@@ -28,11 +28,11 @@
             android:layout_height="wrap_content">
 
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/back_bg" />
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/back_bg" />
 
             <ImageView
                 android:layout_width="25dp"
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_gravity="center|bottom"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="70dp"
             android:src="@drawable/strawberry" />
 
     </FrameLayout>
@@ -81,61 +81,16 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="600dp"
+            android:layout_height="550dp"
             android:layout_gravity="bottom"
             android:src="@drawable/whitecont" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal" >
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/footer"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/minus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="0dp"
-                    android:paddingHorizontal="15dp"
-                    android:textSize="24sp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:text="-" />
-
-                <TextView
-                    android:id="@+id/quantity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:paddingHorizontal="15dp"
-                    android:text="1"
-                    android:textSize="20sp" />
-                <TextView
-                    android:id="@+id/plus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:paddingHorizontal="15dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:text="+" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="40dp"
             android:layout_marginHorizontal="20dp"
             android:orientation="vertical">
 
@@ -143,15 +98,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-            <TextView
-                android:id="@+id/productName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="24sp"
-                android:textColor="@color/semiblack"
-                android:fontFamily="@font/montserrat_bold"
-                android:text="Vanilla Bean Cake"/>
+                <TextView
+                    android:id="@+id/productName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
+                    android:textColor="@color/semiblack"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="Vanilla Bean Cake"/>
 
                 <TextView
                     android:id="@+id/productPrice"
@@ -165,20 +120,20 @@
                     android:textSize="26sp" />
             </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Cake Sizes:"
-            android:fontFamily="@font/montserrat_bold"
-            android:textSize="18sp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Quantities:"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="18sp"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/cakeSizes"
+                android:id="@+id/cupcakeSizes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                tools:listitem="@layout/cake_sizes"
+                tools:listitem="@layout/cupcake_sizes"
                 tools:itemCount="1" />
 
             <TextView

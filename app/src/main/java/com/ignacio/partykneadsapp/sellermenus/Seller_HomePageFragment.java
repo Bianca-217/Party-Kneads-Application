@@ -13,14 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ignacio.partykneadsapp.R;
-import com.ignacio.partykneadsapp.databinding.FragmentSellerHomePageBinding;
+import com.ignacio.partykneadsapp.databinding.FragmentSellersMenuBinding;
 import com.ignacio.partykneadsapp.customermenus.LikesFragment;
 import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 
 
 public class Seller_HomePageFragment extends Fragment {
 
-    private FragmentSellerHomePageBinding binding;
+    private FragmentSellersMenuBinding binding;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class Seller_HomePageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment using View Binding
-        binding = FragmentSellerHomePageBinding.inflate(inflater, container, false);
+        binding = FragmentSellersMenuBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }

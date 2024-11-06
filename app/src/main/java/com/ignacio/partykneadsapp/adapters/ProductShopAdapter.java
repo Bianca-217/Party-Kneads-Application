@@ -57,16 +57,23 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Create a new instance of the Cake_Description fragment
-                Cake_Description fragment = new Cake_Description();
+                // Create a new instance of the appropriate fragment based on the category
 
-                // Create a Bundle to pass the data
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("detailed", productList.get(position)); // Assuming ProductShopModel implements Serializable
+                bundle.putSerializable("detailed", productList.get(position)); // Pass the product details
 
-                // Get the FragmentManager and start the transaction
-                NavController navController = Navigation.findNavController(view);
-                navController.navigate(R.id.action_homePageFragment_to_cake_Description, bundle);
+                // Check the category and decide which fragment to navigate to
+                String category = currentProduct.getCategory();
+                if ("Cakes".equals(category)) {
+                    // Get the NavController and navigate
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(R.id.action_homePageFragment_to_cake_Description, bundle);
+                } else if ("Dessert - Cupcakes".equals(category)) {
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(R.id.action_homePageFragment_to_cupcake_Description, bundle);
+                }
+
+
             }
         });
 

@@ -10,9 +10,10 @@ public class ProductShopModel implements Serializable {
     private String description; // Ensure this exists
     private String rate;
     private String numreviews;
+    private String category;
 
     // Constructor
-    public ProductShopModel(String id, String imageUrl, String name, String price, String description, String rate, String numreviews) {
+    public ProductShopModel(String id, String imageUrl, String name, String price, String description, String rate, String numreviews, String category) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.name = name;
@@ -20,6 +21,7 @@ public class ProductShopModel implements Serializable {
         this.description = description;
         this.rate = rate;
         this.numreviews = numreviews;
+        this.category = category;
     }
 
     // Getter methods
@@ -41,6 +43,10 @@ public class ProductShopModel implements Serializable {
 
     public String getPrice() {
         return price;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public String getDescription() {

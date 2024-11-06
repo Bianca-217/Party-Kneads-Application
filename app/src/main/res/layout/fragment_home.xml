@@ -214,23 +214,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="Popular Products"
+                    android:text="Recommended for you"
+                    android:layout_marginBottom="10dp"
                     android:textColor="@color/semiblack"
                     android:textSize="18sp" />
 
-                <!-- View All Button -->
-                <TextView
-                    android:id="@+id/btnViewAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:onClick="onViewAllPopularProductsClick"
-                    android:text="View All >"
-                    android:textColor="@color/grey"
-                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- RecyclerView for Popular Products -->
@@ -241,51 +229,9 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginVertical="0dp"
                 tools:itemCount="1"
+                android:orientation="vertical"
+                app:spanCount="2"
                 tools:listitem="@layout/popular_item" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="5dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <!-- Order History Title -->
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:text="Order History"
-                    android:textColor="@color/semiblack"
-                    android:textSize="18sp" />
-
-                <!-- View All Button -->
-                <TextView
-                    android:id="@+id/viewAllOrderHistory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:onClick="onViewAllOrderHistoryClick"
-                    android:text="View All >"
-                    android:textColor="@color/grey"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- RecyclerView for Order History -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/orderHistory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="5dp"
-                tools:itemCount="1"
-                tools:listitem="@layout/order_history_item" />
 
 
         </LinearLayout>

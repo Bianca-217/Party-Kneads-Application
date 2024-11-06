@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         // Initialize category, popular, and order history
         setupCategories();
         setupPopularProducts();
-        setupOrderHistory();
+
 
         return binding.getRoot();
     }
@@ -304,16 +304,16 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         categories = binding.categories;
         categoriesModelList = new ArrayList<>();
         categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.breads, "Breads"));
         categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Desserts"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.candles, "Candles"));
         categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.confetti, "Confetti"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.toppers, "Toppers"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.backdrop, "Backdrop"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
 
-        categoriesAdapter = new CategoriesAdapter(getActivity(), categoriesModelList);
+
+        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {});
         categories.setAdapter(categoriesAdapter);
         categories.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
         categories.setHasFixedSize(true);
@@ -333,21 +333,6 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         popular.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
         popular.setHasFixedSize(true);
         popular.setNestedScrollingEnabled(false);
-    }
-
-    // Set up order history
-    private void setupOrderHistory() {
-        orderHistory = binding.orderHistory;
-        orderHistoryList = new ArrayList<>();
-        orderHistoryList.add(new OrderHistoryModel("Strawberry Bean", "5.0 (100)", "₱700.00",  R.drawable.strawberry, "20 sold"));
-        orderHistoryList.add(new OrderHistoryModel("Matcha", "5.0 (100)", "₱800.00", R.drawable.matcha, "23 sold"));
-        orderHistoryList.add(new OrderHistoryModel("Strawberry Shortcake 3", "5.0 (100)", "₱900.00", R.drawable.shortcake, "15 sold"));
-
-        orderHistoryAdapter = new OrderHistoryAdapter(getActivity(), orderHistoryList);
-        orderHistory.setAdapter(orderHistoryAdapter);
-        orderHistory.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
-        orderHistory.setHasFixedSize(true);
-        orderHistory.setNestedScrollingEnabled(false);
     }
 
     private String capitalizeFirstLetter(String str) {

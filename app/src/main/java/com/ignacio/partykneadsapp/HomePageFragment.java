@@ -12,14 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ignacio.partykneadsapp.databinding.FragmentHomePageBinding;
+import com.ignacio.partykneadsapp.databinding.FragmentCustomersMenuPageBinding;
 import com.ignacio.partykneadsapp.customermenus.LikesFragment;
 import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 import com.ignacio.partykneadsapp.customermenus.ShopFragment;
 
 public class HomePageFragment extends Fragment {
 
-    private FragmentHomePageBinding binding;
+    private FragmentCustomersMenuPageBinding binding;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class HomePageFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = FragmentHomePageBinding.inflate(inflater, container, false);
+        binding = FragmentCustomersMenuPageBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
