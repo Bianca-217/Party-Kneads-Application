@@ -145,7 +145,7 @@ public class CheckoutFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String location = document.getString("location");
                                 String phoneNumber = document.getString("phoneNumber"); // Fetch the phone number
-                               userNameInLocation = document.getString("userName"); // Fetch the userName
+                                userNameInLocation = document.getString("userName"); // Fetch the userName
                                 if (location != null && phoneNumber != null) {
                                     // Add both location and phone number as a single string
                                     activeLocations.add(location + " - " + phoneNumber); // Combine them for display
@@ -366,44 +366,44 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void clearCart() {
-            // Get the current user
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            if (currentUser != null) {
-                // Get the current user's document ID
-                String currentUserId = currentUser.getUid();
+        // Get the current user
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // Get the current user's document ID
+            String currentUserId = currentUser.getUid();
 
-                // Reference to the cart items collection for the current user
-                db.collection("Users")
-                        .document(currentUserId)
-                        .collection("cartItems")
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                // Loop through the cart items and delete the ones that match the checked-out product IDs
-                                for (CartItemModel item : selectedItems) {
-                                    String productIdToDelete = item.getProductId();
+            // Reference to the cart items collection for the current user
+            db.collection("Users")
+                    .document(currentUserId)
+                    .collection("cartItems")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            // Loop through the cart items and delete the ones that match the checked-out product IDs
+                            for (CartItemModel item : selectedItems) {
+                                String productIdToDelete = item.getProductId();
 
-                                    // Check if the product ID matches any in the cart
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        CartItemModel cartItem = document.toObject(CartItemModel.class);
-                                        if (cartItem.getProductId().equals(productIdToDelete)) {
-                                            // Delete the matching cart item
-                                            document.getReference().delete()
-                                                    .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item with ID " + productIdToDelete + " deleted successfully"))
-                                                    .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error deleting cart item", e));
-                                        }
+                                // Check if the product ID matches any in the cart
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    CartItemModel cartItem = document.toObject(CartItemModel.class);
+                                    if (cartItem.getProductId().equals(productIdToDelete)) {
+                                        // Delete the matching cart item
+                                        document.getReference().delete()
+                                                .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item with ID " + productIdToDelete + " deleted successfully"))
+                                                .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error deleting cart item", e));
                                     }
                                 }
-                            } else {
-                                Log.w("CheckoutFragment", "No cart items found for the current user.");
                             }
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.w("CheckoutFragment", "Error fetching cart items", e);
-                        });
-            } else {
-                Log.w("CheckoutFragment", "No current user is logged in.");
-            }
+                        } else {
+                            Log.w("CheckoutFragment", "No cart items found for the current user.");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("CheckoutFragment", "Error fetching cart items", e);
+                    });
+        } else {
+            Log.w("CheckoutFragment", "No current user is logged in.");
         }
+    }
 
 }

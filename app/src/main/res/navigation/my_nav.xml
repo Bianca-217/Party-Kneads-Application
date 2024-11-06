@@ -189,6 +189,9 @@
         <action
             android:id="@+id/action_cake_Description_to_cartFragment"
             app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_cake_Description_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
     </fragment>
     <fragment
         android:id="@+id/checkoutFragment"
@@ -204,6 +207,9 @@
         <action
             android:id="@+id/action_checkoutFragment_to_addressFragment"
             app:destination="@id/addressFragment" />
+        <action
+            android:id="@+id/action_checkoutFragment_to_orderConfirmationFragment"
+            app:destination="@id/orderFragment" />
     </fragment>
     <fragment
         android:id="@+id/addressFragment"

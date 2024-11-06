@@ -12,6 +12,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.ignacio.partykneadsapp.adapters.CakeSizeAdapter;
 import com.ignacio.partykneadsapp.model.CakeSizeModel;
+import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.ignacio.partykneadsapp.model.ProductShopModel;
 import com.ignacio.partykneadsapp.model.AddToCartModel;
 
@@ -41,7 +44,7 @@ public class Cake_Description extends Fragment {
     private TextView productName, productPrice, productDescription, ratePercent, numReviews;
     private ImageView productImage, btnBack;
     private TextView minusButton, quantityTextView, plusButton; // Quantity controls
-    private Button btnAddtoCart; // Add to Cart button
+    private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
     private ListenerRegistration productListener;
@@ -75,9 +78,13 @@ public class Cake_Description extends Fragment {
         quantityTextView = view.findViewById(R.id.quantity);
         plusButton = view.findViewById(R.id.plus);
         btnAddtoCart = view.findViewById(R.id.btnAddtoCart); // Initialize Add to Cart button
+        btnBuyNow = view.findViewById(R.id.btnBuyNow); // Initialize Buy Now button
 
-        // Set button click listener
+        // Set button click listener for "Add to Cart"
         btnAddtoCart.setOnClickListener(v -> showAddToCartDialog());
+
+        // Set button click listener for "Buy Now"
+        btnBuyNow.setOnClickListener(v -> handleBuyNow());
 
         minusButton.setOnClickListener(v -> {
             if (quantity > 1) {
@@ -128,13 +135,7 @@ public class Cake_Description extends Fragment {
             navController.navigate(R.id.action_cake_Description_to_homePageFragment, args1);
         });
 
-
         return view; // Return the inflated view
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showAddToCartDialog() {
@@ -148,14 +149,13 @@ public class Cake_Description extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
-
         // Reference to FirebaseAuth
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
 
         // Automatically add item to the cart when the dialog is shown
         if (userId != null) {
-            saveCartItem(userId);
+            saveCartItem(userId); // Method to add to cart
         } else {
             Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
         }
@@ -163,7 +163,7 @@ public class Cake_Description extends Fragment {
         Button btnCart = dialog.findViewById(R.id.btnCart);
         btnCart.setOnClickListener(v -> {
             dialog.dismiss(); // Close the dialog
-            goToCart(); // Navigate to the cart
+            goToCart(); // Navigate to the cart fragment
         });
 
         // Use findViewById to get the TextView and set an OnClickListener
@@ -176,8 +176,6 @@ public class Cake_Description extends Fragment {
         // Show the dialog
         dialog.show();
     }
-
-
 
     private void saveCartItem(String userId) {
         // Create a new AddToCartModel with imageUrl and timestamp
@@ -207,6 +205,37 @@ public class Cake_Description extends Fragment {
                 });
     }
 
+    private void handleBuyNow() {
+        // Create a CartItemModel for the selected cake and quantity
+        String size = selectedCakeSize.getSize();
+        int price = Integer.parseInt(selectedCakeSize.getPrice().replace("₱", ""));
+        int totalPrice = price * quantity;
+
+        // Create a CartItemModel for this selection
+        CartItemModel cartItem = new CartItemModel(
+                productShopModel.getId(),
+                productShopModel.getName(),
+                size,
+                quantity,
+                "₱" + totalPrice, // Include price with quantity
+                productShopModel.getimageUrl() // Product Image URL
+        );
+
+        // Bundle the cart item to pass to the CheckoutFragment
+        List<CartItemModel> selectedItems = new ArrayList<>();
+        selectedItems.add(cartItem);
+
+        // Log the details of the cart item
+        Log.d("CartItem", "Item: " + cartItem.getProductName() + ", Quantity: " + cartItem.getQuantity() + ", Total Price: " + cartItem.getTotalPrice());
+
+        // Create a Bundle to pass the selected items to CheckoutFragment
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("selectedItems", (ArrayList<? extends Parcelable>) selectedItems);
+
+        // Navigate to CheckoutFragment and pass the selected items
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_cake_Description_to_checkoutFragment, bundle);
+    }
 
     private void updateQuantityAndPrice() {
         quantityTextView.setText(String.valueOf(quantity));
@@ -249,6 +278,7 @@ public class Cake_Description extends Fragment {
             }
         });
     }
+
 
 
     private void goToCart() {
