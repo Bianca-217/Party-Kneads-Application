@@ -826,4 +826,46 @@
 
     </string-array>
 
+    <string-array name="Numbers">
+        <item>Number - 0</item>
+        <item>Number - 1</item>
+        <item>Number - 2</item>
+        <item>Number - 3</item>
+        <item>Number - 4</item>
+        <item>Number - 5</item>
+        <item>Number - 6</item>
+        <item>Number - 7</item>
+        <item>Number - 8</item>
+        <item>Number - 9</item>
+    </string-array>
+
+    <string-array name="Letters">
+        <item>Letter - A</item>
+        <item>Letter - B</item>
+        <item>Letter - C</item>
+        <item>Letter - D</item>
+        <item>Letter - E</item>
+        <item>Letter - F</item>
+        <item>Letter - G</item>
+        <item>Letter - H</item>
+        <item>Letter - I</item>
+        <item>Letter - J</item>
+        <item>Letter - K</item>
+        <item>Letter - L</item>
+        <item>Letter - M</item>
+        <item>Letter - N</item>
+        <item>Letter - O</item>
+        <item>Letter - P</item>
+        <item>Letter - Q</item>
+        <item>Letter - R</item>
+        <item>Letter - S</item>
+        <item>Letter - T</item>
+        <item>Letter - U</item>
+        <item>Letter - V</item>
+        <item>Letter - W</item>
+        <item>Letter - X</item>
+        <item>Letter - Y</item>
+        <item>Letter - Z</item>
+    </string-array>
+
 </resources>

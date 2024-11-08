@@ -1,4 +1,4 @@
-package com.ignacio.partykneadsapp;
+package com.ignacio.partykneadsapp.customermenus;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.adapters.CartAdapter;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 

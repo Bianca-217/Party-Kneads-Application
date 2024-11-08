@@ -188,13 +188,14 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         // Fetch the first name from Firestore (assuming it's stored as "firstName")
+                        String fname = documentSnapshot.getString("First Name");
                         String firstName = documentSnapshot.getString("firstName");
 
                         // Check if firstName is not null before displaying
-                        if (firstName != null && !firstName.isEmpty()) {
+                        if (fname == null && fname.isEmpty()) {
                             txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
-                        } else {
-                            txtUser.setText("Hi, No First Name Found!");
+                        } else if ((fname != null && !fname.isEmpty())){
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
                         }
                     } else {
                         txtUser.setText("Hi, No Document Found!");

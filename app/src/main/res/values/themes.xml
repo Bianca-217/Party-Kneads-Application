@@ -28,4 +28,12 @@
         <!-- Exit animation for the dialog -->
         <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
+
+    <!-- Custom AlertDialog Style -->
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">#F2F2F2</item> <!-- semi-white background color -->
+        <item name="android:textColorPrimary">#000000</item> <!-- black text color -->
+        <!-- Button text appearance -->
+    </style>
+
 </resources>

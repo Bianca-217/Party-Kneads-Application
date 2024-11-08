@@ -21,15 +21,16 @@ import com.bumptech.glide.Glide;
 import com.ignacio.partykneadsapp.Cake_Description;
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.model.ProductShopModel;
+import com.ignacio.partykneadsapp.model.SellerProductModel;
 
 import java.util.List;
 
-public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.ProductViewHolder> {
+public class SellerProductAdapter extends RecyclerView.Adapter<SellerProductAdapter.ProductViewHolder> {
 
-    private List<ProductShopModel> productList;
+    private List<SellerProductModel> productList;
     private Context context; // Add context reference
 
-    public ProductShopAdapter(Context context, List<ProductShopModel> productList) {
+    public SellerProductAdapter(Context context, List<SellerProductModel> productList) {
         this.context = context; // Initialize context
         this.productList = productList;
     }
@@ -43,7 +44,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        ProductShopModel currentProduct = productList.get(position);
+        SellerProductModel currentProduct = productList.get(position);
 
         // Bind data to the views
         holder.productName.setText(currentProduct.getName());
@@ -62,19 +63,8 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("detailed", productList.get(position)); // Pass the product details
 
-                // Check the category and decide which fragment to navigate to
-                String category = currentProduct.getCategory();
-                if ("Cakes".equals(category)) {
-                    // Get the NavController and navigate
-                    NavController navController = Navigation.findNavController(view);
-                    navController.navigate(R.id.action_homePageFragment_to_cake_Description, bundle);
-                } else if ("Dessert - Cupcakes".equals(category) || "Dessert - Cookies".equals(category) || "Dessert - Donuts".equals(category)) {
-                    NavController navController = Navigation.findNavController(view);
-                    navController.navigate(R.id.action_homePageFragment_to_cupcake_Description, bundle);
-                }else if ("Balloons - Classic".equals(category) || "Balloons - Latex".equals(category) || "Balloons - LED".equals(category) || "Balloons - Number".equals(category) || "Balloons - Letter".equals(category)) {
-                    NavController navController = Navigation.findNavController(view);
-                    navController.navigate(R.id.action_homePageFragment_to_balloonClassicDescription, bundle);
-                }
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.action_myProductFragment_to_sellerCakeDescription, bundle);
 
 
             }
@@ -99,7 +89,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
         }
     }
 
-    public void updateData(List<ProductShopModel> newProductsList) {
+    public void updateData(List<SellerProductModel> newProductsList) {
         this.productList.clear();
         this.productList.addAll(newProductsList);
         notifyDataSetChanged();

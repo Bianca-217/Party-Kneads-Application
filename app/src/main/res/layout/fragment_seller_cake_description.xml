@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/pinkbg"
     android:orientation="vertical"
-    tools:context=".BalloonClassicDescription">
+    tools:context=".sellermenus.SellerCakeDescription">
 
 
     <FrameLayout
@@ -66,10 +66,10 @@
         <ImageView
             android:id="@+id/productImage"
             android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_height="200dp"
             android:layout_gravity="center|bottom"
             android:layout_marginTop="70dp"
-            android:src="@drawable/balloon" />
+            android:src="@drawable/strawberry" />
 
     </FrameLayout>
 
@@ -81,17 +81,18 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="570dp"
+            android:layout_height="550dp"
             android:layout_gravity="bottom"
             android:src="@drawable/whitecont" />
+
+
 
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="60dp"
             android:layout_marginHorizontal="20dp"
             android:orientation="vertical">
 
@@ -104,10 +105,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="22sp"
+                    android:textSize="24sp"
                     android:textColor="@color/semiblack"
                     android:fontFamily="@font/montserrat_extrabold"
-                    android:text="50Pcs. Classic"/>
+                    android:text="Vanilla Bean Cake"/>
 
                 <TextView
                     android:id="@+id/productPrice"
@@ -121,28 +122,13 @@
                     android:textSize="26sp" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Colors:"
-                android:fontFamily="@font/montserrat_bold"
-                android:textSize="18sp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/balloonColors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                tools:listitem="@layout/balloon_colors"
-                tools:itemCount="1" />
 
             <TextView
                 android:id="@+id/productDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="35dp"
                 android:fontFamily="@font/montserrat_semibold"
                 android:text="@string/Description"
                 android:textColor="@color/semiblack"
@@ -151,7 +137,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="35dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -228,33 +214,33 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="35dp"
                 android:orientation="horizontal">
 
                 <!-- Add to Cart Button with Icon -->
                 <Button
-                    android:id="@+id/btnAddtoCart"
+                    android:id="@+id/btnDelete"
                     android:layout_width="0dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/pink"
-                    android:text="Add to cart"
+                    android:backgroundTint="@color/darkpink"
+                    android:text="Delete"
                     android:textSize="16sp"
-                    android:drawableLeft="@drawable/addtocart"
+                    android:drawableLeft="@drawable/delete_white"
                     android:fontFamily="@font/montserrat_semibold"
                     android:textColor="@android:color/white"
                     android:layout_marginEnd="10dp"/>
 
                 <!-- Buy Now Button with Icon -->
                 <Button
-                    android:id="@+id/btnBuyNow"
+                    android:id="@+id/btnEdit"
                     android:layout_width="0dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/darkpink"
-                    android:text="Buy Now"
+                    android:backgroundTint="@color/pink"
+                    android:text="Edit"
                     android:textSize="16sp"
-                    android:drawableLeft="@drawable/buynowcart"
+                    android:drawableLeft="@drawable/edit_white"
                     android:fontFamily="@font/montserrat_semibold"
                     android:textColor="@android:color/white"
                     android:layout_marginStart="10dp"/>

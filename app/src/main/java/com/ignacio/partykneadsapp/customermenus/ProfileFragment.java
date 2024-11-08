@@ -61,14 +61,16 @@ public class ProfileFragment extends Fragment {
                             // Retrieve first name, last name, email, and profile picture URL
                             String firstName = document.getString("firstName");
                             String lastName = document.getString("lastName");
+                            String fname = document.getString("First Name");
+                            String lname = document.getString("Last Name");
                             String email = document.getString("email");
                             String profilePictureUrl = document.getString("profilePictureUrl");
 
                             // Set the full name and email in the TextViews
-                            if (firstName != null && lastName != null) {
+                            if (fname == null && lname == null) {
                                 binding.txtUserName.setText(firstName + " " + lastName);
-                            } else {
-                                binding.txtUserName.setText("No Name Available");
+                            } else if ((fname != null && lname != null)){
+                                binding.txtUserName.setText(fname + " " + lname);
                             }
 
                             if (email != null) {

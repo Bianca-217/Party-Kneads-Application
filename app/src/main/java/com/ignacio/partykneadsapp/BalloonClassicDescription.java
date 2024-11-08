@@ -1,6 +1,8 @@
 package com.ignacio.partykneadsapp;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
@@ -17,6 +19,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,12 +36,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.ignacio.partykneadsapp.adapters.BalloonColorAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentBalloonClassicDescriptionBinding;
-import com.ignacio.partykneadsapp.databinding.FragmentShopBinding;
 import com.ignacio.partykneadsapp.model.AddToCartModel;
 import com.ignacio.partykneadsapp.model.BalloonColorModel;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.ignacio.partykneadsapp.model.CategoriesModel;
-import com.ignacio.partykneadsapp.model.CupcakeModel;
 import com.ignacio.partykneadsapp.model.ProductShopModel;
 
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class BalloonClassicDescription extends Fragment {
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
     private ListenerRegistration productListener;
-    private String color = "";
+    private String color;
     private int quantity = 1; // Initial quantity
 
     FragmentBalloonClassicDescriptionBinding binding;
@@ -91,17 +93,49 @@ public class BalloonClassicDescription extends Fragment {
         btnBuyNow = view.findViewById(R.id.btnBuyNow); // Initialize Buy Now button
 
         // Set button click listener for "Add to Cart"
-        btnAddtoCart.setOnClickListener(v -> showAddToCartDialog());
+        btnAddtoCart.setOnClickListener(v -> showAddToCartDialog(null, 1));
 
         // Set button click listener for "Buy Now"
-        btnBuyNow.setOnClickListener(v -> handleBuyNow());
+        btnBuyNow.setOnClickListener(v -> {
+
+                    String productCategory1 = productShopModel.getCategory();
+
+                    // Check if the category is "Balloons - Classic" or "Balloons - Latex"
+                    if (productCategory1.equals("Balloons - Classic") || productCategory1.equals("Balloons - Latex")) {
+                        // Directly show the second dialog without quantity and dropdown
+                        handleBuyNow("", 1);
+                    } else if (productShopModel.getCategory().equals("Balloons - Letter")) {
+                        // Show the original dialog with quantity and dropdown
+                        showLetterBuyDialog();
+                    } else if (productShopModel.getCategory().equals("Balloons - Number")) {
+                        showNumberBuyDialog();
+                    } else if (productShopModel.getCategory().equals("Balloons - LED")) {
+                        showLEDBuyDialog();
+                    }
+                }
+        );
+
 
         if (productShopModel != null) {
             loadProductDetails(productShopModel.getId());
         }
 
-
-        setupBalloonColors();
+        if (productShopModel.getCategory().equals("Balloons - Classic")) {
+            color = "Assorted";
+            setupBalloonColors();
+        } else if(productShopModel.getCategory().equals("Balloons - Latex")) {
+            color = "Assorted";
+            setupBalloonLatexColors();
+        } else if(productShopModel.getCategory().equals("Balloons - LED")) {
+            color = "LED Blue";
+            setupBalloonLEDColors();
+        } else if(productShopModel.getCategory().equals("Balloons - Number")) {
+            color = "Gold";
+            setupBalloonNumberColors();
+        } else if(productShopModel.getCategory().equals("Balloons - Letter")) {
+            color = "Gold";
+            setupBalloonNumberColors();
+        }
 
         btnBack.setOnClickListener(v -> {
             Bundle args1 = new Bundle();
@@ -112,6 +146,456 @@ public class BalloonClassicDescription extends Fragment {
             navController.navigate(R.id.action_balloonClassicDescription_to_homePageFragment, args1);
         });
 
+        Button addToCartBtn = getView().findViewById(R.id.btnAddtoCart); // Your main "Add to Cart" button
+        addToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the product category
+                String productCategory = productShopModel.getCategory();
+
+                // Check if the category is "Balloons - Classic" or "Balloons - Latex"
+                if (productCategory.equals("Balloons - Classic") || productCategory.equals("Balloons - Latex")) {
+                    // Directly show the second dialog without quantity and dropdown
+                    showAddToCartDialog("Assorted", 1);
+                } else if (productShopModel.getCategory().equals("Balloons - Letter")){
+                    // Show the original dialog with quantity and dropdown
+                    showLetterAddDialog();
+                } else if (productShopModel.getCategory().equals("Balloons - Number")) {
+                    showNumberAddDialog();
+                } else if (productShopModel.getCategory().equals("Balloons - LED")) {
+                    showLEDAddDialog();
+                }
+            }
+        });
+
+    }
+
+    private void showLetterBuyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.numletterbuy_dialog, null);
+        builder.setView(dialogView);
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Set up the AutoCompleteTextView
+        AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.colorstxtview);
+
+        // Create an ArrayAdapter using the letters from strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Letters, android.R.layout.simple_dropdown_item_1line);
+
+        // Set the adapter to the AutoCompleteTextView
+        autoCompleteTextView.setAdapter(adapter);
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the selected letter from the AutoCompleteTextView
+                String selectedLetter = autoCompleteTextView.getText().toString();
+
+                // Check if the selected letter is empty
+                if (selectedLetter.isEmpty()) {
+                    // Show a warning message if no letter is selected
+                    autoCompleteTextView.setError("Please select a letter");
+                    autoCompleteTextView.requestFocus();
+                    return; // Stop further execution until a letter is selected
+                }
+
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                handleBuyNow(selectedLetter, quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    private void showNumberBuyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.numletterbuy_dialog, null);
+        builder.setView(dialogView);
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Set up the AutoCompleteTextView
+        AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.colorstxtview);
+
+        // Create an ArrayAdapter using the letters from strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Numbers, android.R.layout.simple_dropdown_item_1line);
+
+        // Set the adapter to the AutoCompleteTextView
+        autoCompleteTextView.setAdapter(adapter);
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the selected letter from the AutoCompleteTextView
+                String selectedLetter = autoCompleteTextView.getText().toString();
+
+                // Check if the selected letter is empty
+                if (selectedLetter.isEmpty()) {
+                    // Show a warning message if no letter is selected
+                    autoCompleteTextView.setError("Please select a number");
+                    autoCompleteTextView.requestFocus();
+                    return; // Stop further execution until a letter is selected
+                }
+
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                handleBuyNow(selectedLetter, quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    private void showLEDBuyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.quantobuy, null);
+        builder.setView(dialogView);
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmAddToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                handleBuyNow("", quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    // Method to show the first dialog with quantity and dropdown
+    private void showLetterAddDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.numletteradd_dialog, null);
+        builder.setView(dialogView);
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Set up the AutoCompleteTextView
+        AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.colorstxtview);
+
+        // Create an ArrayAdapter using the letters from strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Letters, android.R.layout.simple_dropdown_item_1line);
+
+        // Set the adapter to the AutoCompleteTextView
+        autoCompleteTextView.setAdapter(adapter);
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmAddToCartBtn = dialogView.findViewById(R.id.addToCartBtn);
+        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the selected letter from the AutoCompleteTextView
+                String selectedLetter = autoCompleteTextView.getText().toString();
+
+                // Check if the selected letter is empty
+                if (selectedLetter.isEmpty()) {
+                    // Show a warning message if no letter is selected
+                    autoCompleteTextView.setError("Please select a letter");
+                    autoCompleteTextView.requestFocus();
+                    return; // Stop further execution until a letter is selected
+                }
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                addToCartFunctionality(selectedLetter, quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    // Method to show the first dialog with quantity and dropdown
+    private void showNumberAddDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.numletteradd_dialog, null);
+        builder.setView(dialogView);
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Set up the AutoCompleteTextView
+        AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.colorstxtview);
+
+        // Create an ArrayAdapter using the letters from strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Numbers, android.R.layout.simple_dropdown_item_1line);
+
+        // Set the adapter to the AutoCompleteTextView
+        autoCompleteTextView.setAdapter(adapter);
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmAddToCartBtn = dialogView.findViewById(R.id.addToCartBtn);
+        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the selected letter from the AutoCompleteTextView
+                String selectedLetter = autoCompleteTextView.getText().toString();
+
+                // Check if the selected letter is empty
+                if (selectedLetter.isEmpty()) {
+                    // Show a warning message if no letter is selected
+                    autoCompleteTextView.setError("Please select a number");
+                    autoCompleteTextView.requestFocus();
+                    return; // Stop further execution until a letter is selected
+                }
+
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                addToCartFunctionality(selectedLetter, quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    private void showLEDAddDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.quantocart_dialog, null);
+        builder.setView(dialogView);
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+
+        // Initialize the quantity-related views
+        TextView quantityTextView = dialogView.findViewById(R.id.quantity);
+        TextView minusButton = dialogView.findViewById(R.id.minus);
+        TextView plusButton = dialogView.findViewById(R.id.plus);
+
+        // Set up initial quantity
+        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        quantityTextView.setText(String.valueOf(quantity[0]));
+
+        // Handle the minus button click
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity[0] > 1) {
+                    quantity[0]--;
+                    quantityTextView.setText(String.valueOf(quantity[0]));
+                } else {
+                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle the plus button click
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity[0]++;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            }
+        });
+
+        // Inside this dialog, find the confirmation button (addToCartBtn)
+        Button confirmAddToCartBtn = dialogView.findViewById(R.id.addToCartBtn);
+        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Your logic for confirming adding to cart with the selected letter and quantity
+                addToCartFunctionality("", quantity[0]);
+
+                // Dismiss the dialog after confirmation
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show(); // Display the dialog
+    }
+
+    // Define the method for adding to the cart with selected letter and quantity
+    private void addToCartFunctionality(String selectedLetter, int quantityLetter) {
+        // Example logic for adding the item to the cart
+        showAddToCartDialog(selectedLetter, quantityLetter);
+        // Implement your actual add-to-cart logic here
     }
 
     private void setupBalloonColors() {
@@ -140,8 +624,81 @@ public class BalloonClassicDescription extends Fragment {
         balloonColorsRecyclerView.setNestedScrollingEnabled(false);
     }
 
+    private void setupBalloonLatexColors() {
+        RecyclerView balloonColorsRecyclerView = binding.balloonColors;
+        List<BalloonColorModel> balloonColorList = new ArrayList<>();
 
-    private void showAddToCartDialog() {
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_assorted, "Assorted"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_gold, "Gold"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_blue, "Blue"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_darkpink, "Dark Pink"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_green, "Green"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_pink, "Pink"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_purple, "Purple"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_rosegold, "Rosegold"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_silver, "Silver"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.metallic_teal, "Teal"));
+
+        // Initialize adapter and layout manager for balloon colors
+        BalloonColorAdapter balloonColorAdapter = new BalloonColorAdapter(requireActivity(), balloonColorList, colorSelected -> {
+            color = colorSelected;
+        });
+
+        balloonColorsRecyclerView.setAdapter(balloonColorAdapter);
+        balloonColorsRecyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        balloonColorsRecyclerView.setHasFixedSize(true);
+        balloonColorsRecyclerView.setNestedScrollingEnabled(false);
+    }
+
+    private void setupBalloonLEDColors() {
+        RecyclerView balloonColorsRecyclerView = binding.balloonColors;
+        List<BalloonColorModel> balloonColorList = new ArrayList<>();
+
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_blue, "LED BLue"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_green, "LED Green"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_pink, "LED Pink"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_purple, "LED Purple"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_red, "LED Red"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.led_yellow, "LED Yellow"));
+
+        // Initialize adapter and layout manager for balloon colors
+        BalloonColorAdapter balloonColorAdapter = new BalloonColorAdapter(requireActivity(), balloonColorList, colorSelected -> {
+            color = colorSelected;
+        });
+
+        balloonColorsRecyclerView.setAdapter(balloonColorAdapter);
+        balloonColorsRecyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        balloonColorsRecyclerView.setHasFixedSize(true);
+        balloonColorsRecyclerView.setNestedScrollingEnabled(false);
+    }
+
+    private void setupBalloonNumberColors() {
+        RecyclerView balloonColorsRecyclerView = binding.balloonColors;
+        List<BalloonColorModel> balloonColorList = new ArrayList<>();
+
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        balloonColorList.add(new BalloonColorModel(R.drawable.gold_num, "Gold"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.sil_num, "Silver"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.rose_num, "Rose Gold"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.cream_num, "Cream"));
+        balloonColorList.add(new BalloonColorModel(R.drawable.pink_num, "Pink"));
+
+        // Initialize adapter and layout manager for balloon colors
+        BalloonColorAdapter balloonColorAdapter = new BalloonColorAdapter(requireActivity(), balloonColorList, colorSelected -> {
+            color = colorSelected;
+        });
+
+        balloonColorsRecyclerView.setAdapter(balloonColorAdapter);
+        balloonColorsRecyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        balloonColorsRecyclerView.setHasFixedSize(true);
+        balloonColorsRecyclerView.setNestedScrollingEnabled(false);
+    }
+
+
+
+    private void showAddToCartDialog(String selectedLetter, int quantityLetter) {
         // Create a dialog
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.addtocartdialog); // Inflate your dialog layout
@@ -158,7 +715,7 @@ public class BalloonClassicDescription extends Fragment {
 
         // Automatically add item to the cart when the dialog is shown
         if (userId != null) {
-            saveCartItem(userId); // Method to add to cart
+            saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
         } else {
             Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
         }
@@ -180,8 +737,11 @@ public class BalloonClassicDescription extends Fragment {
         dialog.show();
     }
 
-    private void saveCartItem(String userId) {
+    private void saveCartItem(String userId, String selectedLetter, int quantityLetter) {
         // Create a new AddToCartModel with imageUrl and timestamp
+        String priceText = productPrice.getText().toString();
+        int totalPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", "")) * quantityLetter;
+
         String imageUrl = productShopModel.getimageUrl(); // Ensure this accesses the image URL correctly
 
         long timestamp = System.currentTimeMillis(); // Get the current timestamp
@@ -189,9 +749,9 @@ public class BalloonClassicDescription extends Fragment {
         AddToCartModel cartItem = new AddToCartModel(
                 productShopModel.getId(),
                 productShopModel.getName(),
-                color,
-                quantity,
-                productPrice.getText().toString(),
+                color + " | " + selectedLetter,
+                quantityLetter,
+                "₱" + (totalPrice),
                 imageUrl,
                 timestamp // Pass the timestamp here
         );
@@ -208,17 +768,17 @@ public class BalloonClassicDescription extends Fragment {
     }
 
 
-    private void handleBuyNow() {
+    private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {
         // Create a CartItemModel for the selected cake and quantity
-        int price = Integer.parseInt(productPrice.getText().toString());
-        int totalPrice = price * quantity;
+        int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
+        int totalPrice = price * quantityNumLetter;
 
         // Create a CartItemModel for this selection
         CartItemModel cartItem = new CartItemModel(
                 productShopModel.getId(),
                 productShopModel.getName(),
-                color,
-                quantity,
+                color + " | " + selectedNumLetter,
+                quantityNumLetter,
                 "₱" + totalPrice, // Include price with quantity
                 productShopModel.getimageUrl() // Product Image URL
         );

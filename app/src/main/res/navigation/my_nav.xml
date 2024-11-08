@@ -148,7 +148,14 @@
         android:id="@+id/myProductFragment"
         android:name="com.ignacio.partykneadsapp.sellermenus.MyProductFragment"
         android:label="fragment_my_product"
-        tools:layout="@layout/fragment_my_product" />
+        tools:layout="@layout/fragment_my_product" >
+        <action
+            android:id="@+id/action_myProductFragment_to_seller_HomePageFragment"
+            app:destination="@id/seller_HomePageFragment" />
+        <action
+            android:id="@+id/action_myProductFragment_to_sellerCakeDescription"
+            app:destination="@id/sellerCakeDescription" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.ignacio.partykneadsapp.customermenus.ProfileFragment"
@@ -174,7 +181,7 @@
     </fragment>
     <fragment
         android:id="@+id/cartFragment"
-        android:name="com.ignacio.partykneadsapp.CartFragment"
+        android:name="com.ignacio.partykneadsapp.customermenus.CartFragment"
         android:label="fragment_cart"
         tools:layout="@layout/fragment_cart" >
         <action
@@ -294,5 +301,14 @@
         <action
             android:id="@+id/action_balloonClassicDescription_to_checkoutFragment"
             app:destination="@id/checkoutFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sellerCakeDescription"
+        android:name="com.ignacio.partykneadsapp.sellermenus.SellerCakeDescription"
+        android:label="fragment_seller_cake_description"
+        tools:layout="@layout/fragment_seller_cake_description" >
+        <action
+            android:id="@+id/action_sellerCakeDescription_to_myProductFragment"
+            app:destination="@id/myProductFragment" />
     </fragment>
 </navigation>
