@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "839073691480",
+    "firebase_url": "https://party-kneads-firebase-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "party-kneads-firebase",
     "storage_bucket": "party-kneads-firebase.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.ignacio.partykneadsapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "839073691480-g3qrgh96q2lf9jf0k3ulvan4vok92dfm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ignacio.partykneadsapp",
+            "certificate_hash": "f289800a95c91f3444c55c68bf693ef9d6bc6e3c"
+          }
+        },
+        {
+          "client_id": "839073691480-k89t0no0adl7k7m724p0avaclr300tp9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAA6AMo2-E_ZXCDV-iQBy3S9s5Wlt7bQ9M"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "839073691480-k5c063opqd9ukt2ti1r6u0nrcdjb1tkq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
