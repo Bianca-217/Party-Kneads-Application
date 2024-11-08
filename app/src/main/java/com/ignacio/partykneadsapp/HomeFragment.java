@@ -183,18 +183,26 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
     private void fetchUserFirstName(String userId) {
         DocumentReference userDocRef = firestore.collection("Users").document(userId);
+
         userDocRef.get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        String firstName = documentSnapshot.getString("First Name");
-                        txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
+                        // Fetch the first name from Firestore (assuming it's stored as "firstName")
+                        String firstName = documentSnapshot.getString("firstName");
+
+                        // Check if firstName is not null before displaying
+                        if (firstName != null && !firstName.isEmpty()) {
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
+                        } else {
+                            txtUser.setText("Hi, No First Name Found!");
+                        }
                     } else {
-                        txtUser.setText("Hi, No Document!");
+                        txtUser.setText("Hi, No Document Found!");
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("HomeFragment", "Error fetching user data", e);
-                    txtUser.setText("Hi, Error Fetching!");
+                    txtUser.setText("Hi, Error Fetching Data!");
                 });
     }
 

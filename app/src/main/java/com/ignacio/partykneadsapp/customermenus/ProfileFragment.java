@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ignacio.partykneadsapp.R;
@@ -57,14 +58,33 @@ public class ProfileFragment extends Fragment {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            // Retrieve first name, last name, and email
-                            String firstName = document.getString("First Name");
-                            String lastName = document.getString("Last Name");
+                            // Retrieve first name, last name, email, and profile picture URL
+                            String firstName = document.getString("firstName");
+                            String lastName = document.getString("lastName");
                             String email = document.getString("email");
+                            String profilePictureUrl = document.getString("profilePictureUrl");
 
                             // Set the full name and email in the TextViews
-                            binding.txtUserName.setText(firstName + " " + lastName);
-                            binding.txtUserEmail.setText(email);
+                            if (firstName != null && lastName != null) {
+                                binding.txtUserName.setText(firstName + " " + lastName);
+                            } else {
+                                binding.txtUserName.setText("No Name Available");
+                            }
+
+                            if (email != null) {
+                                binding.txtUserEmail.setText(email);
+                            } else {
+                                binding.txtUserEmail.setText("No Email Available");
+                            }
+
+                            // Load and display the profile picture if available
+                            if (profilePictureUrl != null) {
+                                Glide.with(getActivity())  // Glide to load the image
+                                        .load(profilePictureUrl)
+                                        .into(binding.userProfile);  // Set the profile image in imgProfile
+                            } else {
+                                binding.userProfile.setImageResource(R.drawable.img_placeholder);  // Use default image if no profile picture
+                            }
                         } else {
                             Toast.makeText(getActivity(), "User data not found", Toast.LENGTH_SHORT).show();
                         }
@@ -73,6 +93,7 @@ public class ProfileFragment extends Fragment {
                     }
                 });
     }
+
 
     private void setupButtons() {
         binding.btnLogout.setOnClickListener(v -> {
