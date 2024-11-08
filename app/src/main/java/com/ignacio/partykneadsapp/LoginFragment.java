@@ -37,10 +37,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
@@ -56,6 +55,8 @@ public class LoginFragment extends Fragment {
     private CallbackManager callbackManager;
     private GoogleSignInClient googleSignInClient;
 
+    private static final int RC_SIGN_IN = 100; // Request code for Google Sign-In
+
     @Override
     public void onStart() {
         super.onStart();
@@ -69,7 +70,6 @@ public class LoginFragment extends Fragment {
                 navigateToUserHomePage();
             }
         }
-
     }
 
     @Override
@@ -96,7 +96,7 @@ public class LoginFragment extends Fragment {
             navController.navigate(R.id.action_loginFragment_to_termsFragment2);
         });
 
-        //Login with email
+        // Login with email
         btnContinue.setOnClickListener(v -> loginWithEmail());
 
         cl = view.findViewById(R.id.clayout);
@@ -107,8 +107,6 @@ public class LoginFragment extends Fragment {
     }
 
     private void loginWithEmail() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
         String email = etEmail.getText().toString();
         String password = etPass.getText().toString();
 
@@ -145,91 +143,119 @@ public class LoginFragment extends Fragment {
     }
 
     private void setupFacebookLogin() {
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        Log.d("LoginFragment", "Facebook login successful");
-                        AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
-                        mAuth.signInWithCredential(credential)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d("LoginFragment", "Firebase authentication successful");
-                                        Toast.makeText(getActivity(), "Login Successfully", Toast.LENGTH_SHORT).show();
-                                        navigateToUserHomePage();
-                                    } else {
-                                        Log.e("LoginFragment", "Firebase authentication failed", task.getException());
-                                        Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
+        btnFacebook.setOnClickListener(v -> signInWithFacebook());
+        initializeFacebookLogin();
+    }
 
-                    @Override
-                    public void onCancel() {
-                        Log.d("LoginFragment", "Facebook login canceled");
-                    }
+    private void signInWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(getActivity(), Arrays.asList("email", "public_profile"));
+    }
 
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Log.e("LoginFragment", "Facebook login error", exception);
-                    }
-                });
+    private void initializeFacebookLogin() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d("LoginFragment", "Facebook login successful");
+                AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
+                FirebaseUser user = mAuth.getCurrentUser();
 
-        btnFacebook.setOnClickListener(v -> {
-            LoginManager.getInstance().logOut();
-            LoginManager.getInstance().logInWithReadPermissions(LoginFragment.this, Arrays.asList("public_profile"));
+                if (user != null) {
+                    user.linkWithCredential(credential)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d("FacebookLogin", "Linking successful");
+                                    navigateToUserHomePage();
+                                } else {
+                                    Log.e("FacebookLogin", "Linking failed", task.getException());
+                                    Toast.makeText(getActivity(), "Linking Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    mAuth.signInWithCredential(credential)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    navigateToUserHomePage();
+                                } else {
+                                    Log.e("FacebookLogin", "Firebase Auth failed", task.getException());
+                                    Toast.makeText(getActivity(), "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("FacebookLogin", "Facebook login canceled");
+                Toast.makeText(getActivity(), "Facebook login canceled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.e("FacebookLogin", "Error: " + error.getMessage(), error);
+                Toast.makeText(getActivity(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void setupGoogleSignIn() {
+        // Update to use Web Client ID from Firebase for Google Sign-In
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.client_id)) // Update to your actual client ID
+                .requestIdToken(getString(R.string.default_web_client_id)) // Web Client ID (from Firebase)
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), options);
 
-        btnGoogle.setOnClickListener(v -> {
-            Intent intent = googleSignInClient.getSignInIntent();
-            startActivityForResult(intent, 100); // Request code can be anything
-        });
+        btnGoogle.setOnClickListener(v -> signInWithGoogle());
+    }
+
+    private void signInWithGoogle() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            handleGoogleSignInResult(data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            firebaseAuthWithGoogle(account);
+        } catch (ApiException e) {
+            Log.e("GoogleSignIn", "Sign-in failed: " + e.getStatusCode(), e);
+            Toast.makeText(getActivity(), "Google Sign-in failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void handleGoogleSignInResult(Intent data) {
-        try {
-            Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(data);
-            GoogleSignInAccount signInAccount = accountTask.getResult(ApiException.class);
-            AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAccount.getIdToken(), null);
-            mAuth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Log.d("LoginFragment", "Google sign-in successful");
-                    Toast.makeText(getActivity(), "Login Successfully", Toast.LENGTH_SHORT).show();
-                    navigateToUserHomePage();
-                } else {
-                    Log.e("LoginFragment", "Google sign-in failed", task.getException());
-                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } catch (ApiException e) {
-            Log.e("LoginFragment", "Google sign-in failed", e);
-        }
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        navigateToUserHomePage();
+                    } else {
+                        Log.e("GoogleSignIn", "Authentication failed", task.getException());
+                        Toast.makeText(getActivity(), "Google Authentication Failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void navigateToUserHomePage() {
+        // Navigate to the User's home page after successful login
         NavController navController = Navigation.findNavController(requireView());
         navController.navigate(R.id.action_loginFragment_to_homePageFragment);
     }
 
     private void navigateToSellerHomePage() {
+        // Navigate to Seller's home page after successful login
         NavController navController = Navigation.findNavController(requireView());
         navController.navigate(R.id.action_loginFragment_to_seller_HomePageFragment);
     }
