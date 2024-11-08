@@ -15,14 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "839073691480-bkk39thuuae4lbp6o47nfim6p5pk4b7o.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ignacio.partykneadsapp",
-            "certificate_hash": "5faa6cc1f5a8c1b3e8ed1ff068c0af7bd13fcdfe"
-          }
-        },
-        {
           "client_id": "839073691480-g3qrgh96q2lf9jf0k3ulvan4vok92dfm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
