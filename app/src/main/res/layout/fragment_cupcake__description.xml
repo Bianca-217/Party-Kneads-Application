@@ -66,10 +66,10 @@
         <ImageView
             android:id="@+id/productImage"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="230dp"
             android:layout_gravity="center|bottom"
             android:layout_marginTop="70dp"
-            android:src="@drawable/strawberry" />
+            android:src="@drawable/berry_delight" />
 
     </FrameLayout>
 
@@ -81,7 +81,7 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="550dp"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
             android:src="@drawable/whitecont" />
 
@@ -91,6 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginHorizontal="20dp"
             android:orientation="vertical">
 
@@ -105,7 +106,7 @@
                     android:layout_weight="1"
                     android:textSize="24sp"
                     android:textColor="@color/semiblack"
-                    android:fontFamily="@font/montserrat_bold"
+                    android:fontFamily="@font/montserrat_extrabold"
                     android:text="Vanilla Bean Cake"/>
 
                 <TextView
@@ -113,7 +114,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:fontFamily="@font/montserrat_extrabold"
+                    android:fontFamily="@font/montserrat_bold"
                     android:gravity="center|end"
                     android:text="₱250.00"
                     android:textColor="@color/darkpink"

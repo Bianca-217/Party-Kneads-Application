@@ -107,6 +107,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_cupcake_Description"
             app:destination="@id/cupcake_Description" />
+        <action
+            android:id="@+id/action_homePageFragment_to_balloonClassicDescription"
+            app:destination="@id/balloonClassicDescription" />
 
     </fragment>
 
@@ -276,5 +279,20 @@
         <action
             android:id="@+id/action_cupcake_Description_to_cartFragment"
             app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/balloonClassicDescription"
+        android:name="com.ignacio.partykneadsapp.BalloonClassicDescription"
+        android:label="fragment_balloon__classic__description"
+        tools:layout="@layout/fragment_balloon__classic__description" >
+        <action
+            android:id="@+id/action_balloonClassicDescription_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_balloonClassicDescription_to_cartFragment"
+            app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_balloonClassicDescription_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
     </fragment>
 </navigation>

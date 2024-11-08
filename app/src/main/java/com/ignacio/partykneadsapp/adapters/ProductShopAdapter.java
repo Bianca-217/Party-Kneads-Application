@@ -68,9 +68,12 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                     // Get the NavController and navigate
                     NavController navController = Navigation.findNavController(view);
                     navController.navigate(R.id.action_homePageFragment_to_cake_Description, bundle);
-                } else if ("Dessert - Cupcakes".equals(category)) {
+                } else if ("Dessert - Cupcakes".equals(category) || "Dessert - Cookies".equals(category) || "Dessert - Donuts".equals(category)) {
                     NavController navController = Navigation.findNavController(view);
                     navController.navigate(R.id.action_homePageFragment_to_cupcake_Description, bundle);
+                }else if ("Balloons - Classic".equals(category)) {
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(R.id.action_homePageFragment_to_balloonClassicDescription, bundle);
                 }
 
 
