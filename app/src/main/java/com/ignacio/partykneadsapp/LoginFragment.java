@@ -5,6 +5,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.text.TextUtils;
@@ -41,8 +42,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class LoginFragment extends Fragment {
@@ -227,25 +233,79 @@ public class LoginFragment extends Fragment {
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
+            // Get the signed-in account from the result
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            firebaseAuthWithGoogle(account);
+
+            // Extract the first name, last name, email, and profile picture URL from the account
+            String firstName = account.getGivenName();  // First name
+            String lastName = account.getFamilyName();  // Last name
+            String email = account.getEmail();          // Email address
+            String profilePictureUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null;  // Profile picture URL
+
+            // Log the information (or save it as needed)
+            Log.d("GoogleSignIn", "First Name: " + firstName);
+            Log.d("GoogleSignIn", "Last Name: " + lastName);
+            Log.d("GoogleSignIn", "Email: " + email);
+            Log.d("GoogleSignIn", "Profile Picture URL: " + profilePictureUrl);
+
+            // Continue to Firebase authentication
+            firebaseAuthWithGoogle(account, firstName, lastName, email, profilePictureUrl);
+
         } catch (ApiException e) {
             Log.e("GoogleSignIn", "Sign-in failed: " + e.getStatusCode(), e);
             Toast.makeText(getActivity(), "Google Sign-in failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account, String firstName, String lastName, String email, String profilePictureUrl) {
+        // Use the Google account's ID token to authenticate with Firebase
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
+                        // Successfully authenticated with Firebase
+                        Log.d("GoogleSignIn", "Authentication successful");
+
+                        // You can also save the user data (first name, last name, profile picture, etc.) to Firestore
+                        saveUserData(firstName, lastName, email, profilePictureUrl);
+
+                        // Navigate to the user home page
                         navigateToUserHomePage();
                     } else {
+                        // Authentication failed
                         Log.e("GoogleSignIn", "Authentication failed", task.getException());
                         Toast.makeText(getActivity(), "Google Authentication Failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void saveUserData(String firstName, String lastName, String email, String profilePictureUrl) {
+        // Save user data (First Name, Last Name, Email, Profile Picture URL) to Firestore
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // Create a map to hold the user data
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("firstName", firstName);
+            userData.put("lastName", lastName);
+            userData.put("email", email);
+            userData.put("profilePictureUrl", profilePictureUrl);  // Add the profile picture URL
+            userData.put("lastLogin", FieldValue.serverTimestamp());
+
+            // Save the data to Firestore (you can store it in a collection like "users")
+            firestore.collection("Users")
+                    .document(currentUser.getUid())
+                    .set(userData, SetOptions.merge())  // Use merge to avoid overwriting existing fields
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("GoogleSignIn", "User data saved to Firestore");
+                        } else {
+                            Log.e("GoogleSignIn", "Error saving user data: ", task.getException());
+                        }
+                    });
+        }
     }
 
     private void navigateToUserHomePage() {
