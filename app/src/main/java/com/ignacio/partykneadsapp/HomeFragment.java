@@ -29,6 +29,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -41,14 +42,17 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.ignacio.partykneadsapp.adapters.CarouselAdapter;
 import com.ignacio.partykneadsapp.adapters.CategoriesAdapter;
 import com.ignacio.partykneadsapp.adapters.OrderHistoryAdapter;
 import com.ignacio.partykneadsapp.adapters.PopularAdapter;
+import com.ignacio.partykneadsapp.adapters.SearchProductAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentHomeBinding;
 import com.ignacio.partykneadsapp.model.CategoriesModel;
 import com.ignacio.partykneadsapp.model.OrderHistoryModel;
 import com.ignacio.partykneadsapp.model.PopularModel;
+import com.ignacio.partykneadsapp.model.SearchProduct;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Collections;
+
 
 public class HomeFragment extends Fragment implements NavigationBarView.OnItemSelectedListener {
 
@@ -80,46 +86,55 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
     private int dotsCount;
     private ImageView[] dots;
     private LinearLayout cl;
+    private ViewPager2 viewPager;
+    private CarouselAdapter carouselAdapter; // Declare CarouselAdapter here
 
     // Location-related variables
     private FusedLocationProviderClient fusedLocationClient;
     private TextView locationTextView;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
-    }
+    private SearchProductAdapter productAdapter;
+    private List<SearchProduct> productList;
+    private SearchView searchView;
+    private RecyclerView recyclerView;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mAuth = FirebaseAuth.getInstance();
+            firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
+        }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false; // Implement navigation item selection if needed
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                                 @Nullable Bundle savedInstanceState) {
+            // Inflate the fragment layout
+            binding = FragmentHomeBinding.inflate(inflater, container, false);
 
-        // Initialize ViewPager and Adapter
-        int[] images = {
-                R.drawable.homepage_slider,
-                R.drawable.image2,
-                R.drawable.image3,
-        };
+            // Initialize the CarouselAdapter
+            int[] images = {
+                    R.drawable.homepage_slider,
+                    R.drawable.image2,
+                    R.drawable.image3,
+            };
 
-        adapter = new CarouselAdapter(images);
-        binding.viewPager.setAdapter(adapter);
-        setupDotsIndicator();
+            carouselAdapter = new CarouselAdapter(images);  // Initialize CarouselAdapter here
+            viewPager = binding.viewPager;  // Ensure ViewPager is correctly linked
+            viewPager.setAdapter(carouselAdapter);  // Set the adapter to ViewPager
+            setupDotsIndicator();  // Now setup the dots after carouselAdapter is initialized
 
-        // Initialize category, popular, and order history
-        setupCategories();
-        setupPopularProducts();
+            // Initialize category, popular, and order history
+            setupCategories();
+            setupPopularProducts();
 
 
-        return binding.getRoot();
-    }
+            return binding.getRoot();
+        }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -130,6 +145,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         user = mAuth.getCurrentUser();
 
         if (user == null) {
+            // Redirect to login if user is not logged in
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_loginFragment_to_homePageFragment);
         } else {
@@ -146,40 +162,160 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
         // Initialize location services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        locationTextView = view.findViewById(R.id.location); // Ensure this ID matches your XML
+        locationTextView = view.findViewById(R.id.location);
         requestLocationPermissions();
-    }
 
-    private void setupDotsIndicator() {
-        dotsCount = adapter.getItemCount();
-        dots = new ImageView[dotsCount];
-
-        // Add dots to the LinearLayout
-        for (int i = 0; i < dotsCount; i++) {
-            dots[i] = new ImageView(getActivity());
-            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(4, 0, 4, 0);
-            binding.dotsIndicator.addView(dots[i], params);
+        // Initialize RecyclerView and SearchView using binding
+        recyclerView = binding.SearchrecyclerView;  // Reference RecyclerView from binding
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            productList = new ArrayList<>();
+            productAdapter = new SearchProductAdapter(productList);
+            recyclerView.setAdapter(productAdapter);
+        } else {
+            Log.e("HomeFragment", "RecyclerView is null from binding");
         }
 
-        // Set the first dot as active
-        if (dots.length > 0) {
-            dots[0].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
-        }
+        // Initialize SearchView
+        searchView = view.findViewById(R.id.searchView);
+        searchView.setQueryHint("Search products...");
 
-        // Set up a page change listener to update the dots
-        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        // Listen for changes in the SearchView input
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                for (int i = 0; i < dotsCount; i++) {
-                    dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
-                }
-                dots[position].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
+            public boolean onQueryTextSubmit(String query) {
+                return false; // No need to handle submit for Firestore query
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchProducts(newText); // Call the function to search products
+                return true;
             }
         });
     }
+
+    private void searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            loadAllProducts();
+            return;
+        }
+
+        // Normalize the keyword to uppercase for consistency
+        String normalizedKeyword = keyword.trim().toUpperCase();
+        Log.d("HomeFragment", "Searching for products with keyword: " + normalizedKeyword);
+
+        // Simple query that fetches all products - we'll filter in memory
+        firestore.collection("products")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("HomeFragment", "Query successful, processing results");
+
+                        productList.clear();
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                String productName = document.getString("name");
+
+                                // Basic null check
+                                if (productName == null) continue;
+
+                                // Convert to uppercase for comparison
+                                String upperProductName = productName.toUpperCase();
+
+                                // For single letter search, check if it starts with the letter
+                                if (normalizedKeyword.length() == 1) {
+                                    if (upperProductName.startsWith(normalizedKeyword)) {
+                                        SearchProduct product = document.toObject(SearchProduct.class);
+                                        if (product != null) {
+                                            productList.add(product);
+                                            Log.d("HomeFragment", "Added product: " + productName);
+                                        }
+                                    }
+                                }
+                                // For multiple letters, check if it contains the search term
+                                else {
+                                    if (upperProductName.contains(normalizedKeyword)) {
+                                        SearchProduct product = document.toObject(SearchProduct.class);
+                                        if (product != null) {
+                                            productList.add(product);
+                                            Log.d("HomeFragment", "Added product: " + productName);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Sort the results
+                            Collections.sort(productList, (p1, p2) -> {
+                                String name1 = p1.getName().toUpperCase();
+                                String name2 = p2.getName().toUpperCase();
+                                return name1.compareTo(name2);
+                            });
+
+                            Log.d("HomeFragment", "Found " + productList.size() + " products");
+                            productAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        Log.e("HomeFragment", "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    private void loadAllProducts() {
+        firestore.collection("products")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        productList.clear();
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                SearchProduct product = document.toObject(SearchProduct.class);  // Use SearchProduct
+                                if (product != null) {
+                                    productList.add(product);
+                                }
+                            }
+                            productAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        // Log error if load fails
+                        Log.e("HomeFragment", "Error loading products: ", task.getException());
+                    }
+                });
+    }
+
+
+    private void setupDotsIndicator() {
+            dotsCount = carouselAdapter.getItemCount(); // Now safely use the initialized adapter
+            dots = new ImageView[dotsCount];
+
+            // Add dots to the LinearLayout
+            for (int i = 0; i < dotsCount; i++) {
+                dots[i] = new ImageView(getActivity());
+                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(4, 0, 4, 0);
+                binding.dotsIndicator.addView(dots[i], params);
+            }
+
+            // Set the first dot as active
+            if (dots.length > 0) {
+                dots[0].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
+            }
+
+            // Set up a page change listener to update the dots
+            binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    for (int i = 0; i < dotsCount; i++) {
+                        dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
+                    }
+                    dots[position].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
+                }
+            });
+        }
 
     private void fetchUserFirstName(String userId) {
         DocumentReference userDocRef = firestore.collection("Users").document(userId);
@@ -187,15 +323,17 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         userDocRef.get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Fetch the first name from Firestore (assuming it's stored as "firstName")
+                        // Fetch the first name from Firestore (assuming it's stored as "First Name" and "firstName")
                         String fname = documentSnapshot.getString("First Name");
                         String firstName = documentSnapshot.getString("firstName");
 
-                        // Check if firstName is not null before displaying
-                        if (fname == null && fname.isEmpty()) {
-                            txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
-                        } else if ((fname != null && !fname.isEmpty())){
+                        // Check if fname is not null or empty before displaying
+                        if (fname != null && !fname.isEmpty()) {
                             txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
+                        } else if (firstName != null && !firstName.isEmpty()) {
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
+                        } else {
+                            txtUser.setText("Hi, No First Name Found!");
                         }
                     } else {
                         txtUser.setText("Hi, No Document Found!");
@@ -206,6 +344,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                     txtUser.setText("Hi, Error Fetching Data!");
                 });
     }
+
 
     private void requestLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
