@@ -31,7 +31,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationBarView;
@@ -98,43 +100,43 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
     private SearchView searchView;
     private RecyclerView recyclerView;
 
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            mAuth = FirebaseAuth.getInstance();
-            firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
-        }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false; // Implement navigation item selection if needed
     }
 
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
-            // Inflate the fragment layout
-            binding = FragmentHomeBinding.inflate(inflater, container, false);
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate the fragment layout
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
 
-            // Initialize the CarouselAdapter
-            int[] images = {
-                    R.drawable.homepage_slider,
-                    R.drawable.image2,
-                    R.drawable.image3,
-            };
+        // Initialize the CarouselAdapter
+        int[] images = {
+                R.drawable.homepage_slider,
+                R.drawable.image2,
+                R.drawable.image3,
+        };
 
-            carouselAdapter = new CarouselAdapter(images);  // Initialize CarouselAdapter here
-            viewPager = binding.viewPager;  // Ensure ViewPager is correctly linked
-            viewPager.setAdapter(carouselAdapter);  // Set the adapter to ViewPager
-            setupDotsIndicator();  // Now setup the dots after carouselAdapter is initialized
+        carouselAdapter = new CarouselAdapter(images);  // Initialize CarouselAdapter here
+        viewPager = binding.viewPager;  // Ensure ViewPager is correctly linked
+        viewPager.setAdapter(carouselAdapter);  // Set the adapter to ViewPager
+        setupDotsIndicator();  // Now setup the dots after carouselAdapter is initialized
 
-            // Initialize category, popular, and order history
-            setupCategories();
-            setupPopularProducts();
+        // Initialize category, popular, and order history
+        setupCategories();
+        setupPopularProducts();
 
 
-            return binding.getRoot();
-        }
+        return binding.getRoot();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -262,6 +264,51 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                 });
     }
 
+    private void fetchUserFirstName(String userId) {
+        DocumentReference userDocRef = firestore.collection("Users").document(userId);
+
+        userDocRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Fetch the first name and profile picture URL from Firestore
+                        String fname = documentSnapshot.getString("First Name");
+                        String firstName = documentSnapshot.getString("firstName");
+                        String profilePictureUrl = documentSnapshot.getString("profilePictureUrl");
+
+                        // Check if firstName is not null before displaying
+                        if (fname == null || fname.isEmpty()) {
+                            // If fname is null or empty, use the "firstName" field
+                            fname = firstName;
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
+                        } else {
+                            // Use the "First Name" field if it's not null or empty
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
+                        }
+
+                        // Load profile picture using Glide if available
+                        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                            Glide.with(requireContext())
+                                    .load(profilePictureUrl)
+                                    .placeholder(R.drawable.round_person_24) // Default placeholder
+                                    .error(R.drawable.img_placeholder) // Error placeholder
+                                    .into(binding.imgUserProfile);
+                        } else {
+                            // Set default image if no profile picture URL is found
+                            binding.imgUserProfile.setImageResource(R.drawable.img_placeholder);
+                        }
+
+                    } else {
+                        txtUser.setText("Hi, No Document Found!");
+                        binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image if no document found
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("HomeFragment", "Error fetching user data", e);
+                    txtUser.setText("Hi, Error Fetching Data!");
+                    binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image in case of error
+                });
+    }
+
     private void loadAllProducts() {
         firestore.collection("products")
                 .get()
@@ -287,63 +334,36 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
 
     private void setupDotsIndicator() {
-            dotsCount = carouselAdapter.getItemCount(); // Now safely use the initialized adapter
-            dots = new ImageView[dotsCount];
+        dotsCount = carouselAdapter.getItemCount(); // Now safely use the initialized adapter
+        dots = new ImageView[dotsCount];
 
-            // Add dots to the LinearLayout
-            for (int i = 0; i < dotsCount; i++) {
-                dots[i] = new ImageView(getActivity());
-                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.setMargins(4, 0, 4, 0);
-                binding.dotsIndicator.addView(dots[i], params);
-            }
-
-            // Set the first dot as active
-            if (dots.length > 0) {
-                dots[0].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
-            }
-
-            // Set up a page change listener to update the dots
-            binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageSelected(int position) {
-                    super.onPageSelected(position);
-                    for (int i = 0; i < dotsCount; i++) {
-                        dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
-                    }
-                    dots[position].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
-                }
-            });
+        // Add dots to the LinearLayout
+        for (int i = 0; i < dotsCount; i++) {
+            dots[i] = new ImageView(getActivity());
+            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(4, 0, 4, 0);
+            binding.dotsIndicator.addView(dots[i], params);
         }
 
-    private void fetchUserFirstName(String userId) {
-        DocumentReference userDocRef = firestore.collection("Users").document(userId);
+        // Set the first dot as active
+        if (dots.length > 0) {
+            dots[0].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
+        }
 
-        userDocRef.get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Fetch the first name from Firestore (assuming it's stored as "First Name" and "firstName")
-                        String fname = documentSnapshot.getString("First Name");
-                        String firstName = documentSnapshot.getString("firstName");
-
-                        // Check if fname is not null or empty before displaying
-                        if (fname != null && !fname.isEmpty()) {
-                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
-                        } else if (firstName != null && !firstName.isEmpty()) {
-                            txtUser.setText("Hi, " + capitalizeFirstLetter(firstName) + "!");
-                        } else {
-                            txtUser.setText("Hi, No First Name Found!");
-                        }
-                    } else {
-                        txtUser.setText("Hi, No Document Found!");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("HomeFragment", "Error fetching user data", e);
-                    txtUser.setText("Hi, Error Fetching Data!");
-                });
+        // Set up a page change listener to update the dots
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                for (int i = 0; i < dotsCount; i++) {
+                    dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
+                }
+                dots[position].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
+            }
+        });
     }
+
 
 
     private void requestLocationPermissions() {

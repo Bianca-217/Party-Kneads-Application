@@ -114,7 +114,27 @@ public class SellerCakeDescription extends Fragment {
     }
 
 
-    public void editItem() {}
+    public void editItem() {
+
+            if (productShopModel != null) {
+                // Create a Bundle to pass data to the Edit_Items fragment
+                Bundle bundle = new Bundle();
+                bundle.putString("productId", productShopModel.getId());
+                bundle.putString("imageUrl", productShopModel.getimageUrl());
+                bundle.putString("name", productShopModel.getName());
+                bundle.putString("description", productShopModel.getDescription());
+                bundle.putString("price", productShopModel.getPrice());
+                bundle.putString("rate", productShopModel.getRate());
+                bundle.putString("numReviews", String.valueOf(productShopModel.getNumreviews()));
+
+                // Navigate to Edit_Items fragment with the bundle
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_sellerCakeDescription_to_edit_Items, bundle);
+            } else {
+                Toast.makeText(getContext(), "Product details are missing", Toast.LENGTH_SHORT).show();
+            }
+        }
+
 
 
     private void loadProductDetails(String productId) {

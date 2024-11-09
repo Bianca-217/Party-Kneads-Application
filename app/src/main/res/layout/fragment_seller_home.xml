@@ -44,13 +44,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
-                    android:id="@+id/userProfile"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imgUserProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_gravity="bottom"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/round_person_24" />
+                    android:contentDescription="Profile Picture"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/round_person_24" />
 
                 <TextView
                     android:id="@+id/txtSellerFname"
@@ -59,7 +60,7 @@
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_extrabold"
-                    android:text=""
+                    android:text="Party Kneads!"
                     android:textColor="@color/darkpink"
                     android:textSize="28sp" />
 
@@ -89,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_medium"
                     android:gravity="center_vertical"
-                    android:text=""
+                    android:text="Victoria, Laguna"
                     android:textColor="@color/semiblack"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -159,7 +160,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginHorizontal="20dp"
        android:layout_gravity="center"
-        android:textColor="@color/darkpink"
+        android:textColor="@color/semiblack"
         android:text=""
         android:textSize="32sp"
         android:fontFamily="@font/montserrat_extrabold"
@@ -218,7 +219,7 @@
             android:textAlignment="viewStart"
             android:layout_marginTop="70dp"
             android:layout_marginHorizontal="20dp"
-            android:textColor="@color/darkpink"
+            android:textColor="@color/semiblack"
             android:text=""
             android:textSize="30sp"
             android:fontFamily="@font/montserrat_extrabold"
@@ -263,7 +264,7 @@
                 android:textAlignment="viewStart"
                 android:layout_marginTop="70dp"
                 android:layout_marginHorizontal="20dp"
-                android:textColor="@color/darkpink"
+                android:textColor="@color/semiblack"
                 android:text=""
                 android:textSize="30sp"
                 android:fontFamily="@font/montserrat_extrabold"

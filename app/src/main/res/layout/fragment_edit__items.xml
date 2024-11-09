@@ -215,11 +215,11 @@
 
             </FrameLayout>
             <Button
-                android:id="@+id/btnAddItem"
+                android:id="@+id/btnSaveChanges"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="6"
-                android:text="Add Item"
+                android:text="Save Changes"
                 android:textSize="16dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:backgroundTint="@color/pink"

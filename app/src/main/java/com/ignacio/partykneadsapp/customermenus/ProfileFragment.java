@@ -22,9 +22,20 @@ import com.ignacio.partykneadsapp.databinding.FragmentProfileBinding;
 import java.util.Objects;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import android.content.Intent;
+import android.net.Uri;
+import android.app.Activity;
+import android.provider.MediaStore;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 
 public class ProfileFragment extends Fragment {
-
+    private StorageReference storageReference;
+    private Uri selectedImageUri;
     private FragmentProfileBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -43,14 +54,72 @@ public class ProfileFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-
+        storageReference = FirebaseStorage.getInstance().getReference();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             retrieveUserInfo(userId);
         }
 
         setupButtons();
+
+        binding.btnchangeProfile.setOnClickListener(v -> {
+            openGallery();
+        });
     }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(galleryIntent);
+    }
+
+
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    selectedImageUri = result.getData().getData();
+
+                    // Using Glide to load the selected image into ImageView
+                    Glide.with(requireContext())
+                            .load(selectedImageUri)
+                            .placeholder(R.drawable.round_person_24) // Optional: add a placeholder
+                            .into(binding.userProfile);
+
+                    uploadProfilePicture(selectedImageUri);
+                }
+            }
+    );
+
+    private void uploadProfilePicture(Uri imageUri) {
+        if (imageUri != null && currentUser != null) {
+            String userId = currentUser.getUid();
+            StorageReference fileRef = storageReference.child("profile_pictures/" + userId + ".jpg");
+
+            // Show progress bar
+            binding.progressBar.setVisibility(View.VISIBLE);
+
+            fileRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        updateProfilePictureUrl(userId, downloadUrl);
+                        Toast.makeText(getActivity(), "Profile picture updated successfully", Toast.LENGTH_SHORT).show();
+                        binding.progressBar.setVisibility(View.GONE);
+                    }))
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getActivity(), "Failed to upload picture", Toast.LENGTH_SHORT).show();
+                        binding.progressBar.setVisibility(View.GONE);
+                    });
+        }
+    }
+
+
+    private void updateProfilePictureUrl(String userId, String url) {
+        firestore.collection("Users").document(userId)
+                .update("profilePictureUrl", url)
+                .addOnSuccessListener(aVoid -> Toast.makeText(getActivity(), "Profile picture saved", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to save profile picture", Toast.LENGTH_SHORT).show());
+    }
+
 
     private void retrieveUserInfo(String userId) {
         firestore.collection("Users").document(userId).get()

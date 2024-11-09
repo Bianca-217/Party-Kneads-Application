@@ -100,14 +100,14 @@
                 android:id="@+id/btnPending"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="Pending"
-                android:backgroundTint="@color/semiwhite"
-                android:textColor="@color/pink"
-                android:fontFamily="@font/montserrat_semibold"
-                android:textSize="15sp"
-                app:cornerRadius="0dp"
                 android:layout_weight="1"
-                android:textAlignment="center" />
+                android:backgroundTint="@color/semiwhite"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Pending"
+                android:textAlignment="center"
+                android:textColor="@color/pink"
+                android:textSize="15sp"
+                app:cornerRadius="0dp" />
 
             <Button
                 android:id="@+id/btnToDeliver"

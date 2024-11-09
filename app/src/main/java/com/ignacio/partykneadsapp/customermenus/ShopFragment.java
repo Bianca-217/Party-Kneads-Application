@@ -56,6 +56,9 @@ public class ShopFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        shopsearchView = binding.ShopsearchView;  // Assuming your layout has a SearchView with this ID
+        shopsearchView.setQueryHint("Search for products...");
+
         db = FirebaseFirestore.getInstance();
         productsRef = db.collection("products");
 
@@ -66,6 +69,8 @@ public class ShopFragment extends Fragment {
         // Initialize the adapter with an empty list and the fragment's context
         productShopAdapter = new ProductShopAdapter(requireActivity(), new ArrayList<>());
         recyclerView.setAdapter(productShopAdapter);
+
+        loadAllProducts();
 
         // Setup categories
         setupCategories();
@@ -142,6 +147,7 @@ public class ShopFragment extends Fragment {
         String normalizedKeyword = keyword.trim().toUpperCase();
         Log.d("ShopFragment", "Searching for products with keyword: " + normalizedKeyword);
 
+        // Remove default category filtering; just search based on the keyword
         productsRef
                 .get()
                 .addOnCompleteListener(task -> {
@@ -165,31 +171,6 @@ public class ShopFragment extends Fragment {
                         productShopAdapter.updateData(filteredList);  // Update the adapter with the filtered list
                     } else {
                         Log.d("Firestore", "Error searching products: ", task.getException());
-                    }
-                });
-    }
-
-    private void loadAllProducts() {
-        productsRef
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<ProductShopModel> allProductsList = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String id = document.getId();
-                            String imageUrl = document.getString("imageUrl");
-                            String name = document.getString("name");
-                            String price = document.getString("price");
-                            String description = document.getString("description");
-                            String rate = document.getString("rate");
-                            String numreviews = document.getString("numreviews");
-                            String category = document.getString("categories");
-
-                            allProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
-                        }
-                        productShopAdapter.updateData(allProductsList);  // Update the adapter with all products
-                    } else {
-                        Log.d("Firestore", "Error loading products: ", task.getException());
                     }
                 });
     }
@@ -222,6 +203,31 @@ public class ShopFragment extends Fragment {
                         productShopAdapter.updateData(productsList);
                     } else {
                         Log.d("Firestore", "Error getting products: ", task.getException());
+                    }
+                });
+    }
+
+    private void loadAllProducts() {
+        productsRef
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<ProductShopModel> allProductsList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String id = document.getId();
+                            String imageUrl = document.getString("imageUrl");
+                            String name = document.getString("name");
+                            String price = document.getString("price");
+                            String description = document.getString("description");
+                            String rate = document.getString("rate");
+                            String numreviews = document.getString("numreviews");
+                            String category = document.getString("categories");
+
+                            allProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                        }
+                        productShopAdapter.updateData(allProductsList);  // Update the adapter with all products
+                    } else {
+                        Log.d("Firestore", "Error loading products: ", task.getException());
                     }
                 });
     }
