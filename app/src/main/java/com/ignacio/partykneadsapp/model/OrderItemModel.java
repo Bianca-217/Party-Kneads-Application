@@ -6,6 +6,7 @@ public class OrderItemModel {
     private String imageUrl;
     private int quantity;
     private String price;
+    private String referenceID;
 
     // Default constructor required for Firestore
     public OrderItemModel() {
@@ -59,5 +60,9 @@ public class OrderItemModel {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public void setReferenceID(String referenceID) {
+        this.referenceID = referenceID;
     }
 }

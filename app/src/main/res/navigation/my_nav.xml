@@ -166,6 +166,9 @@
         <action
             android:id="@+id/action_myProductFragment_to_edit_Items"
             app:destination="@id/edit_Items" />
+        <action
+            android:id="@+id/action_myProductFragment_to_sellerTransactions"
+            app:destination="@id/sellerTransactions" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -342,5 +345,13 @@
         <action
             android:id="@+id/action_edit_Items_to_sellerCakeDescription"
             app:destination="@id/sellerCakeDescription" />
+    </fragment>
+    <fragment
+        android:id="@+id/sellerTransactions"
+        android:name="com.ignacio.partykneadsapp.sellermenus.SellerTransactions"
+        android:label="SellerTransactions" >
+        <action
+            android:id="@+id/action_sellerTransactions_to_myProductFragment"
+            app:destination="@id/myProductFragment" />
     </fragment>
 </navigation>

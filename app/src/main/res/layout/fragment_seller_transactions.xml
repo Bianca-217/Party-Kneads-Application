@@ -147,7 +147,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="377dp"
-        android:layout_height="594dp"
+        android:layout_height="600dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="76dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -156,6 +156,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/whitecont"
         app:layout_constraintVertical_bias="0.115"
+        tools:itemCount="1"
         tools:listitem="@layout/cartcheckout_items" />
 
 
