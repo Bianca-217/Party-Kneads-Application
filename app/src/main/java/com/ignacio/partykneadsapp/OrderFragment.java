@@ -12,11 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.ignacio.partykneadsapp.adapters.ToCompleteAdapter;
+import com.ignacio.partykneadsapp.adapters.ToReceiveAdapter;
 import com.ignacio.partykneadsapp.adapters.ToShipAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentOrderBinding;
+import com.ignacio.partykneadsapp.model.OrderItemModel;
 import com.ignacio.partykneadsapp.model.ToShipModel;
 
 import java.util.ArrayList;
@@ -26,13 +31,23 @@ import java.util.Map;
 public class OrderFragment extends Fragment {
 
     FragmentOrderBinding binding;
-    ToShipAdapter orderAdapter;
+    ToShipAdapter toShipAdapter;
+    ToReceiveAdapter toReceiveAdapter;
+    ToCompleteAdapter toCompleteAdapter; // Add adapter for completed orders
     List<ToShipModel> orderList = new ArrayList<>();
+    FirebaseFirestore db;
+    String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
+    String currentUserEmail;
+
+    // Track which tab is currently active
+    private static final String TO_SHIP = "To Ship";
+    private static final String TO_RECEIVE = "To Receive";
+    private static final String TO_COMPLETE = "Completed";
+    private String currentTab = TO_SHIP;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentOrderBinding.inflate(getLayoutInflater());
         return binding.getRoot();
     }
@@ -41,12 +56,13 @@ public class OrderFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        db = FirebaseFirestore.getInstance();
+        currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
         setupBackButton();
-        initializeAdapter();
-        fetchOrders();
-
-        binding.btnToShip.setOnClickListener(v -> { fetchOrders(); });
-
+        initializeAdapters();
+        setupTabButtons();
+        fetchOrdersBasedOnTab();
     }
 
     private void setupBackButton() {
@@ -58,20 +74,49 @@ public class OrderFragment extends Fragment {
         });
     }
 
+    private void initializeAdapters() {
+        // Initialize adapters
+        toShipAdapter = new ToShipAdapter(orderList, getContext());
+        toReceiveAdapter = new ToReceiveAdapter(orderList, getContext());  // Same adapter for both tabs
+        toCompleteAdapter = new ToCompleteAdapter(orderList, getContext()); // Adapter for completed orders
 
-
-    private void initializeAdapter() {
-        orderAdapter = new ToShipAdapter(orderList, getContext());
+        // Set the initial adapter
         binding.toShipRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.toShipRecycler.setAdapter(orderAdapter);
+        binding.toShipRecycler.setAdapter(toShipAdapter);  // Default adapter
     }
 
-    private void fetchOrders() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
-        String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+    private void setupTabButtons() {
+        binding.btnToShip.setOnClickListener(v -> {
+            currentTab = TO_SHIP;
+            binding.toShipRecycler.setAdapter(toShipAdapter);  // Switch to toShipAdapter
+            fetchOrdersBasedOnTab();
+        });
 
-        // Fetch the admin UID and user's orders in a single method
+        binding.btnToReceive.setOnClickListener(v -> {
+            currentTab = TO_RECEIVE;
+            binding.toShipRecycler.setAdapter(toReceiveAdapter);  // Switch to toReceiveAdapter
+            fetchOrdersBasedOnTab();
+        });
+
+        // Add a button for Completed Orders tab
+        binding.btnCompleted.setOnClickListener(v -> {
+            currentTab = TO_COMPLETE;
+            binding.toShipRecycler.setAdapter(toCompleteAdapter);  // Switch to toCompleteAdapter
+            fetchOrdersBasedOnTab();
+        });
+    }
+
+    private void fetchOrdersBasedOnTab() {
+        if (TO_SHIP.equals(currentTab)) {
+            fetchToShipOrders();
+        } else if (TO_RECEIVE.equals(currentTab)) {
+            fetchToReceiveOrders();
+        } else if (TO_COMPLETE.equals(currentTab)) {
+            fetchToCompleteOrders(); // Fetch completed orders
+        }
+    }
+
+    private void fetchToShipOrders() {
         db.collection("Users")
                 .whereEqualTo("email", adminEmail)
                 .get()
@@ -80,38 +125,113 @@ public class OrderFragment extends Fragment {
                         String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
                         db.collection("Users").document(adminUid)
                                 .collection("Orders")
-                                .whereEqualTo("userEmail", currentUserEmail) // Filter by status
+                                .whereEqualTo("userEmail", currentUserEmail)
+                                .whereIn("status", List.of("placed", "preparing order"))
                                 .get()
                                 .addOnSuccessListener(orderSnapshots -> {
                                     orderList.clear();
                                     for (QueryDocumentSnapshot doc : orderSnapshots) {
-                                        processOrder(doc);
+                                        String status = doc.getString("status");
+                                        String referenceId = doc.getId();
+                                        fetchFirstItemFromOrder(doc, referenceId, status);
                                     }
-                                    orderAdapter.notifyDataSetChanged(); // Refresh RecyclerView
+                                    toShipAdapter.notifyDataSetChanged();  // Notify adapter for changes
                                 })
                                 .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
-                    } else {
-                        Log.e("Firestore Error", "Admin user not found.");
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
     }
 
-    private void processOrder(QueryDocumentSnapshot doc) {
+    private void fetchToReceiveOrders() {
+        db.collection("Users")
+                .whereEqualTo("email", adminEmail)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        db.collection("Users").document(adminUid)
+                                .collection("Orders")
+                                .whereEqualTo("userEmail", currentUserEmail)
+                                .whereEqualTo("status", "Out for Delivery")
+                                .get()
+                                .addOnSuccessListener(orderSnapshots -> {
+                                    orderList.clear();
+                                    for (QueryDocumentSnapshot doc : orderSnapshots) {
+                                        String status = doc.getString("status");
+                                        String referenceId = doc.getId();
+                                        fetchFirstItemFromOrder(doc, referenceId, status);
+                                    }
+                                    toReceiveAdapter.notifyDataSetChanged();  // Notify adapter for changes
+                                })
+                                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+    }
+
+    private void fetchToCompleteOrders() {
+        db.collection("Users")
+                .whereEqualTo("email", adminEmail)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        db.collection("Users").document(adminUid)
+                                .collection("Orders")
+                                .whereEqualTo("userEmail", currentUserEmail)
+                                .whereEqualTo("status", "Complete Order")
+                                .get()
+                                .addOnSuccessListener(orderSnapshots -> {
+                                    orderList.clear();
+                                    for (QueryDocumentSnapshot doc : orderSnapshots) {
+                                        String status = doc.getString("status");
+                                        String referenceId = doc.getId();
+                                        fetchFirstItemFromOrder(doc, referenceId, status);
+                                    }
+                                    toCompleteAdapter.notifyDataSetChanged();  // Notify adapter for changes
+                                })
+                                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+    }
+
+    private void fetchFirstItemFromOrder(QueryDocumentSnapshot doc, String referenceId, String status) {
         List<Map<String, Object>> items = (List<Map<String, Object>>) doc.get("items");
-        if (items != null) {
-            for (Map<String, Object> item : items) {
-                String productName = (String) item.get("productName");
-                String cakeSize = (String) item.get("cakeSize");
-                long quantity = (long) item.get("quantity"); // Assuming quantity is stored as long
-                String totalPrice = (String) item.get("totalPrice");
-                String imageUrl = (String) item.get("imageUrl");
-                String status = doc.getString("status").equals("preparing order") ?
-                        "Seller preparing your order" : "Placed Order";
-                // Create a new ToShipModel instance
-                ToShipModel order = new ToShipModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice, status);
-                orderList.add(order); // Add order to list
+
+        if (items != null && !items.isEmpty()) {
+            Map<String, Object> firstItem = items.get(0);
+            String productName = (String) firstItem.get("productName");
+            String cakeSize = (String) firstItem.get("cakeSize");
+            long quantity = firstItem.get("quantity") != null ? (long) firstItem.get("quantity") : 0;
+            String totalPrice = (String) firstItem.get("totalPrice");
+            String imageUrl = (String) firstItem.get("imageUrl");
+
+            String displayStatus;
+            switch (status.toLowerCase()) {
+                case "preparing order":
+                    displayStatus = "Seller is preparing your order";
+                    break;
+                case "out for delivery":
+                    displayStatus = "Your order is Out for Delivery";
+                    break;
+                case "complete order":
+                    displayStatus = "Order Completed";
+                    break;
+                default:
+                    displayStatus = "Placed Order";
+                    break;
             }
+
+            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice);
+            List<OrderItemModel> itemList = new ArrayList<>();
+            itemList.add(item);
+
+            ToShipModel order = new ToShipModel(referenceId, displayStatus, totalPrice, productName, cakeSize, imageUrl, (int) quantity, itemList);
+            orderList.add(order);
         }
     }
 }
+
+

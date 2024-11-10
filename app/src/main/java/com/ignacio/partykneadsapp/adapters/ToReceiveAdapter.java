@@ -10,12 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.R;
@@ -26,12 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewHolder> {
+public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.OrderViewHolder> {
     private List<ToShipModel> orderList;
     private Context context;
 
     // Constructor to initialize the order list and context
-    public ToShipAdapter(List<ToShipModel> orderList, Context context) {
+    public ToReceiveAdapter(List<ToShipModel> orderList, Context context) {
         this.orderList = orderList;
         this.context = context;
     }
@@ -39,14 +42,12 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
     @NonNull
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.toshipitems, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.toreceiveitems, parent, false);
         return new OrderViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-
-
         ToShipModel order = orderList.get(position);
         holder.productName.setText(order.getProductName());
         holder.cakeSize.setText(order.getCakeSize());
@@ -61,6 +62,17 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
         // Set the status text
         holder.orderStatus.setText(order.getStatus());
 
+        // Handle button click if needed
+        holder.receiveButton.setOnClickListener(v -> {
+            Toast.makeText(context, "Order received!", Toast.LENGTH_SHORT).show();
+            // Additional logic to mark order as received
+        });
+
+        holder.receiveButton.setOnClickListener(v -> {
+            // Open the confirmation dialog
+            showConfirmReceivedDialog(order.getReferenceId(), holder.getAdapterPosition());
+        });
+
         // Handle item click to open dialog
         holder.itemView.setOnClickListener(v -> showOrderDetailsDialog(order.getReferenceId()));
     }
@@ -74,6 +86,7 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
     static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView productName, cakeSize, quantity, totalPrice, orderStatus;
         ImageView cakeImage;
+        Button receiveButton;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,9 +95,89 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
             quantity = itemView.findViewById(R.id.quantity);
             totalPrice = itemView.findViewById(R.id.totalPrice);
             cakeImage = itemView.findViewById(R.id.cakeImage);
-            orderStatus = itemView.findViewById(R.id.txtStatus);
+            orderStatus = itemView.findViewById(R.id.orderStatus);
+            receiveButton = itemView.findViewById(R.id.receiveButton);
         }
     }
+
+    private void showConfirmReceivedDialog(String referenceId, int position) {
+        // Create a dialog
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.confirmreceived_dialog);
+
+        // Find the confirm button
+        Button btnReceive = dialog.findViewById(R.id.btnReceive);
+
+        // Set up the confirmation button
+        btnReceive.setOnClickListener(v -> {
+            // Update the order status in the data source (e.g., Firestore)
+
+            updateOrderStatus(referenceId);
+
+            // Update the order status in the RecyclerView list
+            orderList.get(position).setStatus("Complete Order");
+            notifyItemChanged(position);  // Refresh the item to show the updated status
+            updateOrderStatusLocally(position, "Complete Order");
+            // Show confirmation message
+            Toast.makeText(context, "Order marked as complete!", Toast.LENGTH_SHORT).show();
+
+            // Dismiss the dialog
+            dialog.dismiss();
+        });
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    public void updateOrderStatusLocally(int position, String status) {
+        // Update the status in the orderList
+        ToShipModel order = orderList.get(position);
+        order.setStatus(status);  // Update the order status
+
+        // Notify the adapter that the item at this position has been updated
+        notifyItemChanged(position);
+    }
+
+        private void updateOrderStatus(String referenceId) {
+            // Get Firestore instance
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            // Query Users collection where email field equals "sweetkatrinabiancaignacio@gmail.com"
+            db.collection("Users")
+                    .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")  // Query by email
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                            // Assuming only one document will be returned
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            String uid = document.getId();  // Get the UID of the user (document ID)
+
+                            // Now use the UID to access the Orders collection and update the order status
+                            DocumentReference orderRef = db.collection("Users")
+                                    .document(uid)  // Use the UID to access the user's document
+                                    .collection("Orders")
+                                    .document(referenceId);  // Order document ID using referenceId
+
+                            // Update the status to "Complete Order"
+                            orderRef.update("status", "Complete Order")
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Order status successfully updated
+                                        Log.d("OrderAdapter", "Order status updated to Complete Order.");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle error in updating the status
+                                        Log.e("OrderAdapter", "Error updating order status", e);
+                                    });
+                        } else {
+                            // Handle the case where the email is not found or query fails
+                            Log.e("OrderAdapter", "User with email not found or query failed.");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Handle any errors with the query
+                        Log.e("OrderAdapter", "Error querying Users collection", e);
+                    });
+        }
 
 
     private void showOrderDetailsDialog(String referenceId) {
@@ -191,6 +284,4 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
                     Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 }

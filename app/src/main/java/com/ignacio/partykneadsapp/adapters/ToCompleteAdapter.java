@@ -10,12 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.R;
@@ -26,12 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewHolder> {
+public class ToCompleteAdapter extends RecyclerView.Adapter<ToCompleteAdapter.OrderViewHolder> {
     private List<ToShipModel> orderList;
     private Context context;
 
     // Constructor to initialize the order list and context
-    public ToShipAdapter(List<ToShipModel> orderList, Context context) {
+    public ToCompleteAdapter(List<ToShipModel> orderList, Context context) {
         this.orderList = orderList;
         this.context = context;
     }
@@ -39,14 +42,12 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
     @NonNull
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.toshipitems, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.completeorderitems, parent, false);
         return new OrderViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-
-
         ToShipModel order = orderList.get(position);
         holder.productName.setText(order.getProductName());
         holder.cakeSize.setText(order.getCakeSize());
@@ -61,7 +62,9 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
         // Set the status text
         holder.orderStatus.setText(order.getStatus());
 
-        // Handle item click to open dialog
+
+
+        // Handle item click to open order details
         holder.itemView.setOnClickListener(v -> showOrderDetailsDialog(order.getReferenceId()));
     }
 
@@ -74,6 +77,7 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
     static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView productName, cakeSize, quantity, totalPrice, orderStatus;
         ImageView cakeImage;
+        Button receiveButton;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,16 +87,60 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
             totalPrice = itemView.findViewById(R.id.totalPrice);
             cakeImage = itemView.findViewById(R.id.cakeImage);
             orderStatus = itemView.findViewById(R.id.txtStatus);
+            receiveButton = itemView.findViewById(R.id.receiveButton);
         }
     }
 
+
+
+
+    private void updateOrderStatus(String referenceId) {
+        // Get Firestore instance
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Query Users collection where email field equals "sweetkatrinabiancaignacio@gmail.com"
+        db.collection("Users")
+                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")  // Query by email
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        // Assuming only one document will be returned
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        String uid = document.getId();  // Get the UID of the user (document ID)
+
+                        // Now use the UID to access the Orders collection and update the order status
+                        DocumentReference orderRef = db.collection("Users")
+                                .document(uid)  // Use the UID to access the user's document
+                                .collection("Orders")
+                                .document(referenceId);  // Order document ID using referenceId
+
+                        // Update the status to "Completed"
+                        orderRef.update("status", "Completed")
+                                .addOnSuccessListener(aVoid -> {
+                                    // Order status successfully updated
+                                    Log.d("OrderAdapter", "Order status updated to Completed.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle error in updating the status
+                                    Log.e("OrderAdapter", "Error updating order status", e);
+                                });
+                    } else {
+                        // Handle the case where the email is not found or query fails
+                        Log.e("OrderAdapter", "User with email not found or query failed.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors with the query
+                    Log.e("OrderAdapter", "Error querying Users collection", e);
+                });
+    }
 
     private void showOrderDetailsDialog(String referenceId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Query the 'Users' collection for the document with the specified email
         db.collection("Users")
-                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com") // Make sure email is correctly stored in Firestore
+                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -101,9 +149,9 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
 
                         // Access the Orders collection and the specific order by referenceId
                         db.collection("Users")
-                                .document(userDocument.getId()) // Get the user document ID
+                                .document(userDocument.getId())
                                 .collection("Orders")
-                                .document(referenceId) // Reference to the specific order document
+                                .document(referenceId)
                                 .get()
                                 .addOnSuccessListener(orderSnapshot -> {
                                     if (orderSnapshot.exists()) {
@@ -147,50 +195,36 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
                                                 String imageUrl = (String) item.get("imageUrl");
                                                 String price = (String) item.get("totalPrice");
 
-                                                // Add item to the list if the required fields are not null
-                                                if (productName != null && price != null) {
+                                                // Add item to the list if the required fields are present
+                                                if (productName != null && cakeSize != null && price != null) {
                                                     productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, price));
-
-                                                    // Sum the totalPrice (assuming the price is stored with the "₱" symbol)
-                                                    try {
-                                                        String priceWithoutSymbol = price.replace("₱", "").trim();  // Remove "₱" symbol and spaces
-                                                        double itemPrice = Double.parseDouble(priceWithoutSymbol);  // Convert to double
-                                                        totalPrice += itemPrice * quantity;  // Multiply by quantity and add to totalPrice
-                                                    } catch (NumberFormatException e) {
-                                                        Log.e("ParseError", "Invalid price format: " + price);
-                                                    }
+                                                    totalPrice += Double.parseDouble(price.replace("P", "")); // Add price after removing "P"
                                                 }
                                             }
 
-                                            // Notify adapter of the new data
+                                            // Notify the adapter to update the RecyclerView
                                             adapter.notifyDataSetChanged();
 
-                                            // Set the total price to the itemTotal TextView
-                                            itemTotalTextView.setText("₱" + String.format("%.2f", totalPrice)); // Format to 2 decimal places
-                                            totalCosttTextView.setText(itemTotalTextView.getText());
+                                            // Set the total cost
+                                            itemTotalTextView.setText("Total Items: " + items.size());
+                                            totalCosttTextView.setText("Total Cost: P" + totalPrice);
                                         }
 
-                                        // Show the dialog after all data is set
+                                        // Show the dialog
                                         dialog.show();
                                     } else {
-                                        Log.d("OrderDetailsDialog", "Order document not found.");
-                                        Toast.makeText(context, "Order not found.", Toast.LENGTH_SHORT).show();
+                                        Log.d("OrderDetailsDialog", "Order not found in Firestore.");
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("Firestore Error", e.getMessage());
-                                    Toast.makeText(context, "Failed to fetch order details.", Toast.LENGTH_SHORT).show();
+                                    Log.e("OrderDetailsDialog", "Error fetching order details", e);
                                 });
                     } else {
-                        Log.d("OrderDetailsDialog", "User document not found.");
-                        Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show();
+                        Log.e("OrderDetailsDialog", "User not found.");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firestore Error", e.getMessage());
-                    Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
+                    Log.e("OrderDetailsDialog", "Error querying Users collection", e);
                 });
     }
-
-
 }

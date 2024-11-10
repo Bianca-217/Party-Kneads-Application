@@ -95,7 +95,6 @@
                 android:id="@+id/totalPrice"
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:gravity="bottom|end"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
                 android:fontFamily="@font/montserrat_bold"
@@ -110,25 +109,16 @@
                 android:layout_marginLeft="10dp"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View Details"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/footerpink"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/grey" />
+
                 <Button
+                    android:id="@+id/receiveButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/pink"
-                    app:cornerRadius="5dp"
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_semibold"
                     android:layout_gravity="right"
-                    android:text="Recieve"
+                    android:text="Recieve Order"
                     android:textColor="@color/semiwhite"
 
                     />
@@ -149,6 +139,7 @@
             android:src="@drawable/item_bg"/>
 
         <TextView
+            android:id="@+id/orderStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Your order is out for delivery."

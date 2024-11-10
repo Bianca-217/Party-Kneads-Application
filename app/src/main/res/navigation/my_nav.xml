@@ -142,6 +142,11 @@
         <action
             android:id="@+id/action_seller_HomePageFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+
+        <action
+            android:id="@+id/action_seller_HomePageFragment_to_edit_Items"
+            app:destination="@id/edit_Items" />
+
         <action
             android:id="@+id/action_seller_HomePageFragment_to_add_Items"
             app:destination="@id/add_Items" />
@@ -158,6 +163,12 @@
         <action
             android:id="@+id/action_myProductFragment_to_sellerCakeDescription"
             app:destination="@id/sellerCakeDescription" />
+        <action
+            android:id="@+id/action_myProductFragment_to_edit_Items"
+            app:destination="@id/edit_Items" />
+        <action
+            android:id="@+id/action_myProductFragment_to_sellerTransactions"
+            app:destination="@id/sellerTransactions" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -312,6 +323,35 @@
         tools:layout="@layout/fragment_seller_cake_description" >
         <action
             android:id="@+id/action_sellerCakeDescription_to_myProductFragment"
+            app:destination="@id/myProductFragment" />
+        <action
+            android:id="@+id/action_sellerCakeDescription_to_edit_Items"
+            app:destination="@id/edit_Items" />
+    </fragment>
+    <fragment
+        android:id="@+id/edit_Items"
+        android:name="com.ignacio.partykneadsapp.sellermenus.Edit_Items"
+        android:label="fragment_edit__items"
+        tools:layout="@layout/fragment_edit__items" >
+        <action
+            android:id="@+id/action_edit_Items_to_seller_HomePageFragment"
+            app:destination="@id/seller_HomePageFragment" />
+        <action
+            android:id="@+id/action_edit_Items_to_add_Items"
+            app:destination="@id/add_Items" />
+        <action
+            android:id="@+id/action_edit_Items_to_myProductFragment"
+            app:destination="@id/myProductFragment" />
+        <action
+            android:id="@+id/action_edit_Items_to_sellerCakeDescription"
+            app:destination="@id/sellerCakeDescription" />
+    </fragment>
+    <fragment
+        android:id="@+id/sellerTransactions"
+        android:name="com.ignacio.partykneadsapp.sellermenus.SellerTransactions"
+        android:label="SellerTransactions" >
+        <action
+            android:id="@+id/action_sellerTransactions_to_myProductFragment"
             app:destination="@id/myProductFragment" />
     </fragment>
 </navigation>
