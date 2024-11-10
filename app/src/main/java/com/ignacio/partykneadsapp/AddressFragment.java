@@ -97,35 +97,43 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         if (cUser != null) {
             String userId = cUser.getUid();
 
-            // First, fetch active locations
+            // Fetch all locations without filtering by status
             db.collection("Users").document(userId).collection("Locations")
-                    .whereEqualTo("status", "Active")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            activeLocations.clear();
+                            activeLocations.clear(); // Clear existing locations
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String houseNum = document.getString("houseNum");
+                                Log.d("AddressFragment", "Fetched document: " + document.getId());
+
+                                // Fetch fields using the updated names
+                                String houseNum = document.getString("houseNumber");
                                 String barangay = document.getString("barangay");
                                 String city = document.getString("city");
                                 String postalCode = document.getString("postalCode");
-                                String phoneNumber = document.getString("phoneNumber");
-                                String userNameInLocation = document.getString("userName");
+                                String phoneNumber = document.getString("contactNumber");
+                                String userNameInLocation = document.getString("fullName");
 
-                                // Check if the location entry has a userName, else fetch from main user profile
+                                // Debugging: Print out all the fields fetched
+                                Log.d("AddressFragment", "HouseNum: " + houseNum);
+                                Log.d("AddressFragment", "Barangay: " + barangay);
+                                Log.d("AddressFragment", "City: " + city);
+                                Log.d("AddressFragment", "PostalCode: " + postalCode);
+                                Log.d("AddressFragment", "PhoneNumber: " + phoneNumber);
+                                Log.d("AddressFragment", "UserNameInLocation: " + userNameInLocation);
+
+                                // Check if the location entry has a userName, else fetch from the main user profile
                                 if (userNameInLocation == null || userNameInLocation.isEmpty()) {
                                     fetchUserName(userId, () -> {
-                                        // This will be used as a fallback if userName in location is null or empty
                                         LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber, userName);
-                                        activeLocations.add(location); // Add the LocationModel to the list
-                                        locationAdapter.setUserName(userName); // Set the userName in the adapter
+                                        activeLocations.add(location);
+                                        locationAdapter.setUserName(userName);
                                         locationAdapter.notifyDataSetChanged();
                                     });
                                 } else {
-                                    // If userName is available in location entry, use it directly
                                     LocationModel location = new LocationModel(houseNum, barangay, city + ", Laguna", postalCode, phoneNumber, userNameInLocation);
                                     locationAdapter.setUserName(userNameInLocation);
-                                    activeLocations.add(location); // Add the LocationModel to the list
+                                    activeLocations.add(location);
                                 }
                             }
                             locationAdapter.notifyDataSetChanged(); // Notify adapter about data change
@@ -139,28 +147,31 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         }
     }
 
-
     private void fetchUserName(String userId, Runnable onComplete) {
         db.collection("Users").document(userId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document != null && document.exists()) {
-                            String firstName = document.getString("First Name");
-                            String lastName = document.getString("Last Name");
-                            userName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-                            locationAdapter.setUserName(userName); // Set userName after fetching
+                            // Fetch full name from the updated field
+                            String fullName = document.getString("fullName"); // Assuming the full name is stored in 'fullName'
+
+                            // If fullName exists, use it, otherwise, fallback to empty string
+                            userName = (fullName != null && !fullName.isEmpty()) ? fullName : "";
+
+                            // Pass the fetched userName to the adapter
+                            locationAdapter.setUserName(userName);
                         }
                     } else {
                         Log.w("AddressFragment", "Error fetching user name", task.getException());
                     }
-                    onComplete.run(); // Run the onComplete callback
+                    // Ensure onComplete callback runs after the task is done
+                    onComplete.run();
                 })
                 .addOnFailureListener(e -> {
                     Log.w("AddressFragment", "Error fetching user name", e);
-                    onComplete.run(); // Ensure to run the callback even on failure
+                    // Ensure onComplete callback runs on failure as well
+                    onComplete.run();
                 });
     }
-
 }
-
