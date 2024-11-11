@@ -240,6 +240,10 @@
         <action
             android:id="@+id/action_checkoutFragment_to_orderConfirmationFragment"
             app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_checkoutFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/addressFragment"
@@ -357,4 +361,9 @@
             android:id="@+id/action_sellerTransactions_to_myProductFragment"
             app:destination="@id/myProductFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.ignacio.partykneadsapp.customermenus.NotificationFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notification" />
 </navigation>
