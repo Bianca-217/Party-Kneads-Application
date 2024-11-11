@@ -3,20 +3,14 @@ package com.ignacio.partykneadsapp;
 import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,8 +33,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
 import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter;
+import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.ignacio.partykneadsapp.model.NotificationViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -207,7 +203,7 @@ public class CheckoutFragment extends Fragment {
 
 
     private void proceedToSaveOrder() {
-        // Generate a random reference ID for the order
+        // Generate a random reference ID
         String orderRefId = "REF-" + System.currentTimeMillis();
 
         // Create a map to store order details
@@ -267,10 +263,6 @@ public class CheckoutFragment extends Fragment {
                                                 .set(orderData, SetOptions.merge()) // Use merge to avoid overwriting
                                                 .addOnSuccessListener(documentReference -> {
                                                     Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
-
-                                                    // Step 1: Send notification to admin after successful order placement
-                                                    sendOrderNotificationToAdmin(userDocId, orderRefId);
-
                                                     clearCart();
                                                     showSuccessDialog(); // Show success dialog after order placement
                                                 })
@@ -291,61 +283,22 @@ public class CheckoutFragment extends Fragment {
                 });
     }
 
-    private void sendOrderNotificationToAdmin(String adminUserId, String orderRefId) {
-        // Get the context from the fragment
-        Context context = getContext(); // or requireContext() for non-null context
+    private void sendOrderToNotificationFragment(String orderRefId) {
+        // Assuming you have a ViewModel or shared resource to send the order data
+        // Example using LiveData or directly calling the fragment to refresh
 
-        if (context != null) {
-            try {
-                // Step 1: Create an Intent to trigger the BroadcastReceiver
-                Intent intent = new Intent(context, OrderNotificationReceiver.class);
-                intent.putExtra("orderRefId", orderRefId);  // Pass order details if needed
+        // If you are using a shared ViewModel for notifications
+        NotificationViewModel notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
+        notificationViewModel.setOrderReferenceId(orderRefId);
 
-                // Step 2: Determine the PendingIntent flag based on Android version
-                int pendingIntentFlag;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // For Android 12 (API 31) and above, use FLAG_IMMUTABLE
-                    pendingIntentFlag = PendingIntent.FLAG_IMMUTABLE;
-                } else {
-                    // For Android 10 (API 29) and above (up to Android 11), FLAG_UPDATE_CURRENT is commonly used
-                    pendingIntentFlag = PendingIntent.FLAG_UPDATE_CURRENT;
-                }
+        // Or, if you want to directly update the NotificationFragment using FragmentManager:
+        NotificationFragment notificationFragment = (NotificationFragment) getChildFragmentManager().findFragmentByTag("NotificationFragment");
 
-                // Step 3: Create a PendingIntent for the BroadcastReceiver with the correct flag
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                        context, 0, intent, pendingIntentFlag);
-
-                // Step 4: Create the notification channel for Android 8.0+ (API level 26)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel(
-                            "order_notifications_channel",
-                            "New Orders",
-                            NotificationManager.IMPORTANCE_HIGH);
-                    channel.setDescription("Notifications for new orders placed.");
-                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.createNotificationChannel(channel);
-                }
-
-                // Step 5: Create the notification
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "order_notifications_channel")
-                        .setSmallIcon(R.drawable.add)  // Replace with your notification icon
-                        .setContentTitle("New Order!")
-                        .setContentText("A customer has placed a new order with reference: " + orderRefId)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setAutoCancel(true)
-                        .setContentIntent(pendingIntent); // Add PendingIntent to open app when clicked
-
-                // Step 6: Send the notification
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-                notificationManager.notify(1, builder.build()); // Notification ID = 1 for this case
-                Log.d("CheckoutFragment", "Notification sent to admin.");
-
-            } catch (SecurityException e) {
-                Log.e("CheckoutFragment", "Error sending notification: Permission denied", e);
-                // You can handle this exception here (e.g., show a message to the user)
-            }
+        if (notificationFragment != null) {
+            notificationFragment.updateNotificationList(orderRefId);
         } else {
-            Log.w("CheckoutFragment", "Context is null. Unable to send notification.");
+            // Handle the case when NotificationFragment is not found
+            Log.e("CheckoutFragment", "NotificationFragment not found.");
         }
     }
 
@@ -472,4 +425,5 @@ public class CheckoutFragment extends Fragment {
             Log.w("CheckoutFragment", "No current user is logged in.");
         }
     }
+
 }
