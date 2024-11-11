@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="700dp"
+    android:id="@+id/dialog"
+    android:layout_marginHorizontal="20dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg"
     >
 
@@ -33,6 +35,7 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <ImageButton
+                    android:id="@+id/closeButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:src="@drawable/close_button"

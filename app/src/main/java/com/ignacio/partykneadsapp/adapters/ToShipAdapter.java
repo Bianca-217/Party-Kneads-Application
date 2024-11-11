@@ -2,6 +2,8 @@ package com.ignacio.partykneadsapp.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,6 +115,12 @@ public class ToShipAdapter extends RecyclerView.Adapter<ToShipAdapter.OrderViewH
                                         // Initialize the dialog
                                         Dialog dialog = new Dialog(context);
                                         dialog.setContentView(R.layout.view_order_details);
+
+                                        // Make dialog background transparent with rounded corners programmatically
+                                        // Set the dialog background to transparent
+                                        if (dialog.getWindow() != null) {
+                                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        }
 
                                         // Get references to the TextViews in the dialog
                                         TextView orderIdTextView = dialog.findViewById(R.id.OrderID);

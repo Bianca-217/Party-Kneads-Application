@@ -162,6 +162,11 @@ public class ToCompleteAdapter extends RecyclerView.Adapter<ToCompleteAdapter.Or
                                         Dialog dialog = new Dialog(context);
                                         dialog.setContentView(R.layout.view_order_details);
 
+                                        // Make dialog background transparent
+                                        if (dialog.getWindow() != null) {
+                                            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                        }
+
                                         // Get references to the TextViews in the dialog
                                         TextView orderIdTextView = dialog.findViewById(R.id.OrderID);
                                         TextView itemTotalTextView = dialog.findViewById(R.id.itemTotal);
