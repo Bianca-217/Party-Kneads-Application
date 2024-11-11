@@ -34,6 +34,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.BalloonColorAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentBalloonClassicDescriptionBinding;
 import com.ignacio.partykneadsapp.model.AddToCartModel;
@@ -738,34 +739,82 @@ public class BalloonClassicDescription extends Fragment {
     }
 
     private void saveCartItem(String userId, String selectedLetter, int quantityLetter) {
-        // Create a new AddToCartModel with imageUrl and timestamp
+        // Extract the product details
         String priceText = productPrice.getText().toString();
-        int totalPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", "")) * quantityLetter;
-
-        String imageUrl = productShopModel.getimageUrl(); // Ensure this accesses the image URL correctly
-
-        long timestamp = System.currentTimeMillis(); // Get the current timestamp
-
-        AddToCartModel cartItem = new AddToCartModel(
-                productShopModel.getId(),
-                productShopModel.getName(),
-                color + " | " + selectedLetter,
-                quantityLetter,
-                "₱" + (totalPrice),
-                imageUrl,
-                timestamp // Pass the timestamp here
-        );
+        int unitPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", ""));
+        int totalPrice = unitPrice * quantityLetter;
+        String imageUrl = productShopModel.getimageUrl();
+        long timestamp = System.currentTimeMillis();
+        String productName = productShopModel.getName();
+        String uniqueKey = color + " | " + selectedLetter; // Create a unique key for color and letter combination
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(userId).collection("cartItems").add(cartItem)
-                .addOnSuccessListener(documentReference -> {
-                    // Successfully added to cart
+
+        // Check if the product with the same color and letter already exists in the cart
+        db.collection("Users")
+                .document(userId)
+                .collection("cartItems")
+                .whereEqualTo("productName", productName)
+                .whereEqualTo("cakeSize", uniqueKey)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // Item exists, update the quantity and totalPrice
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String docId = document.getId();
+                            int existingQuantity = document.getLong("quantity").intValue();
+                            String existingTotalPriceStr = document.getString("totalPrice");
+
+                            // Calculate the new quantity and total price
+                            int newQuantity = existingQuantity + quantityLetter;
+                            int existingTotalPrice = Integer.parseInt(existingTotalPriceStr.replaceAll("[^\\d]", ""));
+                            int newTotalPrice = existingTotalPrice + (unitPrice * quantityLetter);
+
+                            // Update the existing cart item
+                            db.collection("Users")
+                                    .document(userId)
+                                    .collection("cartItems")
+                                    .document(docId)
+                                    .update("quantity", newQuantity, "totalPrice", "₱" + newTotalPrice)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Successfully updated the cart item
+                                        Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getActivity(), "Failed to update cart item.", Toast.LENGTH_SHORT).show();
+                                        Log.e("CartItem", "Error updating cart item: ", e);
+                                    });
+                        }
+                    } else {
+                        // Item doesn't exist, create a new cart item
+                        AddToCartModel cartItem = new AddToCartModel(
+                                productShopModel.getId(),
+                                productName,
+                                uniqueKey,
+                                quantityLetter,
+                                "₱" + totalPrice,
+                                imageUrl,
+                                timestamp
+                        );
+
+                        // Add the new item to the cart
+                        db.collection("Users")
+                                .document(userId)
+                                .collection("cartItems")
+                                .add(cartItem)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(getActivity(), "Item added to cart", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure
-                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+                    Log.e("CartItem", "Error fetching cart items: ", e);
                 });
     }
+
 
 
     private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {

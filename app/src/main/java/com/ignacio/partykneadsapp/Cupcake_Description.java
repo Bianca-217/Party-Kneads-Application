@@ -30,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.CakeSizeAdapter;
 import com.ignacio.partykneadsapp.adapters.CupcakeSizeAdapter;
 import com.ignacio.partykneadsapp.model.CakeSizeModel;
@@ -179,32 +180,81 @@ public class Cupcake_Description extends Fragment {
     }
 
     private void saveCartItem(String userId) {
-        // Create a new AddToCartModel with imageUrl and timestamp
+        // Extract product details
         String imageUrl = productShopModel.getimageUrl(); // Ensure this accesses the image URL correctly
-
+        String productName = productShopModel.getName();
+        String cupcakeSize = selectedCupcakeSize.getSize();
+        String priceText = productPrice.getText().toString();
+        int unitPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", "")); // Convert price to integer
+        int totalPrice = unitPrice * quantity;
         long timestamp = System.currentTimeMillis(); // Get the current timestamp
 
-        AddToCartModel cartItem = new AddToCartModel(
-                productShopModel.getId(),
-                productShopModel.getName(),
-                selectedCupcakeSize.getSize(),
-                quantity,
-                productPrice.getText().toString(),
-                imageUrl,
-                timestamp // Pass the timestamp here
-        );
-
-        // Save to Firestore under the user's document
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(userId).collection("cartItems").add(cartItem)
-                .addOnSuccessListener(documentReference -> {
-                    // Successfully added to cart
+
+        // Check if the product with the same name and cupcake size already exists in the cart
+        db.collection("Users")
+                .document(userId)
+                .collection("cartItems")
+                .whereEqualTo("productName", productName)
+                .whereEqualTo("cakeSize", cupcakeSize)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // Item exists, update the quantity and total price
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String docId = document.getId();
+                            int existingQuantity = document.getLong("quantity").intValue();
+                            String existingTotalPriceStr = document.getString("totalPrice");
+
+                            // Calculate the new quantity and total price
+                            int newQuantity = existingQuantity + quantity;
+                            int existingTotalPrice = Integer.parseInt(existingTotalPriceStr.replaceAll("[^\\d]", ""));
+                            int newTotalPrice = existingTotalPrice + (unitPrice * quantity);
+
+                            // Update the existing cart item
+                            db.collection("Users")
+                                    .document(userId)
+                                    .collection("cartItems")
+                                    .document(docId)
+                                    .update("quantity", newQuantity, "totalPrice", "₱" + newTotalPrice)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getActivity(), "Failed to update cart item.", Toast.LENGTH_SHORT).show();
+                                        Log.e("CartItem", "Error updating cart item: ", e);
+                                    });
+                        }
+                    } else {
+                        // Item doesn't exist, create a new cart item
+                        AddToCartModel cartItem = new AddToCartModel(
+                                productShopModel.getId(),
+                                productName,
+                                cupcakeSize,
+                                quantity,
+                                "₱" + totalPrice,
+                                imageUrl,
+                                timestamp
+                        );
+
+                        // Save the new item to the cart
+                        db.collection("Users")
+                                .document(userId)
+                                .collection("cartItems")
+                                .add(cartItem)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(getActivity(), "Item added to cart", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure
-                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+                    Log.e("CartItem", "Error fetching cart items: ", e);
                 });
     }
+
 
     private void handleBuyNow() {
         // Create a CartItemModel for the selected cake and quantity

@@ -54,7 +54,7 @@ public class SellerOrderFragment extends Fragment {
 
         // Initialize list and adapter
         ordersList = new ArrayList<>();
-        adapter = new PendingOrdersAdapter(getContext(), ordersList, notificationViewModel); // Pass ViewModel to Adapter
+        adapter = new PendingOrdersAdapter(getContext(), ordersList); // Pass ViewModel to Adapter
 
         // Set up RecyclerView
         binding.pendingOrders.setLayoutManager(new LinearLayoutManager(getContext()));

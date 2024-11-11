@@ -30,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.CakeSizeAdapter;
 import com.ignacio.partykneadsapp.model.CakeSizeModel;
 import com.ignacio.partykneadsapp.model.CartItemModel;
@@ -178,32 +179,110 @@ public class Cake_Description extends Fragment {
     }
 
     private void saveCartItem(String userId) {
-        // Create a new AddToCartModel with imageUrl and timestamp
         String imageUrl = productShopModel.getimageUrl(); // Ensure this accesses the image URL correctly
-
         long timestamp = System.currentTimeMillis(); // Get the current timestamp
+        String productName = productShopModel.getName();
+        String cakeSize = selectedCakeSize.getSize();
 
-        AddToCartModel cartItem = new AddToCartModel(
-                productShopModel.getId(),
-                productShopModel.getName(),
-                selectedCakeSize.getSize(),
-                quantity,
-                productPrice.getText().toString(),
-                imageUrl,
-                timestamp // Pass the timestamp here
-        );
-
-        // Save to Firestore under the user's document
+        // Check if the product and cake size already exist in the user's cart
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(userId).collection("cartItems").add(cartItem)
-                .addOnSuccessListener(documentReference -> {
-                    // Successfully added to cart
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failure
-                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+        db.collection("Users")
+                .document(userId)
+                .collection("cartItems")
+                .whereEqualTo("productName", productName)
+                .whereEqualTo("cakeSize", cakeSize)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // Item exists, update the quantity and price
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Retrieve the existing cart item document
+                            String docId = document.getId();
+                            int existingQuantity = document.getLong("quantity").intValue();
+                            String existingPrice = document.getString("totalPrice");
+
+                            // Calculate new quantity and price
+                            int newQuantity = existingQuantity + quantity;
+                            String newPrice = calculateNewPrice(existingPrice, productPrice.getText().toString(), existingQuantity, newQuantity);
+
+                            // Debugging: Log the new quantity and total price
+                            Log.d("CartItem", "New Quantity: " + newQuantity);
+                            Log.d("CartItem", "New Price: " + newPrice);
+
+                            // Update the cart item with new quantity and price
+                            db.collection("Users")
+                                    .document(userId)
+                                    .collection("cartItems")
+                                    .document(docId)
+                                    .update("quantity", newQuantity, "totalPrice", newPrice)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Successfully updated the cart item
+                                        Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle failure
+                                        Toast.makeText(getActivity(), "Failed to update cart item.", Toast.LENGTH_SHORT).show();
+                                        Log.e("CartItem", "Error updating cart item: ", e);
+                                    });
+                        }
+                    } else {
+                        // Item doesn't exist, create a new cart item
+                        AddToCartModel cartItem = new AddToCartModel(
+                                productShopModel.getId(),
+                                productName,
+                                cakeSize,
+                                quantity,
+                                productPrice.getText().toString(),
+                                imageUrl,
+                                timestamp // Pass the timestamp here
+                        );
+
+                        // Save the new cart item to Firestore
+                        db.collection("Users")
+                                .document(userId)
+                                .collection("cartItems")
+                                .add(cartItem)
+                                .addOnSuccessListener(documentReference -> {
+                                    // Successfully added to cart
+                                    Toast.makeText(getActivity(), "Item added to cart", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle failure
+                                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
                 });
     }
+
+    // Helper function to calculate the new price based on quantity
+    private String calculateNewPrice(String existingTotalPrice, String newPrice, int existingQuantity, int newQuantity) {
+        // Check if existingTotalPrice is null or empty, and handle the case appropriately
+        if (existingTotalPrice == null || existingTotalPrice.isEmpty()) {
+            existingTotalPrice = "₱0"; // Set to a default price, or handle it differently based on your needs
+        }
+
+        // Remove the "₱" symbol and convert the price to a float
+        float existingTotalPriceValue = Float.parseFloat(existingTotalPrice.replace("₱", "").trim());
+        float newPriceValue = Float.parseFloat(newPrice.replace("₱", "").trim());
+
+        // Calculate the total price by adding the price of the new quantity to the existing total
+        float newTotalPrice = existingTotalPriceValue + (newPriceValue * quantity);
+
+        // Debugging: Log the total price calculation
+        Log.d("CartItem", "Existing Total Price: " + existingTotalPriceValue);
+        Log.d("CartItem", "New Price Value: " + newPriceValue);
+        Log.d("CartItem", "New Total Price: " + newTotalPrice);
+
+        // Return the formatted price with "₱" symbol
+        return "₱" + String.format("%.2f", newTotalPrice);
+    }
+
+
+
+
+
+
+
 
     private void handleBuyNow() {
         // Create a CartItemModel for the selected cake and quantity

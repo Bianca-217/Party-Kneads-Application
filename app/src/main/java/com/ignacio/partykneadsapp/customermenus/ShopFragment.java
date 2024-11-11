@@ -76,7 +76,7 @@ public class ShopFragment extends Fragment {
         setupCategories();
 
         // Fetch products for the "Cakes" category by default
-        fetchProducts("Cakes");
+        fetchProducts("All Items");
 
         // Setup SearchView
         shopsearchView = binding.ShopsearchView;  // Assuming your layout has a SearchView with this ID
@@ -117,7 +117,7 @@ public class ShopFragment extends Fragment {
         categories = binding.categories;
         categoriesModelList = new ArrayList<>();
 
-        // Add categories to the list (Images should exist in drawable folder)
+        categoriesModelList.add(new CategoriesModel(R.drawable.all, "All Items"));
         categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
         categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
@@ -131,11 +131,16 @@ public class ShopFragment extends Fragment {
         categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {
             fetchProducts(category); // Fetch products for the selected category
         });
+
         categories.setAdapter(categoriesAdapter);
         categories.setLayoutManager(new GridLayoutManager(requireActivity(), 1, RecyclerView.HORIZONTAL, false));
         categories.setHasFixedSize(true);
         categories.setNestedScrollingEnabled(false);
+
+        // Programmatically select "All Items" category
+        fetchProducts("All Items");
     }
+
 
     // Function to search products based on the keyword
     private void searchProducts(String keyword) {
@@ -176,6 +181,12 @@ public class ShopFragment extends Fragment {
     }
 
     private void fetchProducts(String categoryFilter) {
+        if ("All Items".equals(categoryFilter)) {
+            loadAllProducts(); // Load all products if "All Items" category is selected
+            return;
+        }
+
+        // If a specific category is selected, filter by that category
         String startAt = categoryFilter;
         String endAt = categoryFilter + "\uf8ff";
 
@@ -206,6 +217,7 @@ public class ShopFragment extends Fragment {
                     }
                 });
     }
+
 
     private void loadAllProducts() {
         productsRef

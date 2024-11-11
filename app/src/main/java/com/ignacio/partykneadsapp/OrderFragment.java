@@ -217,7 +217,7 @@ public class OrderFragment extends Fragment {
                     displayStatus = "Your order is Out for Delivery";
                     break;
                 case "complete order":
-                    displayStatus = "Order Completed";
+                    displayStatus = "Your order has been delivered.";
                     break;
                 default:
                     displayStatus = "Placed Order";

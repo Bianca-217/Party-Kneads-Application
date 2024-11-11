@@ -14,6 +14,7 @@ public class CartItemModel implements Parcelable {
     private String numReviews; // Add this field if you want to display the number of reviews
     private String imageUrl;
     private boolean isSelected;
+    private String originalPrice;
 
     // Required empty constructor for Firestore
     public CartItemModel() {
@@ -84,6 +85,8 @@ public class CartItemModel implements Parcelable {
         dest.writeString(imageUrl);
     }
 
+
+
     // Getters and setters
     public String getProductId() { return productId; }
 
@@ -115,6 +118,10 @@ public class CartItemModel implements Parcelable {
         return imageUrl;
     }
 
+    public String getOriginalPrice() {
+        return originalPrice;
+    }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -135,6 +142,10 @@ public class CartItemModel implements Parcelable {
             }
         }
         return 0.0; // Return 0 if price is null or invalid
+    }
+
+    public void setOriginalPrice(String originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
     // Setters to allow modifications

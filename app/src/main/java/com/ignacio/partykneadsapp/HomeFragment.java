@@ -121,8 +121,8 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         // Initialize the CarouselAdapter
         int[] images = {
                 R.drawable.homepage_slider,
-                R.drawable.image2,
-                R.drawable.image3,
+                R.drawable.slider_two,
+                R.drawable.slider_three,
         };
 
         carouselAdapter = new CarouselAdapter(images);  // Initialize CarouselAdapter here
