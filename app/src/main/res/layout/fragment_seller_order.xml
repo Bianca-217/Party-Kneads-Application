@@ -7,33 +7,13 @@
     android:background="@drawable/darkpinkbg"
     tools:context=".sellermenus.SellerOrderFragment">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="80dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/back_bg" />
-
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="35dp"
-            android:layout_gravity="center"
-            android:src="@drawable/back" />
-
-    </FrameLayout>
 
 
     <ImageView
         android:id="@+id/whitecont"
         android:layout_width="match_parent"
-        android:layout_height="760dp"
+        android:layout_height="780dp"
         android:layout_gravity="bottom"
         android:backgroundTint="@color/white"
         android:src="@drawable/whitecont"
@@ -117,6 +97,7 @@
                 android:text="To Deliver"
                 android:textColor="@color/pink"
                 android:textSize="15sp"
+                app:cornerRadius="0dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/montserrat_semibold" />
 
@@ -126,7 +107,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/pendingOrders"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="620dp"
             tools:listitem="@layout/pending_orders_items"
             tools:itemCount="1"
             android:layout_marginHorizontal="20dp"
