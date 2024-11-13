@@ -9,17 +9,18 @@ public class LocationModel {
     private String location; // Keep location field for future use
     private String userName;
 
-    // Constructor
+    // Constructor with full address details
     public LocationModel(String houseNum, String barangay, String city, String postalCode, String phoneNumber, String userName) {
         this.houseNum = houseNum;
         this.barangay = barangay;
         this.city = city;
         this.postalCode = postalCode;
         this.phoneNumber = phoneNumber;
-        this.location = null; // Initialize location as null
         this.userName = userName;
+        this.location = null; // Initialize location as null
     }
 
+    // Constructor with only 'location' field
     public LocationModel(String location) {
         this.location = location;
         this.houseNum = null;
@@ -27,8 +28,9 @@ public class LocationModel {
         this.city = null;
         this.postalCode = null;
         this.phoneNumber = null;
-
+        this.userName = null; // Initialize userName as null
     }
+
     // Getter for userName
     public String getUserName() {
         return userName;

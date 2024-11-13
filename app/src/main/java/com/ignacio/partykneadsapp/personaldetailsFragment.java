@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,10 @@ public class personaldetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Set up input filters to allow only letters (no numbers or special characters)
+        binding.etfName.setFilters(new InputFilter[]{getTextOnlyFilter()});
+        binding.etlName.setFilters(new InputFilter[]{getTextOnlyFilter()});
+
         // Set up listeners using binding
         binding.btnBack.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(view);
@@ -69,19 +74,33 @@ public class personaldetailsFragment extends Fragment {
         });
     }
 
+
+    // InputFilter to restrict input to only letters (no numbers or special characters)
+    private InputFilter getTextOnlyFilter() {
+        return (source, start, end, dest, dstart, dend) -> {
+            for (int i = start; i < end; i++) {
+                if (!Character.isLetter(source.charAt(i)) && !Character.isWhitespace(source.charAt(i))) {
+                    return ""; // Reject non-letter characters
+                }
+            }
+            return null;
+        };
+    }
+
+
     private boolean checkFieldIfEmpty() {
         boolean isValid = true;
 
-        // Check if the first name is empty
-        if (binding.etfName.getText().toString().trim().isEmpty()) {
+        // Check if the first name is empty or contains only whitespace
+        if (TextUtils.isEmpty(binding.etfName.getText().toString().trim())) {
             binding.etfName.setError("First Name is required");
             isValid = false;
         } else {
             binding.etfName.setError(null);  // Clear error if not empty
         }
 
-        // Check if the last name is empty
-        if (binding.etlName.getText().toString().trim().isEmpty()) {
+        // Check if the last name is empty or contains only whitespace
+        if (TextUtils.isEmpty(binding.etlName.getText().toString().trim())) {
             binding.etlName.setError("Last Name is required");
             isValid = false;
         } else {
@@ -95,6 +114,7 @@ public class personaldetailsFragment extends Fragment {
 
         return isValid;
     }
+
 
     @Override
     public void onDestroyView() {

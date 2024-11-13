@@ -87,6 +87,7 @@
             android:textColorHint="@color/pink"
             app:boxStrokeColor="@color/darkpink"
             app:cursorColor="@color/pink"
+            android:inputType="text"
             app:endIconMode="clear_text"
             app:endIconTint="@color/pink"
             app:hintTextColor="@color/pink">
@@ -115,6 +116,7 @@
             app:endIconMode="clear_text"
             android:layout_marginTop="5dp"
             app:endIconTint="@color/pink"
+            android:inputType="text"
             app:hintTextColor="@color/pink"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

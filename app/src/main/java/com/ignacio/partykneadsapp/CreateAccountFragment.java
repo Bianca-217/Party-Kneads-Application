@@ -142,13 +142,14 @@ public class CreateAccountFragment extends Fragment {
     }
 
 
-    // Helper method to validate email format, specifically for Gmail
+    // Helper method to validate general email format
     private boolean isValidEmail(String email) {
-        // Regular expression pattern for a Gmail address
-        Pattern emailPattern = Pattern.compile("^[A-Za-z0-9._%+-]+@gmail\\.com$");
+        // Regular expression pattern for a general email address
+        Pattern emailPattern = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
         Matcher matcher = emailPattern.matcher(email);
         return matcher.matches();
     }
+
 
     private boolean isStrongPassword(String password) {
         if (password.length() < 8) {

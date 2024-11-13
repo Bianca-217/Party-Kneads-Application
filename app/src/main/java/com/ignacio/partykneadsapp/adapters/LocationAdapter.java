@@ -40,13 +40,14 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         String fullAddress = location.getFullAddress();
         holder.locationTextView.setText(fullAddress);
         holder.phoneNumberTextView.setText(location.getPhoneNumber());
-        holder.userNameTextView.setText(location.getUserName());
 
-        // Set user name only if it's available
-        if (userName != null && !userName.isEmpty()) {
+        // Display userName from LocationModel if available, otherwise use the adapter's userName
+        if (location.getUserName() != null && !location.getUserName().isEmpty()) {
+            holder.userNameTextView.setText(location.getUserName());
+        } else if (userName != null && !userName.isEmpty()) {
             holder.userNameTextView.setText(userName);
         } else {
-            holder.userNameTextView.setText("User"); // Fallback or placeholder
+            holder.userNameTextView.setText("User");
         }
 
         // Set click listener for btnEdit
@@ -56,6 +57,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
             }
         });
     }
+
 
     @Override
     public int getItemCount() {
