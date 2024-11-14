@@ -11,10 +11,11 @@ public class PendingOrdersModel {
     private String imageURL;
     private String orderId; // Add this field for the order ID
     private String status; // Add this field for the order status
+    private String userEmail;
 
     // Constructor
     public PendingOrdersModel(String userName, String contactNum, String location, String productName,
-                              String cakeSize, int quantity, String totalPrice, String imageURL, String status, String orderId) {
+                              String cakeSize, int quantity, String totalPrice, String imageURL, String status, String orderId, String userEmail) {
         this.userName = userName;
         this.contactNum = contactNum;
         this.location = location;
@@ -24,6 +25,7 @@ public class PendingOrdersModel {
         this.totalPrice = totalPrice;
         this.imageURL = imageURL;
         this.status = status;
+        this.userEmail = userEmail;
         this.orderId = orderId; // Set the order ID in the constructor
     }
 
@@ -38,6 +40,9 @@ public class PendingOrdersModel {
     public String getImageURL() { return imageURL; }
     public String getOrderId() { return orderId; } // Getter for orderId
     public void setStatus(String status) { this.status = status; } // Setter for status
+    public String getUserEmail() {
+        return userEmail;
+    }
 }
 
 

@@ -1,6 +1,7 @@
 package com.ignacio.partykneadsapp.adapters;
 
 import android.app.Dialog;
+import android.app.Notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.R;
+import com.ignacio.partykneadsapp.model.NotificationViewModel;
 import com.ignacio.partykneadsapp.model.ToShipModel;
 import com.ignacio.partykneadsapp.model.OrderItemModel;
 
@@ -110,14 +112,17 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
         // Set up the confirmation button
         btnReceive.setOnClickListener(v -> {
-            // Update the order status in the data source (e.g., Firestore)
-
+            // Update the order status in the data source (Firestore)
             updateOrderStatus(referenceId);
+
+            // Create notification for in-app and Firestore update
+            createNotification(referenceId, position);
 
             // Update the order status in the RecyclerView list
             orderList.get(position).setStatus("Complete Order");
             notifyItemChanged(position);  // Refresh the item to show the updated status
             updateOrderStatusLocally(position, "Complete Order");
+
             // Show confirmation message
             Toast.makeText(context, "Order marked as complete!", Toast.LENGTH_SHORT).show();
 
@@ -129,6 +134,60 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         dialog.show();
     }
 
+    private void createNotification(String referenceId, int position) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get the current user's email
+        String userEmail = "sweetkatrinabiancaignacio@gmail.com";  // Replace with dynamic email retrieval
+
+        // Create a notification message based on the user type
+        String orderStatus;
+        String userRateComment;
+        String cakeImageUrl = orderList.get(position).getImageUrl();  // Use the image URL from the order
+
+        // Check if the user is admin or customer
+        if (isAdmin(userEmail)) {
+            orderStatus = "Order Received by Customer";
+            userRateComment = "The customer has received their order successfully. Great work on completing the delivery process!";
+        } else {
+            orderStatus = "Order Complete";
+            userRateComment = "Your order has been successfully completed! We appreciate your trust. Thank you for choosing Party Kneads.";
+        }
+
+        // Create the NotificationViewModel
+        NotificationViewModel notification = new NotificationViewModel(orderStatus, userRateComment, cakeImageUrl);
+
+        // Now add the notification to the Firestore user's Notifications collection
+        db.collection("Users")
+                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        DocumentSnapshot userDoc = task.getResult().getDocuments().get(0);
+                        String uid = userDoc.getId();
+
+                        // Add the notification to the user's Notifications subcollection
+                        db.collection("Users")
+                                .document(uid)
+                                .collection("Notifications")
+                                .add(notification)
+                                .addOnSuccessListener(documentReference -> {
+                                    // Notification successfully added
+                                    Log.d("Notification", "Notification added successfully.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Notification", "Error adding notification", e);
+                                });
+                    }
+                });
+    }
+
+    private boolean isAdmin(String email) {
+        // Implement logic to check if the email belongs to an admin user
+        return email.equals("sweetkatrinabiancaignacio@gmail.com");  // Replace with actual admin check logic
+    }
+
+
     public void updateOrderStatusLocally(int position, String status) {
         // Update the status in the orderList
         ToShipModel order = orderList.get(position);
@@ -138,46 +197,46 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         notifyItemChanged(position);
     }
 
-        private void updateOrderStatus(String referenceId) {
-            // Get Firestore instance
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void updateOrderStatus(String referenceId) {
+        // Get Firestore instance
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // Query Users collection where email field equals "sweetkatrinabiancaignacio@gmail.com"
-            db.collection("Users")
-                    .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")  // Query by email
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                            // Assuming only one document will be returned
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                            String uid = document.getId();  // Get the UID of the user (document ID)
+        // Query Users collection where email field equals "sweetkatrinabiancaignacio@gmail.com"
+        db.collection("Users")
+                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")  // Query by email
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        // Assuming only one document will be returned
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        String uid = document.getId();  // Get the UID of the user (document ID)
 
-                            // Now use the UID to access the Orders collection and update the order status
-                            DocumentReference orderRef = db.collection("Users")
-                                    .document(uid)  // Use the UID to access the user's document
-                                    .collection("Orders")
-                                    .document(referenceId);  // Order document ID using referenceId
+                        // Now use the UID to access the Orders collection and update the order status
+                        DocumentReference orderRef = db.collection("Users")
+                                .document(uid)  // Use the UID to access the user's document
+                                .collection("Orders")
+                                .document(referenceId);  // Order document ID using referenceId
 
-                            // Update the status to "Complete Order"
-                            orderRef.update("status", "Complete Order")
-                                    .addOnSuccessListener(aVoid -> {
-                                        // Order status successfully updated
-                                        Log.d("OrderAdapter", "Order status updated to Complete Order.");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        // Handle error in updating the status
-                                        Log.e("OrderAdapter", "Error updating order status", e);
-                                    });
-                        } else {
-                            // Handle the case where the email is not found or query fails
-                            Log.e("OrderAdapter", "User with email not found or query failed.");
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle any errors with the query
-                        Log.e("OrderAdapter", "Error querying Users collection", e);
-                    });
-        }
+                        // Update the status to "Complete Order"
+                        orderRef.update("status", "Complete Order")
+                                .addOnSuccessListener(aVoid -> {
+                                    // Order status successfully updated
+                                    Log.d("OrderAdapter", "Order status updated to Complete Order.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle error in updating the status
+                                    Log.e("OrderAdapter", "Error updating order status", e);
+                                });
+                    } else {
+                        // Handle the case where the email is not found or query fails
+                        Log.e("OrderAdapter", "User with email not found or query failed.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors with the query
+                    Log.e("OrderAdapter", "Error querying Users collection", e);
+                });
+    }
 
 
     private void showOrderDetailsDialog(String referenceId) {

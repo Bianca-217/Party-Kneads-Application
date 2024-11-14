@@ -279,33 +279,40 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                         if (fname == null || fname.isEmpty()) {
                             // If fname is null or empty, use the "firstName" field
                             fname = firstName;
-                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
-                        } else {
-                            // Use the "First Name" field if it's not null or empty
-                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
                         }
 
-                        // Load profile picture using Glide if available
-                        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
-                            Glide.with(requireContext())
-                                    .load(profilePictureUrl)
-                                    .placeholder(R.drawable.round_person_24) // Default placeholder
-                                    .error(R.drawable.img_placeholder) // Error placeholder
-                                    .into(binding.imgUserProfile);
-                        } else {
-                            // Set default image if no profile picture URL is found
-                            binding.imgUserProfile.setImageResource(R.drawable.img_placeholder);
+                        // Check if the fragment is still added and use getView() to safely update UI
+                        if (isAdded() && getView() != null) {
+                            // Set the greeting text
+                            txtUser.setText("Hi, " + capitalizeFirstLetter(fname) + "!");
+
+                            // Load profile picture using Glide if available
+                            if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                                Glide.with(requireContext()) // Using requireContext() here is safe
+                                        .load(profilePictureUrl)
+                                        .placeholder(R.drawable.round_person_24) // Default placeholder
+                                        .error(R.drawable.img_placeholder) // Error placeholder
+                                        .into(binding.imgUserProfile);
+                            } else {
+                                // Set default image if no profile picture URL is found
+                                binding.imgUserProfile.setImageResource(R.drawable.img_placeholder);
+                            }
                         }
 
                     } else {
-                        txtUser.setText("Hi, No Document Found!");
-                        binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image if no document found
+                        // Handle case where the document doesn't exist
+                        if (isAdded() && getView() != null) {
+                            txtUser.setText("Hi, No Document Found!");
+                            binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image if no document found
+                        }
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("HomeFragment", "Error fetching user data", e);
-                    txtUser.setText("Hi, Error Fetching Data!");
-                    binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image in case of error
+                    if (isAdded() && getView() != null) {
+                        txtUser.setText("Hi, Error Fetching Data!");
+                        binding.imgUserProfile.setImageResource(R.drawable.img_placeholder); // Set default image in case of error
+                    }
                 });
     }
 

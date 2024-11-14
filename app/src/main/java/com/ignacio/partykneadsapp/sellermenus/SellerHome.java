@@ -81,16 +81,21 @@ public class SellerHome extends Fragment {
                             // Get the profile picture URL from Firestore
                             String profilePictureUrl = document.getString("profilePictureUrl");
 
-                            if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
-                                // Use Glide to load the profile picture
-                                Glide.with(requireContext())
-                                        .load(profilePictureUrl)
-                                        .placeholder(R.drawable.round_person_24) // Default placeholder
-                                        .error(R.drawable.img_placeholder) // Error placeholder
-                                        .into(binding.imgUserProfile);
+                            // Check if the fragment is still attached to avoid IllegalStateException
+                            if (isAdded() && getContext() != null) {
+                                if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                                    // Use Glide to load the profile picture
+                                    Glide.with(requireContext())
+                                            .load(profilePictureUrl)
+                                            .placeholder(R.drawable.round_person_24) // Default placeholder
+                                            .error(R.drawable.img_placeholder) // Error placeholder
+                                            .into(binding.imgUserProfile);
+                                } else {
+                                    Toast.makeText(getActivity(), "No profile picture found", Toast.LENGTH_SHORT).show();
+                                    binding.imgUserProfile.setImageResource(R.drawable.img_placeholder);
+                                }
                             } else {
-                                Toast.makeText(getActivity(), "No profile picture found", Toast.LENGTH_SHORT).show();
-                                binding.imgUserProfile.setImageResource(R.drawable.img_placeholder);
+                                Log.w("SellerHome", "Fragment is not attached to the context.");
                             }
                         } else {
                             Toast.makeText(getActivity(), "User data not found", Toast.LENGTH_SHORT).show();
@@ -99,7 +104,6 @@ public class SellerHome extends Fragment {
                         Toast.makeText(getActivity(), "Failed to load profile picture", Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
 
     private void fetchTotalProductCount() {

@@ -29,10 +29,12 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.ignacio.partykneadsapp.adapters.CheckoutAdapter;
 import com.ignacio.partykneadsapp.adapters.CheckoutLocationAdapter;
+import com.ignacio.partykneadsapp.adapters.NotificationAdapter;
 import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -208,7 +210,7 @@ public class CheckoutFragment extends Fragment {
 
         // Create a map to store order details
         HashMap<String, Object> orderData = new HashMap<>();
-        orderData.put("referenceId", orderRefId); // Store the reference ID
+        orderData.put("referenceId", orderRefId);
         orderData.put("status", "placed");
 
         // Get the current user's email
@@ -220,22 +222,29 @@ public class CheckoutFragment extends Fragment {
 
         // List to hold item details
         List<HashMap<String, Object>> itemsList = new ArrayList<>();
+        final String[] cakeImageUrl = {""};  // Use an array to allow assignment within loop
+
         for (CartItemModel item : selectedItems) {
             HashMap<String, Object> itemData = new HashMap<>();
             itemData.put("productId", item.getProductId());
             itemData.put("productName", item.getProductName());
             itemData.put("quantity", item.getQuantity());
             itemData.put("totalPrice", item.getTotalPrice());
-            itemData.put("imageUrl", item.getImageUrl());
+            itemData.put("imageUrl", item.getImageUrl());  // Add imageUrl to the item data
             itemData.put("cakeSize", item.getCakeSize());
             itemsList.add(itemData);
+
+            // Get the cake image URL (assuming imageUrl is stored in CartItemModel)
+            if (!item.getImageUrl().isEmpty()) {
+                cakeImageUrl[0] = item.getImageUrl();  // Store the image URL for the notification
+            }
         }
         orderData.put("items", itemsList);
 
         // Fetch location, phone number, and user name from the active location
         db.collection("Users").document(cUser.getUid()).collection("Locations")
                 .whereEqualTo("status", "Active")
-                .limit(1) // Get only one active location
+                .limit(1)  // Get only one active location
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -259,12 +268,15 @@ public class CheckoutFragment extends Fragment {
 
                                         // Use document(orderRefId) to set the order data
                                         db.collection("Users").document(userDocId).collection("Orders")
-                                                .document(orderRefId) // Use the reference ID as the document ID
-                                                .set(orderData, SetOptions.merge()) // Use merge to avoid overwriting
+                                                .document(orderRefId)  // Use the reference ID as the document ID
+                                                .set(orderData, SetOptions.merge())  // Use merge to avoid overwriting
                                                 .addOnSuccessListener(documentReference -> {
                                                     Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
                                                     clearCart();
-                                                    showSuccessDialog(); // Show success dialog after order placement
+                                                    showSuccessDialog();  // Show success dialog after order placement
+
+                                                    // Send notification after order is successfully placed
+                                                    sendOrderNotification(cakeImageUrl[0]);  // Pass the cake image URL
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Log.w("CheckoutFragment", "Error placing order", e);
@@ -275,7 +287,7 @@ public class CheckoutFragment extends Fragment {
                                 });
                     } else {
                         Log.w("CheckoutFragment", "No active locations found.");
-                        showAddressDialog(); // Show dialog if no active location is found
+                        showAddressDialog();  // Show dialog if no active location is found
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -283,24 +295,69 @@ public class CheckoutFragment extends Fragment {
                 });
     }
 
-    private void sendOrderToNotificationFragment(String orderRefId) {
-        // Assuming you have a ViewModel or shared resource to send the order data
-        // Example using LiveData or directly calling the fragment to refresh
+    private void sendOrderNotification(String cakeImageUrl) {
+        // Admin's email address
+        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
 
-        // If you are using a shared ViewModel for notifications
-        NotificationViewModel notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
-        notificationViewModel.setOrderReferenceId(orderRefId);
+        // Create NotificationViewModel for the order
+        NotificationViewModel newOrderNotification = new NotificationViewModel(
+                "New Order Received",
+                "A customer has placed a new order with you! Check the order items and get them ready to go!",
+                cakeImageUrl
+        );
 
-        // Or, if you want to directly update the NotificationFragment using FragmentManager:
-        NotificationFragment notificationFragment = (NotificationFragment) getChildFragmentManager().findFragmentByTag("NotificationFragment");
+        // Save the notification to the admin's Firestore Notifications subcollection
+        saveNotificationToAdmin(adminEmail, newOrderNotification);
+
+        // Optionally send it to the NotificationFragment (if necessary)
+        NotificationFragment notificationFragment = (NotificationFragment) getActivity().getSupportFragmentManager()
+                .findFragmentByTag(NotificationFragment.class.getSimpleName());
 
         if (notificationFragment != null) {
-            notificationFragment.updateNotificationList(orderRefId);
-        } else {
-            // Handle the case when NotificationFragment is not found
-            Log.e("CheckoutFragment", "NotificationFragment not found.");
+            notificationFragment.getNotificationList().add(newOrderNotification);
+            notificationFragment.getNotificationAdapter().notifyDataSetChanged();
         }
     }
+
+    // Helper method to save the notification in Firestore for the admin
+    private void saveNotificationToAdmin(String adminEmail, NotificationViewModel notification) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Save the notification in the "Notifications" subcollection under the admin's document
+        db.collection("Users")
+                .whereEqualTo("email", adminEmail)  // Find the admin document by email
+                .limit(1)  // Limit to 1 result
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        // Get the admin's document ID
+                        String adminDocId = querySnapshot.getDocuments().get(0).getId();
+
+                        // Save the notification under the admin's "Notifications" subcollection
+                        db.collection("Users")
+                                .document(adminDocId)  // Admin's document ID
+                                .collection("Notifications")  // Notifications subcollection
+                                .add(new HashMap<String, Object>() {{
+                                    put("orderStatus", notification.getOrderStatus());
+                                    put("userRateComment", notification.getUserRateComment());
+                                    put("imageUrl", notification.getCakeImageUrl());
+                                    put("timestamp", FieldValue.serverTimestamp());  // Add a timestamp
+                                }})
+                                .addOnSuccessListener(documentReference -> {
+                                    Log.d("Notification", "Notification saved successfully for admin: " + adminEmail);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Notification", "Error saving notification for admin", e);
+                                });
+                    } else {
+                        Log.w("Notification", "Admin user not found with email: " + adminEmail);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Error fetching admin user", e);
+                });
+    }
+
 
     private void showSuccessDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog, null);

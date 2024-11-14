@@ -113,6 +113,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_cakeDescriptionFragment"
             app:destination="@+id/cake_Description"/>
+        <action
+            android:id="@+id/action_homePageFragment_to_notificationFragment"
+            app:destination="@+id/notificationFragment"/>
 
     </fragment>
 
