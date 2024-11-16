@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -116,7 +117,7 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
             updateOrderStatus(referenceId);
 
             // Create notification for in-app and Firestore update
-            createNotification(referenceId, position);
+            createNotification(referenceId, position, new ToShipModel());
 
             // Update the order status in the RecyclerView list
             orderList.get(position).setStatus("Complete Order");
@@ -134,16 +135,26 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         dialog.show();
     }
 
-    private void createNotification(String referenceId, int position) {
+    private void createNotification(String referenceId, int position, ToShipModel shipModel) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Get the current user's email
-        String userEmail = "sweetkatrinabiancaignacio@gmail.com";  // Replace with dynamic email retrieval
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userEmail = currentUser != null ? currentUser.getEmail() : null;
+
+        if (userEmail == null) {
+            Log.e("Notification", "Error: User email is null.");
+            return;
+        }
 
         // Create a notification message based on the user type
         String orderStatus;
         String userRateComment;
         String cakeImageUrl = orderList.get(position).getImageUrl();  // Use the image URL from the order
+
+        if (cakeImageUrl == null || cakeImageUrl.isEmpty()) {
+            cakeImageUrl = "default_image_url";  // Use a default image if URL is missing
+        }
 
         // Check if the user is admin or customer
         if (isAdmin(userEmail)) {
@@ -159,7 +170,7 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
         // Now add the notification to the Firestore user's Notifications collection
         db.collection("Users")
-                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")
+                .whereEqualTo("email", userEmail)  // Use the dynamically fetched email here
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
@@ -186,7 +197,6 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         // Implement logic to check if the email belongs to an admin user
         return email.equals("sweetkatrinabiancaignacio@gmail.com");  // Replace with actual admin check logic
     }
-
 
     public void updateOrderStatusLocally(int position, String status) {
         // Update the status in the orderList

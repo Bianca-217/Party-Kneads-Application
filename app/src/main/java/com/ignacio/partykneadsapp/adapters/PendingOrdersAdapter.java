@@ -273,10 +273,17 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
 
     // Method to remove item from the list
     private void removeItem(int position) {
-        ordersList.remove(position);
-        notifyItemRemoved(position);
+        // Ensure the position is within bounds of the list
+        if (position >= 0 && position < ordersList.size()) {
+            // Remove the item from the list
+            ordersList.remove(position);
+            // Notify the adapter that an item was removed
+            notifyItemRemoved(position);
+        } else {
+            // Log an error if the position is invalid
+            Log.e("PendingOrdersAdapter", "Invalid position for removal: " + position);
+        }
     }
-
 
     // Helper method to show Toast messages
     private void showToast(String message) {
