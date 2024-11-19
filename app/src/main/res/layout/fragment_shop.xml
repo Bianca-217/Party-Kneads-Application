@@ -237,7 +237,6 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:paddingHorizontal="7dp"
-
                 android:layout_height="wrap_content"
                 tools:itemCount="8"
                 tools:listitem="@layout/products_shop" />

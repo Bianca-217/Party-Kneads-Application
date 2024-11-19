@@ -55,24 +55,70 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                 .load(currentProduct.getimageUrl())
                 .into(holder.productImage);
 
-        // Handle Like Button click
-        holder.btnLike.setOnClickListener(v -> {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            String userId = auth.getCurrentUser().getUid();  // Get user's UID (not email)
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
 
+        if (userId != null) {
+            // Check if the product is already liked
+            db.collection("Users")
+                    .document(userId)
+                    .collection("Likes")
+                    .document(currentProduct.getId())
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Product is liked, set the filled heart icon
+                            holder.btnLike.setBackgroundResource(R.drawable.pink_heart_filled);
+                        } else {
+                            // Product is not liked, set the outline heart icon
+                            holder.btnLike.setBackgroundResource(R.drawable.heart_pink);
+                        }
+                    });
+        } else {
+            holder.btnLike.setBackgroundResource(R.drawable.heart_pink); // Default state for guests
+        }
+
+        // Like button click logic
+        holder.btnLike.setOnClickListener(v -> {
             if (userId != null) {
-                // Reference to the "Users" collection and the specific user's document
                 db.collection("Users")
-                        .document(userId)               // Use user UID as the document ID
-                        .collection("Likes")             // Create the "Likes" sub-collection inside the user's document
-                        .document(currentProduct.getId())  // Use the product ID as the document ID
-                        .set(currentProduct)             // Store the product details in that document
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(v.getContext(), "Liked " + currentProduct.getName(), Toast.LENGTH_SHORT).show();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(v.getContext(), "Failed to like the product", Toast.LENGTH_SHORT).show();
+                        .document(userId)
+                        .collection("Likes")
+                        .document(currentProduct.getId())
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                // Product is already liked, so remove it
+                                db.collection("Users")
+                                        .document(userId)
+                                        .collection("Likes")
+                                        .document(currentProduct.getId())
+                                        .delete()
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Change the heart icon to outline
+                                            holder.btnLike.setBackgroundResource(R.drawable.heart_pink);
+                                            Toast.makeText(v.getContext(), "Removed like for " + currentProduct.getName(), Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(v.getContext(), "Failed to remove like", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                // Product is not yet liked, so add it
+                                db.collection("Users")
+                                        .document(userId)
+                                        .collection("Likes")
+                                        .document(currentProduct.getId())
+                                        .set(currentProduct)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Change the heart icon to filled
+                                            holder.btnLike.setBackgroundResource(R.drawable.pink_heart_filled);
+                                            Toast.makeText(v.getContext(), "Liked " + currentProduct.getName(), Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(v.getContext(), "Failed to like the product", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
                         });
             } else {
                 Toast.makeText(v.getContext(), "Please sign in to like products", Toast.LENGTH_SHORT).show();
@@ -106,7 +152,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView productImage;
         TextView productName, itemPrice;
-        Button btnLike;
+        ImageView btnLike;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -50,19 +50,19 @@ public class LikedProductAdapter extends RecyclerView.Adapter<LikedProductAdapte
         LikedProductModel product = likedProducts.get(position);
 
         holder.productName.setText(product.getName());
-        holder.productPrice.setText(product.getPrice());
+        holder.productPrice.setText("₱ " + product.getPrice());
         holder.itemRating.setText(product.getRating() + " (" + product.getNumReviews() + ")");
         Glide.with(holder.itemView.getContext()).load(product.getImageUrl()).into(holder.productImage);
 
         // Handle like button visibility
         if (product.isLiked()) {
-            holder.btnHeart.setBackgroundResource(R.drawable.pink_heart_filled);  // Filled heart icon
+            holder.btnLike.setBackgroundResource(R.drawable.pink_heart_filled);  // Filled heart icon
         } else {
-            holder.btnHeart.setBackgroundResource(R.drawable.heart_pink); // Empty heart icon
+            holder.btnLike.setBackgroundResource(R.drawable.heart_pink); // Empty heart icon
         }
 
         // Handle like button click to toggle like/unlike
-        holder.btnHeart.setOnClickListener(v -> {
+        holder.btnLike.setOnClickListener(v -> {
             // Show a confirmation dialog if the user clicks on the heart button
             showUnlikeConfirmationDialog(product, position, holder.itemView.getContext());
         });
@@ -192,7 +192,7 @@ public class LikedProductAdapter extends RecyclerView.Adapter<LikedProductAdapte
     public static class LikedProductViewHolder extends RecyclerView.ViewHolder {
 
         TextView productName, productPrice, itemRating;
-        Button btnHeart;  // Button for the heart
+        ImageView btnLike;  // Button for the heart
         ImageView productImage;
         Button btnAddToCart;
 
@@ -203,7 +203,7 @@ public class LikedProductAdapter extends RecyclerView.Adapter<LikedProductAdapte
             productPrice = itemView.findViewById(R.id.itemPrice);
             itemRating = itemView.findViewById(R.id.itemRating);
             productImage = itemView.findViewById(R.id.productImage);
-            btnHeart = itemView.findViewById(R.id.btnHeart);  // This is a Button
+            btnLike = itemView.findViewById(R.id.btnLike);  // This is a Button
             btnAddToCart = itemView.findViewById(R.id.btnaddToCart);
         }
     }

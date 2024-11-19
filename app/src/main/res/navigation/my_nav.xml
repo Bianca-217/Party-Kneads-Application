@@ -217,6 +217,12 @@
         <action
             android:id="@+id/action_cartFragment_to_checkoutFragment"
             app:destination="@id/checkoutFragment" />
+        <action
+            android:id="@+id/action_cartFragment_to_likesFragment"
+            app:destination="@id/likesFragment" />
+        <action
+            android:id="@+id/action_cartFragment_to_shopFragment"
+            app:destination="@id/shopFragment" />
     </fragment>
     <fragment
         android:id="@+id/cake_Description"
@@ -401,9 +407,18 @@
         android:name="com.ignacio.partykneadsapp.customermenus.LikesFragment"
         android:label="fragment_likes"
         tools:layout="@layout/fragment_likes">
-    <action
-        android:id="@+id/action_likes_to_cart"
-        app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_likesFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shopFragment"
+        android:name="com.ignacio.partykneadsapp.customermenus.ShopFragment"
+        android:label="fragment_shop"
+        tools:layout="@layout/fragment_shop" >
+        <action
+            android:id="@+id/action_shopFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
     </fragment>
 
 </navigation>

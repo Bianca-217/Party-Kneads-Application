@@ -1,141 +1,250 @@
 package com.ignacio.partykneadsapp.customermenus;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.SearchView;
-import android.widget.Toast;
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
+import android.widget.SearchView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.ignacio.partykneadsapp.R;
+import com.ignacio.partykneadsapp.adapters.CategoriesAdapter;
+import com.ignacio.partykneadsapp.adapters.ProductShopAdapter;
+import com.ignacio.partykneadsapp.model.CategoriesModel;
+import com.ignacio.partykneadsapp.model.ProductShopModel;
+import com.ignacio.partykneadsapp.databinding.FragmentLikesBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.ignacio.partykneadsapp.R;
-import com.ignacio.partykneadsapp.adapters.LikedProductAdapter;
-import com.ignacio.partykneadsapp.model.LikedProductModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LikesFragment extends Fragment {
 
-    private RecyclerView likerecyclerView;
-    private LikedProductAdapter adapter;
-    private List<LikedProductModel> likedProducts;
-    private List<LikedProductModel> filteredProducts; // This list will hold the filtered products
-    private FirebaseFirestore firestore;
-    private FirebaseAuth auth;
-    private String userId;
-    private SearchView likeSearchView;  // Declare the SearchView
-    private Button btnCart; // Declare the Cart Button
+    private LinearLayout cl;
+    private RecyclerView categories;
+    private List<CategoriesModel> categoriesModelList;
+    private CategoriesAdapter categoriesAdapter;
+    private RecyclerView recyclerView;
+    private ProductShopAdapter productShopAdapter;
+    private List<ProductShopModel> likedProductList;
+    private FirebaseFirestore db;
+    private FragmentLikesBinding binding;
+    private SearchView likesSearchView;
 
-    public LikesFragment() {
-        // Required empty public constructor
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentLikesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_likes, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Initialize Firestore and FirebaseAuth
-        firestore = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        likesSearchView = binding.likesearchView;  // Assuming your layout has a SearchView with this ID
+        likesSearchView.setQueryHint("Search for products...");
 
-        // Set up the RecyclerView
-        likerecyclerView = view.findViewById(R.id.likerecyclerView);
-        likerecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        likedProducts = new ArrayList<>();
-        filteredProducts = new ArrayList<>(likedProducts);  // Initialize filteredProducts as a copy of likedProducts
-        adapter = new LikedProductAdapter(filteredProducts, product -> {
-            // Handle product click (e.g., navigate to product details)
-            Toast.makeText(getContext(), "Clicked on " + product.getName(), Toast.LENGTH_SHORT).show();
-        });
-        likerecyclerView.setAdapter(adapter);
+        db = FirebaseFirestore.getInstance();
 
-        // Initialize the SearchView
-        likeSearchView = view.findViewById(R.id.likesearchView);
-        likeSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        // Initialize RecyclerView and adapter for liked products
+        recyclerView = binding.likerecyclerView;
+        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2)); // 2 columns
+
+        likedProductList = new ArrayList<>();
+        productShopAdapter = new ProductShopAdapter(requireActivity(), likedProductList);
+        recyclerView.setAdapter(productShopAdapter);
+
+        // Setup categories
+        setupCategories();
+
+        // Fetch liked products based on a default category
+        fetchLikedProducts("All Items");
+
+        // Setup SearchView for liked products
+        // Setup SearchView
+        likesSearchView = binding.likesearchView;  // Assuming your layout has a SearchView with this ID
+        likesSearchView.setQueryHint("Search for products...");
+
+        likesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // You can handle submission of the search query here if needed
-                return false;
+                return false; // No need to handle submit for Firestore query
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Filter the liked products list based on the search query
-                filterLikedProducts(newText);
-                return false;
+                searchProducts(newText); // Call the function to search products
+                return true;
             }
         });
 
-        // Initialize the Cart Button
-        btnCart = view.findViewById(R.id.btnCart); // Reference to the Cart button
-        btnCart.setOnClickListener(v -> {
-            // Create a bundle if you need to pass data (you can add items or anything else)
-            Bundle bundle = new Bundle();
-            bundle.putString("some_key", "some_value"); // Replace with your actual key-value pair
-
-            // Navigate to CartFragment using Navigation Component and pass the bundle
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_likes_to_cart, bundle);
+        cl = view.findViewById(R.id.clayout);
+        cl.setOnClickListener(v -> {
+            InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         });
 
-        // Load liked products from Firebase
-        loadLikedProducts();
+        binding.btnCart.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
+            navController.navigate(R.id.action_homePageFragment_to_cartFragment);
+        });
 
-        return view;
     }
 
-    private void loadLikedProducts() {
-        userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-        if (userId != null) {
-            firestore.collection("Users")
-                    .document(userId)
-                    .collection("Likes") // Assuming "Likes" collection holds liked products
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            likedProducts.clear();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Convert the Firestore document into a LikedProductModel object
-                                LikedProductModel product = document.toObject(LikedProductModel.class);
-                                likedProducts.add(product);
+
+
+    private void setupCategories() {
+        categories = binding.categories;
+        categoriesModelList = new ArrayList<>();
+
+        // Add categories as done in the ShopFragment
+        categoriesModelList.add(new CategoriesModel(R.drawable.all, "All Items"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.toppers, "Toppers"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.backdrop, "Backdrop"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
+
+        // Initialize adapter and layout manager for categories
+        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {
+            fetchLikedProducts(category); // Fetch liked products for the selected category
+        });
+
+        categories.setAdapter(categoriesAdapter);
+        categories.setLayoutManager(new GridLayoutManager(requireActivity(), 1, RecyclerView.HORIZONTAL, false));
+        categories.setHasFixedSize(true);
+        categories.setNestedScrollingEnabled(false);
+
+        // Programmatically select "All Items" category
+        fetchLikedProducts("All Items");
+    }
+
+    // Function to search products based on the keyword
+    private void searchProducts(String keyword) {
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (keyword == null || keyword.trim().isEmpty()) {
+            loadAllLikedProducts(uid);
+            return;// If no search term, load all products
+
+        }
+
+        String normalizedKeyword = keyword.trim().toUpperCase();
+        Log.d("ShopFragment", "Searching for products with keyword: " + normalizedKeyword);
+
+        db.collection("Users")
+                .document(uid)  // Navigate to the current user's document
+                .collection("Likes")  // Fetch liked products from the "Likes" collection
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<ProductShopModel> filteredList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String productName = document.getString("name");
+                            if (productName != null && productName.toUpperCase().contains(normalizedKeyword)) {
+                                String id = document.getId();
+                                String imageUrl = document.getString("imageUrl");
+                                String name = document.getString("name");
+                                String price = document.getString("price");
+                                String description = document.getString("description");
+                                String rate = document.getString("rate");
+                                String numreviews = document.getString("numreviews");
+                                String category = document.getString("categories");
+
+                                filteredList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
                             }
-                            // After loading the products, we should update the filtered list
-                            filteredProducts.clear();
-                            filteredProducts.addAll(likedProducts);
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to load liked products", Toast.LENGTH_SHORT).show();
                         }
-                    });
-        }
+                        productShopAdapter.updateData(filteredList); // Update adapter with all liked products
+                    } else {
+                        Log.d("Firestore", "Error loading liked products: ", task.getException());
+                    }
+
+                });
     }
 
-    private void filterLikedProducts(String query) {
-        // Clear the filtered list and only add products that match the query
-        filteredProducts.clear();
-        if (query.isEmpty()) {
-            // If the query is empty, show all liked products
-            filteredProducts.addAll(likedProducts);
-        } else {
-            // Loop through the liked products and check if their name or description matches the query
-            for (LikedProductModel product : likedProducts) {
-                if (product.getName().toLowerCase().contains(query.toLowerCase())) {
-                    filteredProducts.add(product);
-                }
-            }
+
+    private void fetchLikedProducts(String categoryFilter) {
+        // Fetch the current user's UID (You can retrieve this from FirebaseAuth)
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if ("All Items".equals(categoryFilter)) {
+            loadAllLikedProducts(uid); // Load all liked products if "All Items" category is selected
+            return;
         }
-        // Notify the adapter that the data has changed so the RecyclerView can update
-        adapter.notifyDataSetChanged();
+
+        // Filter liked products based on the selected category
+        String startAt = categoryFilter;
+        String endAt = categoryFilter + "\uf8ff";
+
+        db.collection("Users")
+                .document(uid)  // Navigate to the current user's document
+                .collection("Likes")  // Fetch liked products from the "Likes" collection
+                .whereGreaterThanOrEqualTo("category", startAt)
+                .whereLessThan("category", endAt)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<ProductShopModel> productsList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String id = document.getId();
+                            String imageUrl = document.getString("imageUrl");
+                            String name = document.getString("name");
+                            String price = document.getString("price");
+                            String description = document.getString("description");
+                            String rate = document.getString("rate");
+                            String numreviews = document.getString("numreviews");
+                            String category = document.getString("category");
+
+                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                        }
+                        productShopAdapter.updateData(productsList);  // Update adapter with filtered liked products
+                    } else {
+                        Log.d("Firestore", "Error fetching liked products: ", task.getException());
+                    }
+                });
+    }
+
+    private void loadAllLikedProducts(String uid) {
+        db.collection("Users")
+                .document(uid)  // Navigate to the current user's document
+                .collection("Likes")  // Fetch liked products from the "Likes" collection
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<ProductShopModel> allLikedProductsList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String id = document.getId();
+                            String imageUrl = document.getString("imageUrl");
+                            String name = document.getString("name");
+                            String price = document.getString("price");
+                            String description = document.getString("description");
+                            String rate = document.getString("rate");
+                            String numreviews = document.getString("numreviews");
+                            String category = document.getString("category");
+
+                            allLikedProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                        }
+                        productShopAdapter.updateData(allLikedProductsList); // Update adapter with all liked products
+                    } else {
+                        Log.d("Firestore", "Error loading liked products: ", task.getException());
+                    }
+                });
     }
 }
