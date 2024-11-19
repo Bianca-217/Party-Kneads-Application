@@ -2,6 +2,7 @@ package com.ignacio.partykneadsapp.adapters;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,20 +83,27 @@ public class LikedProductAdapter extends RecyclerView.Adapter<LikedProductAdapte
     }
 
     private void showUnlikeConfirmationDialog(LikedProductModel product, int position, Context context) {
-        // Create the AlertDialog
-        new androidx.appcompat.app.AlertDialog.Builder(context)
-                .setTitle("Unlike Product")
-                .setMessage("Are you sure you want to unlike this product?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // If the user confirms, unlike the product
-                    unlikeProduct(product, position, context);
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // If the user cancels, just dismiss the dialog
-                    dialog.dismiss();
-                })
-                .show();
-    }
+        try {
+            // Ensure the context is not null and is valid
+            if (context != null) {
+                new androidx.appcompat.app.AlertDialog.Builder(context)
+                        .setTitle("Unlike Product")
+                        .setMessage("Are you sure you want to unlike this product?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            unlikeProduct(product, position, context);
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .show();
+            } else {
+                Log.e("DialogError", "Context is null, unable to show dialog.");
+            }
+        } catch (Exception e) {
+            Log.e("DialogError", "Error showing dialog: ", e);
+        }
+
+}
 
     private void unlikeProduct(LikedProductModel product, int position, Context context) {
         // Get the current user ID
@@ -207,4 +215,7 @@ public class LikedProductAdapter extends RecyclerView.Adapter<LikedProductAdapte
             btnAddToCart = itemView.findViewById(R.id.btnaddToCart);
         }
     }
+
+
+
 }

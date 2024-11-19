@@ -1,5 +1,6 @@
 package com.ignacio.partykneadsapp;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -86,25 +87,64 @@ public class OrderFragment extends Fragment {
     }
 
     private void setupTabButtons() {
+        // Default and selected colors
+        int defaultBackgroundColor = getResources().getColor(R.color.semiwhite);
+        int defaultTextColor = getResources().getColor(R.color.pink);
+        int selectedBackgroundColor = getResources().getColor(R.color.pink);
+        int selectedTextColor = getResources().getColor(R.color.semiwhite);
+
+        // Helper method to reset all buttons
+        Runnable resetButtonStyles = () -> {
+            binding.btnToShip.setBackgroundTintList(ColorStateList.valueOf(defaultBackgroundColor));
+            binding.btnToShip.setTextColor(defaultTextColor);
+
+            binding.btnToReceive.setBackgroundTintList(ColorStateList.valueOf(defaultBackgroundColor));
+            binding.btnToReceive.setTextColor(defaultTextColor);
+
+            binding.btnCompleted.setBackgroundTintList(ColorStateList.valueOf(defaultBackgroundColor));
+            binding.btnCompleted.setTextColor(defaultTextColor);
+        };
+
+        // Set default selected button to "To Ship"
+        resetButtonStyles.run(); // Ensure all buttons start with the default state
+        binding.btnToShip.setBackgroundTintList(ColorStateList.valueOf(selectedBackgroundColor));
+        binding.btnToShip.setTextColor(selectedTextColor);
+        binding.toShipRecycler.setAdapter(toShipAdapter);
+        currentTab = TO_SHIP; // Set the initial tab value
+        fetchOrdersBasedOnTab(); // Fetch data for the default tab
+
+        // To Ship button
         binding.btnToShip.setOnClickListener(v -> {
             currentTab = TO_SHIP;
-            binding.toShipRecycler.setAdapter(toShipAdapter);  // Switch to toShipAdapter
+            resetButtonStyles.run();
+            binding.btnToShip.setBackgroundTintList(ColorStateList.valueOf(selectedBackgroundColor));
+            binding.btnToShip.setTextColor(selectedTextColor);
+            binding.toShipRecycler.setAdapter(toShipAdapter);
             fetchOrdersBasedOnTab();
         });
 
+        // To Receive button
         binding.btnToReceive.setOnClickListener(v -> {
             currentTab = TO_RECEIVE;
-            binding.toShipRecycler.setAdapter(toReceiveAdapter);  // Switch to toReceiveAdapter
+            resetButtonStyles.run();
+            binding.btnToReceive.setBackgroundTintList(ColorStateList.valueOf(selectedBackgroundColor));
+            binding.btnToReceive.setTextColor(selectedTextColor);
+            binding.toShipRecycler.setAdapter(toReceiveAdapter);
             fetchOrdersBasedOnTab();
         });
 
-        // Add a button for Completed Orders tab
+        // Completed button
         binding.btnCompleted.setOnClickListener(v -> {
             currentTab = TO_COMPLETE;
-            binding.toShipRecycler.setAdapter(toCompleteAdapter);  // Switch to toCompleteAdapter
+            resetButtonStyles.run();
+            binding.btnCompleted.setBackgroundTintList(ColorStateList.valueOf(selectedBackgroundColor));
+            binding.btnCompleted.setTextColor(selectedTextColor);
+            binding.toShipRecycler.setAdapter(toCompleteAdapter);
             fetchOrdersBasedOnTab();
         });
     }
+
+
 
     private void fetchOrdersBasedOnTab() {
         if (TO_SHIP.equals(currentTab)) {
