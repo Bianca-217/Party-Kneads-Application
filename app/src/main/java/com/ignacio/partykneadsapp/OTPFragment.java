@@ -223,8 +223,8 @@ public class OTPFragment extends Fragment {
         // Create and send the email
         String subject = "[Party Kneads] Verification Code";
         String message = "Dear Valued Customer,\n\n" +
-                "Your one-time verification code is: " + random +
-                ". Please enter this code in the app to complete your verification.\n\n" +
+                "Your one-time verification code is: \n" + random +
+                "\n\n Please enter this code in the app to complete your verification.\n\n" +
                 "This code is valid for the next 5 minutes. Please do not share this code with anyone.\n\n" +
                 "Thank you for choosing Party Kneads!\n\n" +
                 "Warm regards,\nParty Kneads Team";
