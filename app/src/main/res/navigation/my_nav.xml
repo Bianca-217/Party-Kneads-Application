@@ -55,6 +55,9 @@
         <action
             android:id="@+id/action_termsFragment2_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_termsFragment2_to_tandCFragment"
+            app:destination="@id/tandCFragment" />
 
     </fragment>
     <fragment
@@ -186,6 +189,10 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_termsProfileFragment"
+            app:destination="@id/termsProfileFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/add_Items"
@@ -369,4 +376,21 @@
         android:name="com.ignacio.partykneadsapp.customermenus.NotificationFragment"
         android:label="Notifications"
         tools:layout="@layout/fragment_notification" />
+    <fragment
+        android:id="@+id/tandCFragment"
+        android:name="com.ignacio.partykneadsapp.TandCFragment"
+        android:label="TandCFragment" >
+        <action
+            android:id="@+id/action_tandCFragment_to_termsFragment2"
+            app:destination="@id/termsFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/termsProfileFragment"
+        android:name="com.ignacio.partykneadsapp.TermsProfileFragment"
+        android:label="fragment_terms_profile"
+        tools:layout="@layout/fragment_terms_profile" >
+        <action
+            android:id="@+id/action_termsProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
 </navigation>

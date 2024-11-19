@@ -125,15 +125,36 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                 R.drawable.slider_three,
         };
 
-        carouselAdapter = new CarouselAdapter(images);  // Initialize CarouselAdapter here
-        viewPager = binding.viewPager;  // Ensure ViewPager is correctly linked
-        viewPager.setAdapter(carouselAdapter);  // Set the adapter to ViewPager
-        setupDotsIndicator();  // Now setup the dots after carouselAdapter is initialized
+        carouselAdapter = new CarouselAdapter(images);
+        viewPager = binding.viewPager;
+        viewPager.setAdapter(carouselAdapter);
+
+        // Set the current item to the first real item (index 1)
+        viewPager.setCurrentItem(1, false);
+
+        setupDotsIndicator(); // Setup dots after initializing adapter
 
         // Initialize category, popular, and order history
         setupCategories();
         setupPopularProducts();
 
+        // Enable infinite looping behavior
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
+                // Loop to the last slide when swiping left from the first item
+                if (position == 0) {
+                    viewPager.setCurrentItem(carouselAdapter.getRealItemCount(), false);
+                }
+                // Loop to the first slide when swiping right from the last item
+                else if (position == carouselAdapter.getItemCount() - 1) {
+                    viewPager.setCurrentItem(1, false);
+                }
+                updateDots(position);
+            }
+        });
 
         return binding.getRoot();
     }
@@ -341,11 +362,11 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
 
     private void setupDotsIndicator() {
-        dotsCount = carouselAdapter.getItemCount(); // Now safely use the initialized adapter
-        dots = new ImageView[dotsCount];
+        int realDotsCount = carouselAdapter.getRealItemCount();
+        dots = new ImageView[realDotsCount];
 
         // Add dots to the LinearLayout
-        for (int i = 0; i < dotsCount; i++) {
+        for (int i = 0; i < realDotsCount; i++) {
             dots[i] = new ImageView(getActivity());
             dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -357,18 +378,17 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         if (dots.length > 0) {
             dots[0].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
         }
+    }
 
-        // Set up a page change listener to update the dots
-        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                for (int i = 0; i < dotsCount; i++) {
-                    dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
-                }
-                dots[position].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
-            }
-        });
+    private void updateDots(int position) {
+        int realPosition = position - 1; // Adjust for extra items
+        if (realPosition < 0) realPosition = dots.length - 1;
+        else if (realPosition >= dots.length) realPosition = 0;
+
+        for (int i = 0; i < dots.length; i++) {
+            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.non_active_dot));
+        }
+        dots[realPosition].setImageDrawable(getResources().getDrawable(R.drawable.active_dot));
     }
 
 

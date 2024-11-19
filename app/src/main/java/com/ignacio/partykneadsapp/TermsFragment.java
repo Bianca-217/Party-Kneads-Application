@@ -29,6 +29,7 @@ public class TermsFragment extends Fragment {
     Button btnCont;
     ImageView btnBack;
     TextView btnTerms;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +58,12 @@ public class TermsFragment extends Fragment {
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_termsFragment2_to_loginFragment);
             }
+        });
+
+        btnTerms.setOnClickListener(v ->{
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_termsFragment2_to_tandCFragment);
         });
 
         btnCont.setOnClickListener(new View.OnClickListener() {

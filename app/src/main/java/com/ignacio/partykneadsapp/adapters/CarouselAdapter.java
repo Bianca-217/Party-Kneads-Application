@@ -11,10 +11,14 @@ import com.ignacio.partykneadsapp.R;
 
 public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder> {
 
-    private final int[] images;
+    private int[] images;
 
     public CarouselAdapter(int[] images) {
-        this.images = images;
+        // Add two extra items for infinite looping
+        this.images = new int[images.length + 2];
+        this.images[0] = images[images.length - 1]; // Last image at the first position
+        this.images[this.images.length - 1] = images[0]; // First image at the last position
+        System.arraycopy(images, 0, this.images, 1, images.length);
     }
 
     @NonNull
@@ -34,6 +38,10 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
         return images.length;
     }
 
+    public int getRealItemCount() {
+        return images.length - 2; // Exclude the extra items
+    }
+
     static class CarouselViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
 
@@ -43,3 +51,4 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
         }
     }
 }
+

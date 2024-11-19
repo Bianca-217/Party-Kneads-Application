@@ -18,6 +18,63 @@
     <string name="address">Blk 34 Lot 29 NHA Site 1 Brgy. Dayap, Calauan, Laguna</string>
     <string name="success">Your order has been placed successfully! Get ready for an amazing party!</string>
 
+
+    <string name="Terms_and_Conditions"><b>Party Kneads – Terms and Conditions</b></string>
+    <string name="welcome">Welcome to the Party Kneads app! By downloading and using the Party Kneads application, you agree to the following Terms and Conditions. Please read them carefully.</string>
+    <string name="terms1"><b>1. Personal Information Collection</b>
+                            \nWhen using Party Kneads, users are required to provide personal information such as:
+
+                            <b>\n\n• Email address
+                            \n• First name and last name
+                            \n• Phone number
+                            \n• Address, State, Province, ZIP/Postal code, City</b>
+                            <i>\n\nThis information is collected to ensure smooth processing of orders and accurate delivery.</i></string>
+
+    <string name="terms2"><b>2. Use of Personal Data</b>
+                            \nWe use your personal data solely for:
+
+                            <b>\n\n• Processing orders (e.g., cakes, party supplies)
+                            \n• Delivering products to your specified address
+                            \n• Providing customer support when needed</b>
+                            <i>\n\nWe do not share your personal information with third parties without your explicit consent unless required by law.</i></string>
+
+    <string name="terms3"><b>3. Address Validation</b>
+                            \nBy providing your delivery address, you agree that Party Kneads may verify the accuracy of the provided address to ensure timely and accurate delivery. This may include verifying postal codes and checking the location to ensure it is serviceable. </string>
+
+
+    <string name="terms4"><b>4. Delivery Terms</b>
+
+                           \n\n• Party Kneads will deliver products to the address you provide, as long as the location falls within our delivery zones.
+                            \n• It is your responsibility to ensure the accuracy of the address.
+                            <i>\n\nAny mistakes in the delivery address that lead to failed or delayed deliveries are the user\'s responsibility.</i></string>
+
+    <string name="terms5"><b>5. Canceling Orders</b>
+
+                           \n\n• Orders can only be canceled when the seller has not yet accepted the products for processing.  <b>Once the seller has accepted the order, cancellations are no longer possible.</b>
+                            \n• To cancel an order, please contact us immediately at <a href="mailto:partykneads@gmail.com">partykneads@gmail.com</a>
+                            \n• Custom or made-to-order items cannot be canceled once production has begun.
+                            <i>\n\nRefunds for canceled orders (if applicable) will be processed within 7 business days.</i></string>
+
+
+    <string name="terms6"><b>6. User Responsibilities</b>
+
+                            \n\n• You agree to provide truthful and <b>up-to-date information</b> when registering and placing orders.
+                            \n• Users are responsible for maintaining the <b>confidentiality</b> of their account details.</string>
+
+    <string name="terms7"><b>7. Security of Personal Information</b>
+                            \nWe take reasonable steps to ensure your personal information is <b>protected against unauthorized access.</b> However, we cannot guarantee absolute security due to the nature of online transactions. </string>
+
+    <string name="terms8"><b>8. Data Retention</b>
+                            \nYour personal information will be retained only for as long as necessary to fulfill the purposes mentioned above, such as delivering your orders or complying with legal obligations.</string>
+
+    <string name="terms9"><b>9. Changes to Terms</b>
+                            \nParty Kneads reserves the right to modify these terms at any time. Users will be notified of any significant changes through the app or via email.</string>
+
+    <string name="terms10"><b>10. Contact Us</b>
+                            \nIf you have any questions about these Terms and Conditions, please contact us at <a href="mailto:partykneads@gmail.com">\npartykneads@gmail.com</a>.
+                            \n\n <b>Thank you for trusting Party Kneads!</b></string>
+
+
     <string-array name="City">
         <item>Alaminos</item>
         <item>Bay</item>
@@ -50,6 +107,7 @@
         <item>Siniloan</item>
         <item>Victoria</item>
     </string-array>
+
 
     <string-array name="AlaminosBarangay">
         <item>Barangay I</item>

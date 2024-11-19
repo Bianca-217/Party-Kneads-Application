@@ -123,6 +123,7 @@
             android:textColor="@color/grey"/>
 
         <LinearLayout
+            android:id="@+id/btnManageProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -145,6 +146,7 @@
                 android:textColor="@color/semiblack" />
 
             <Button
+                android:id="@+id/btnVouchers"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
@@ -153,17 +155,17 @@
                 android:text="Vouchers"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
-                android:drawableLeft="@drawable/discount"
+                android:drawableLeft="@drawable/outline_discount_24"
                 android:drawableRight="@drawable/nextt"
                 android:textColor="@color/semiblack"
                  />
 
             <Button
+                android:id="@+id/btnHistory"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
                 app:cornerRadius="10dp"
-
                 android:layout_marginBottom="5dp"
                 android:text="History"
                 android:textAlignment="textStart"
@@ -174,19 +176,21 @@
 
 
             <Button
+                android:id="@+id/btnSupport"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
                 app:cornerRadius="10dp"
-                android:text="Support"
+                android:text="Policy Privacy"
                 android:layout_marginBottom="5dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
-                android:drawableLeft="@drawable/support_pink"
+                android:drawableLeft="@drawable/policy_privacy"
                 android:drawableRight="@drawable/nextt"
                 android:textColor="@color/semiblack" />
 
             <Button
+                android:id="@+id/btnTerms"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
@@ -200,6 +204,7 @@
                 android:textColor="@color/semiblack" />
 
             <Button
+                android:id="@+id/btnAbout"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
