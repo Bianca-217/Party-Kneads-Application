@@ -221,8 +221,13 @@ public class OTPFragment extends Fragment {
         random = new Random().nextInt(900000) + 100000; // Generate 6-digit OTP
 
         // Create and send the email
-        String subject = "Login Signup app's OTP";
-        String message = "Your OTP is -> " + random;
+        String subject = "[Party Kneads] Verification Code";
+        String message = "Dear Valued Customer,\n\n" +
+                "Your one-time verification code is: " + random +
+                ". Please enter this code in the app to complete your verification.\n\n" +
+                "This code is valid for the next 5 minutes. Please do not share this code with anyone.\n\n" +
+                "Thank you for choosing Party Kneads!\n\n" +
+                "Warm regards,\nParty Kneads Team";
 
         new JavaMailSender(email, subject, message).execute(); // Send email
     }
