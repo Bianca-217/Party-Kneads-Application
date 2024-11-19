@@ -51,6 +51,7 @@
             android:layout_gravity="end">
 
             <Button
+                android:id="@+id/btnLike"
                 android:layout_width="40dp"
                 android:layout_height="45dp"
                 android:layout_gravity="start"

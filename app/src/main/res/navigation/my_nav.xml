@@ -119,6 +119,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_notificationFragment"
             app:destination="@+id/notificationFragment"/>
+        <action
+            android:id="@+id/action_homePageFragment_to_likesFragment"
+            app:destination="@id/likesFragment" />
 
     </fragment>
 
@@ -393,4 +396,14 @@
             android:id="@+id/action_termsProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/likesFragment"
+        android:name="com.ignacio.partykneadsapp.customermenus.LikesFragment"
+        android:label="fragment_likes"
+        tools:layout="@layout/fragment_likes">
+    <action
+        android:id="@+id/action_likes_to_cart"
+        app:destination="@id/cartFragment" />
+    </fragment>
+
 </navigation>

@@ -43,9 +43,9 @@ import java.util.List;
 public class Cake_Description extends Fragment {
 
     private TextView productName, productPrice, productDescription, ratePercent, numReviews;
-    private ImageView productImage, btnBack;
+    private ImageView productImage, btnBack; // Added btnLike
     private TextView minusButton, quantityTextView, plusButton; // Quantity controls
-    private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
+    private Button btnAddtoCart, btnBuyNow, btnLike; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
     private ListenerRegistration productListener;
@@ -74,6 +74,7 @@ public class Cake_Description extends Fragment {
         ratePercent = view.findViewById(R.id.ratePercent);
         numReviews = view.findViewById(R.id.numReviews);
         btnBack = view.findViewById(R.id.btnBack);
+        btnLike = view.findViewById(R.id.btnLike); // Initialize btnLike
         // Initialize quantity controls
         minusButton = view.findViewById(R.id.minus);
         quantityTextView = view.findViewById(R.id.quantity);
@@ -136,7 +137,37 @@ public class Cake_Description extends Fragment {
             navController.navigate(R.id.action_cake_Description_to_homePageFragment, args1);
         });
 
+        // Set the like button listener
+        btnLike.setOnClickListener(v -> {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+
+            if (userId != null) {
+                // Save liked product to Firestore under the user's Likes sub-collection
+                saveProductToLikes(userId);
+            } else {
+                Toast.makeText(getContext(), "Please log in to like products.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view; // Return the inflated view
+    }
+
+    private void saveProductToLikes(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Save the liked product inside the "Likes" collection of the user
+        db.collection("Users")
+                .document(userId)
+                .collection("Likes") // Likes sub-collection inside the user's document
+                .document(productShopModel.getId()) // Use the product ID as the document ID
+                .set(productShopModel) // Save the product details
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Product liked!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to like the product.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showAddToCartDialog() {
@@ -276,13 +307,6 @@ public class Cake_Description extends Fragment {
         // Return the formatted price with "₱" symbol
         return "₱" + String.format("%.2f", newTotalPrice);
     }
-
-
-
-
-
-
-
 
     private void handleBuyNow() {
         // Create a CartItemModel for the selected cake and quantity
