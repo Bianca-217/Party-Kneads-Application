@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.os.Handler;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -33,12 +34,33 @@ public class TandCFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Set the terms text with HTML and enable the link
-        binding.tvTerms5.setMovementMethod(LinkMovementMethod.getInstance());
-        binding.tvTerms5.setLinkTextColor(getResources().getColor(android.R.color.holo_blue_dark)); // Make links blue
+        // Hide the Terms and Conditions content initially
+        binding.scrollview.setVisibility(View.GONE);
+        binding.termsLabel.setVisibility(View.GONE);
+        binding.back.setVisibility(View.GONE);// This hides the ScrollView (content area)
 
-        binding.tvTerms10.setMovementMethod(LinkMovementMethod.getInstance());
-        binding.tvTerms10.setLinkTextColor(getResources().getColor(android.R.color.holo_blue_dark)); // Make links blue
+        // Show the progress bar while loading content
+        binding.progressBar.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Once the content is ready, hide the progress bar
+                binding.progressBar.setVisibility(View.GONE);
+
+                // Now display the Terms and Conditions content
+                binding.scrollview.setVisibility(View.VISIBLE);
+                binding.termsLabel.setVisibility(View.VISIBLE);// Make the content visible
+                binding.back.setVisibility(View.VISIBLE);
+
+                // Set the terms text with HTML and enable the link
+                binding.tvTerms5.setMovementMethod(LinkMovementMethod.getInstance());
+                binding.tvTerms5.setLinkTextColor(getResources().getColor(android.R.color.holo_blue_dark)); // Make links blue
+
+                binding.tvTerms10.setMovementMethod(LinkMovementMethod.getInstance());
+                binding.tvTerms10.setLinkTextColor(getResources().getColor(android.R.color.holo_blue_dark)); // Make links blue
+            }
+        }, 3000); // Simulated delay (replace with actual content loading time)
 
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
