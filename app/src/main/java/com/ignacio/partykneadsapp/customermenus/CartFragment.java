@@ -81,28 +81,30 @@ public class CartFragment extends Fragment implements CartAdapter.OnItemSelected
     }
 
     private void loadCartItems() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        firestore.collection("Users").document(userId)
+        firestore.collection("Users")
+                .document(uid)
                 .collection("cartItems")
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING) // Order by timestamp descending
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        cartItemList.clear(); // Clear the existing list to avoid duplicates
-                        for (DocumentSnapshot document : task.getResult()) {
-                            CartItemModel item = document.toObject(CartItemModel.class);
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    cartItemList.clear(); // Clear the existing list to avoid duplicates
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        CartItemModel item = doc.toObject(CartItemModel.class);
+                        if (item != null) {
+                            item.setDocId(doc.getId()); // Set the document ID
                             cartItemList.add(item);
                         }
-
-                        cartAdapter.notifyDataSetChanged();
-                        updateTotalPrice(); // Update total price based on initial selection state
-                    } else {
-                        // Handle the error
-                        Toast.makeText(getContext(), "Error loading cart items", Toast.LENGTH_SHORT).show();
                     }
+                    cartAdapter.notifyDataSetChanged(); // Notify the adapter of changes
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error fetching cart items", e);
+                    Toast.makeText(getContext(), "Failed to load cart items", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
     @Override

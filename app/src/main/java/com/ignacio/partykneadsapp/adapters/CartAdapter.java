@@ -1,16 +1,22 @@
 package com.ignacio.partykneadsapp.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.model.CartItemModel;
 
@@ -48,7 +54,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         CartItemModel item = cartItems.get(position);
         holder.bind(item, position);
 
-        // Set checkbox state with a fallback to false if not present
+        // Set checkbox state
         holder.checkBox.setChecked(selectedItems.getOrDefault(position, false));
 
         // Checkbox listener
@@ -56,7 +62,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             selectedItems.put(position, isChecked); // Update selection state
             onItemSelectedListener.onItemSelected(); // Notify the listener
         });
+
+        // Delete button listener
+        holder.btnDelete.setOnClickListener(v -> {
+            String docId = item.getDocId(); // Get the Firestore document ID
+            removeItemFromFirestore(docId, position, v); // Pass the document ID as a parameter
+        });
     }
+
+
+
 
     @Override
     public int getItemCount() {
@@ -80,9 +95,42 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return selected;
     }
 
+    private void removeItemFromFirestore(String docId, int position, View view) {
+        if (docId == null || docId.isEmpty()) {
+            Toast.makeText(view.getContext(), "Error: Unable to delete item, missing document ID.", Toast.LENGTH_SHORT).show();
+            Log.e("CartAdapter", "Cannot delete item at position " + position + " because docId is null or empty.");
+            return;
+        }
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        DocumentReference cartItemRef = firestore
+                .collection("Users")
+                .document(uid)
+                .collection("cartItems")
+                .document(docId);
+
+        cartItemRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    cartItems.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, cartItems.size());
+                    Toast.makeText(view.getContext(), "Item removed from cart", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("CartAdapter", "Error deleting item", e);
+                    Toast.makeText(view.getContext(), "Failed to delete item", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+
+
     class CartViewHolder extends RecyclerView.ViewHolder {
         private TextView productName, quantity, totalPrice, ratePercent, numReviews, cakeSize;
         private ImageView cakeImage;
+        private Button btnDelete;
         private CheckBox checkBox;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -96,10 +144,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             cakeImage = itemView.findViewById(R.id.cakeImage);
             checkBox = itemView.findViewById(R.id.checkbox);
             cakeSize = itemView.findViewById(R.id.cakeSize);
+            btnDelete = itemView.findViewById(R.id.btnDelete); // Add delete button reference
 
         }
 
         public void bind(CartItemModel item, int position) {
+            Log.d("CartAdapter", "Binding item: " + item.getProductName() + ", docId: " + item.getDocId());
             productName.setText(item.getProductName());
             quantity.setText(String.valueOf(item.getQuantity()));
             totalPrice.setText(item.getTotalPrice()); // Updated method call

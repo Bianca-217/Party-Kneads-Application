@@ -3,6 +3,7 @@ package com.ignacio.partykneadsapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Button;
 
 public class CartItemModel implements Parcelable {
     private String productName;
@@ -15,6 +16,7 @@ public class CartItemModel implements Parcelable {
     private String imageUrl;
     private boolean isSelected;
     private String originalPrice;
+    private String docId; // Firestore document ID
 
     // Required empty constructor for Firestore
     public CartItemModel() {
@@ -83,6 +85,8 @@ public class CartItemModel implements Parcelable {
         return 0;
     }
 
+
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(productId);
@@ -93,6 +97,10 @@ public class CartItemModel implements Parcelable {
         dest.writeString(rate);
         dest.writeLong(numReviews); // Use writeLong for long type
         dest.writeString(imageUrl);
+    }
+
+    public String getDocId() {
+        return docId;
     }
 
     // Getters and setters
@@ -110,6 +118,12 @@ public class CartItemModel implements Parcelable {
     // Setters
     public void setNumReviews(long numReviews) { this.numReviews = numReviews; } // Accept long type
     public void setOriginalPrice(String originalPrice) { this.originalPrice = originalPrice; }
+
+    public void setDocId(String docId) {
+        this.docId = docId;
+    }
+
+
 
     // Optional: You can add any extra methods if needed
 }
