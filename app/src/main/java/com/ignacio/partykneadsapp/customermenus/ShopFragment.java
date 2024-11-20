@@ -111,6 +111,11 @@ public class ShopFragment extends Fragment {
             InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         });
+
+        binding.btnCart.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
+            navController.navigate(R.id.action_homePageFragment_to_cartFragment);
+        });
     }
 
     private void setupCategories() {

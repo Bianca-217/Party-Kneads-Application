@@ -8,7 +8,19 @@
     android:background="@drawable/loginbgg"
     tools:context=".TermsProfileFragment">
 
+    <!-- Horizontal ProgressBar -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:visibility="gone"
+        app:trackColor="@color/footerpink"
+        app:indicatorColor="@color/pink"
+        android:indeterminate="true" />
+
     <FrameLayout
+        android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
@@ -30,6 +42,7 @@
 
 
     <TextView
+        android:id="@+id/termsLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/Terms_and_Conditions"
@@ -43,6 +56,7 @@
 
 
     <ScrollView
+        android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"

@@ -98,7 +98,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                                         .addOnSuccessListener(aVoid -> {
                                             // Change the heart icon to outline
                                             holder.btnLike.setBackgroundResource(R.drawable.heart_pink);
-                                            Toast.makeText(v.getContext(), "Removed like for " + currentProduct.getName(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(v.getContext(), "Item " + currentProduct.getName() + " removed from favorites", Toast.LENGTH_SHORT).show();
                                         })
                                         .addOnFailureListener(e -> {
                                             Toast.makeText(v.getContext(), "Failed to remove like", Toast.LENGTH_SHORT).show();
@@ -113,7 +113,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                                         .addOnSuccessListener(aVoid -> {
                                             // Change the heart icon to filled
                                             holder.btnLike.setBackgroundResource(R.drawable.pink_heart_filled);
-                                            Toast.makeText(v.getContext(), "Liked " + currentProduct.getName(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(v.getContext(), "Item " + currentProduct.getName() + " added to favorites", Toast.LENGTH_SHORT).show();
                                         })
                                         .addOnFailureListener(e -> {
                                             Toast.makeText(v.getContext(), "Failed to like the product", Toast.LENGTH_SHORT).show();
