@@ -372,6 +372,9 @@ public class CheckoutFragment extends Fragment {
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
+        // Make sure the dialog is not dismissible by tapping outside
+        alertDialog.setCancelable(false);
+
         btnContinue.setOnClickListener(v -> {
             alertDialog.dismiss();
             Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
@@ -391,6 +394,7 @@ public class CheckoutFragment extends Fragment {
 
         alertDialog.show();
     }
+
 
     private void showAddressDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.addressdialog, null);
