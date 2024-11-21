@@ -168,14 +168,10 @@
             android:text="Change Password"
             android:fontFamily="@font/montserrat_semibold"
             android:textSize="16sp"
-            android:textAlignment="textStart"
-
-            />
-
-
+            android:textAlignment="textStart"/>
 
         <Button
-            android:id="@+id/btnSave"
+            android:id="@+id/btnSaveChanges"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="15dp"

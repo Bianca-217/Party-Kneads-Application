@@ -52,10 +52,8 @@ public class ManageProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
-
 
         // Back button listener
         binding.btnBack.setOnClickListener(v -> {
@@ -63,11 +61,25 @@ public class ManageProfileFragment extends Fragment {
             navController.navigate(R.id.action_manageProfileFragment_to_profileFragment);
         });
 
+        // Change Password button listener
         binding.btnChangePassword.setOnClickListener(v -> {
             ChangePasswordDialogFragment dialogFragment = new ChangePasswordDialogFragment();
             dialogFragment.show(getParentFragmentManager(), "ChangePasswordDialog");
         });
 
+        // Save changes button listener
+        binding.btnSaveChanges.setOnClickListener(v -> {
+            String updatedFirstName = binding.userFName.getText().toString();
+            String updatedLastName = binding.userLname.getText().toString();
+
+            if (updatedFirstName.isEmpty() || updatedLastName.isEmpty()) {
+                Toast.makeText(getActivity(), "Please fill in both fields", Toast.LENGTH_SHORT).show();
+            } else {
+                // Assuming you have a method to get the user ID
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                updateUserInfo(userId, updatedFirstName, updatedLastName);
+            }
+        });
     }
 
     private void hideKeyboard(View view) {
@@ -76,7 +88,6 @@ public class ManageProfileFragment extends Fragment {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
-
 
     private void retrieveUserInfo(String userId) {
         firestore.collection("Users").document(userId).get()
@@ -101,6 +112,21 @@ public class ManageProfileFragment extends Fragment {
                         }
                     } else {
                         Toast.makeText(getActivity(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // Method to update user info in Firestore
+    private void updateUserInfo(String userId, String firstName, String lastName) {
+        // Update Firestore document with the new first name and last name
+        firestore.collection("Users").document(userId)
+                .update("First Name", firstName, "Last Name", lastName)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                        // Optionally, you could refresh the UI with the updated data here
+                    } else {
+                        Toast.makeText(getActivity(), "Failed to update profile", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
