@@ -183,11 +183,11 @@
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"
                 app:cornerRadius="10dp"
-                android:text="Policy Privacy"
+                android:text="Support"
                 android:layout_marginBottom="5dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
-                android:drawableLeft="@drawable/policy_privacy"
+                android:drawableLeft="@drawable/support_pink"
                 android:drawableRight="@drawable/nextt"
                 android:textColor="@color/semiblack" />
 

@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/loginbgg"
-    tools:context=".ProfileMenus.TermsProfileFragment">
+    tools:context=".ProfileMenus.AboutFragment">
 
     <!-- Horizontal ProgressBar -->
     <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -45,7 +45,7 @@
         android:id="@+id/termsLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Terms_and_Conditions"
+        android:text="About Party Kneads"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
         android:layout_marginHorizontal="20dp"
@@ -73,7 +73,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/welcome"
+                android:text="Welcome to Party Kneads!"
                 android:layout_marginTop="10dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_semibold"
@@ -83,7 +83,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms1"
+                android:text="@string/aboutIntro"
+                android:layout_marginTop="10dp"
+                android:textAlignment="textStart"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/semiblack"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ourServices"
                 android:layout_marginTop="20dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
@@ -93,7 +103,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms2"
+                android:text="@string/ourMission"
                 android:layout_marginTop="20dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
@@ -103,7 +113,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms3"
+                android:text="@string/ourLocation"
                 android:layout_marginTop="20dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
@@ -113,18 +123,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms4"
-                android:layout_marginTop="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:id="@+id/tvTerms5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/terms5"
+                android:text="@string/developers"
                 android:layout_marginTop="20dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
@@ -134,54 +133,23 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms6"
+                android:text="Thank you for choosing Party Kneads!"
                 android:layout_marginTop="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
+                android:textAlignment="center"
+                android:fontFamily="@font/montserrat_semibold"
+                android:textColor="@color/darkpink"
                 android:textSize="16sp"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/terms7"
-                android:layout_marginTop="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/thanks"
+                android:textAlignment="center"
+                android:fontFamily="@font/montserrat_semibold"
                 android:textColor="@color/semiblack"
                 android:textSize="16sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/terms8"
-                android:layout_marginTop="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/terms9"
-                android:layout_marginTop="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:id="@+id/tvTerms10"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/terms10"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
 
         </LinearLayout>
 

@@ -76,6 +76,33 @@
                             \n\n <b>Thank you for trusting Party Kneads!</b></string>
 
 
+
+
+
+    <string name="aboutIntro">We are your one-stop shop for sweet treats and all the party essentials you need to make every occasion special. Whether you\'re celebrating a birthday, anniversary, or simply a joyful get-together, Party Kneads is here to help you create unforgettable moments. With a wide range of freshly baked goods and customizable party supplies, we’ve made it easy to celebrate with ease and joy. From delectable cakes and cupcakes to vibrant balloons and banners, we’ve got everything to help you party like never before.</string>
+
+    <string name="ourServices"><b>Our Services:</b>
+
+                           \n\n• <b>Freshly Baked Goods:</b> We offer an extensive selection of cakes, cupcakes, breads, and more, all made fresh and customized to your taste and event.
+                            \n• <b>Party Essentials:</b> From balloons to banners, candles to confetti, we provide all the must-have supplies for your party to shine.
+                            \n• <b>Customizable Orders:</b> Personalize your orders to suit your unique flavor preferences and party themes.
+                            \n• <b>Convenient Delivery:</b> Enjoy reliable delivery right to your door, with safe and secure packaging to ensure your goodies arrive fresh and intact.
+                            <i>\n\nAny mistakes in the delivery address that lead to failed or delayed deliveries are the user\'s responsibility.</i></string>
+
+    <string name="ourMission"><b>Our Mission</b>
+                            \n\nAt Party Kneads, we believe every celebration deserves to be memorable. Our mission is simple: <i> provide you with high-quality, delicious treats and party supplies to make your events stress-free and full of joy</i>. We are here to help you celebrate, one cake and one balloon at a time. </string>
+
+
+    <string name="ourLocation"><b>Our Location</b>
+                            \n\nParty Kneads is proudly based in <b>Laguna, where we are currently serving our local community</b>. As we grow, we aim to expand and bring Party Kneads to even more people. Our dream is to franchise to other locations soon, so celebrations everywhere can experience the sweetness and joy we bring.</string>
+
+
+    <string name="developers"><b>Meet the Developers</b>
+        \n\nParty Kneads is proudly developed by <b><i>Sweet Katrina Bianca M. Ignacio and Mr. Van Zion Mingi</i></b>. Together, they share a passion for making celebrations sweeter and easier for everyone. With their expertise in design, technology, and baking, they have created Party Kneads to bring convenience and joy to all your special moments.</string>
+
+    <string name="thanks">
+        \nWe look forward to making your next celebration an unforgettable one, no matter how big or small. Stay tuned for more exciting updates as we grow and expand!</string>
+
     <string-array name="City">
         <item>Alaminos</item>
         <item>Bay</item>

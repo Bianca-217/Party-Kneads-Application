@@ -198,6 +198,9 @@
         <action
             android:id="@+id/action_profileFragment_to_manageProfileFragment"
             app:destination="@id/manageProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
 
     </fragment>
     <fragment
@@ -398,7 +401,7 @@
     </fragment>
     <fragment
         android:id="@+id/termsProfileFragment"
-        android:name="com.ignacio.partykneadsapp.TermsProfileFragment"
+        android:name="com.ignacio.partykneadsapp.ProfileMenus.TermsProfileFragment"
         android:label="fragment_terms_profile"
         tools:layout="@layout/fragment_terms_profile" >
         <action
@@ -425,11 +428,20 @@
     </fragment>
     <fragment
         android:id="@+id/manageProfileFragment"
-        android:name="com.ignacio.partykneadsapp.ManageProfileFragment"
+        android:name="com.ignacio.partykneadsapp.ProfileMenus.ManageProfileFragment"
         android:label="fragment_manage_profile"
         tools:layout="@layout/fragment_manage_profile" >
         <action
             android:id="@+id/action_manageProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.ignacio.partykneadsapp.ProfileMenus.AboutFragment"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" >
+        <action
+            android:id="@+id/action_aboutFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
 

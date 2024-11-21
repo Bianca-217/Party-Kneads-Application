@@ -1,4 +1,4 @@
-package com.ignacio.partykneadsapp;
+package com.ignacio.partykneadsapp.ProfileMenus;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -20,8 +20,9 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.ignacio.partykneadsapp.ChangePasswordDialogFragment;
+import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentManageProfileBinding;
-import com.ignacio.partykneadsapp.databinding.FragmentProfileBinding;
 
 
 public class ManageProfileFragment extends Fragment {
