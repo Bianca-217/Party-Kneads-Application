@@ -98,14 +98,13 @@ public class CartFragment extends Fragment implements CartAdapter.OnItemSelected
                         }
                     }
                     cartAdapter.notifyDataSetChanged(); // Notify the adapter of changes
+                    updateTotalPrice(); // Update the total price after items are loaded
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Firestore", "Error fetching cart items", e);
                     Toast.makeText(getContext(), "Failed to load cart items", Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 
     @Override
     public void onItemSelected() {
@@ -142,3 +141,4 @@ public class CartFragment extends Fragment implements CartAdapter.OnItemSelected
         }
     }
 }
+

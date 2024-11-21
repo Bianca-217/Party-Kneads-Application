@@ -5,6 +5,8 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Button;
 
+import java.text.DecimalFormat;
+
 public class CartItemModel implements Parcelable {
     private String productName;
     private String productId;
@@ -97,6 +99,7 @@ public class CartItemModel implements Parcelable {
         dest.writeString(rate);
         dest.writeLong(numReviews); // Use writeLong for long type
         dest.writeString(imageUrl);
+        dest.writeString(docId);
     }
 
     public String getDocId() {
@@ -109,6 +112,9 @@ public class CartItemModel implements Parcelable {
     public String getCakeSize() { return cakeSize; }
     public int getQuantity() { return quantity; }
     public String getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(String totalPrice) {
+        this.totalPrice = totalPrice;
+    }
     public String getRate() { return rate; }
     public long getNumReviews() { return numReviews; } // Return as long
     public String getImageUrl() { return imageUrl; }
@@ -119,11 +125,20 @@ public class CartItemModel implements Parcelable {
     public void setNumReviews(long numReviews) { this.numReviews = numReviews; } // Accept long type
     public void setOriginalPrice(String originalPrice) { this.originalPrice = originalPrice; }
 
+    public void updateTotalPrice(double unitPrice) {
+        // Format the total price to 2 decimal places
+        DecimalFormat decimalFormat = new DecimalFormat("₱#.##"); // Format currency to 2 decimal places
+        this.totalPrice = decimalFormat.format(unitPrice * this.quantity);
+    }
+
+    // Setter for quantity with validation
+    public void setQuantity(int quantity) {
+        this.quantity = Math.max(quantity, 1); // Prevent quantity below 1
+    }
+
     public void setDocId(String docId) {
         this.docId = docId;
     }
-
-
 
     // Optional: You can add any extra methods if needed
 }
