@@ -23,6 +23,7 @@ import com.ignacio.partykneadsapp.model.CartItemModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
     private List<CartItemModel> cartItems;
@@ -60,7 +61,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         // Checkbox listener
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             selectedItems.put(position, isChecked); // Update selection state
-            onItemSelectedListener.onItemSelected(); // Notify the listener
+            onItemSelectedListener.onItemSelected(); // Notify the listener to update total price
         });
 
         // Delete button listener
@@ -69,9 +70,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             removeItemFromFirestore(docId, position, v); // Pass the document ID as a parameter
         });
     }
-
-
-
 
     @Override
     public int getItemCount() {
@@ -124,13 +122,35 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 });
     }
 
+    private void fetchProductPrice(String productId, OnPriceFetchedListener listener) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
+        firestore.collection("products")
+                .document(productId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String price = documentSnapshot.getString("price");
+                        listener.onPriceFetched(price);
+                    } else {
+                        listener.onPriceFetched("0"); // Default if price not found
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("CartAdapter", "Error fetching price for productId: " + productId, e);
+                    listener.onPriceFetched("0");
+                });
+    }
 
+    // Callback interface for fetching prices
+    public interface OnPriceFetchedListener {
+        void onPriceFetched(String price);
+    }
 
     class CartViewHolder extends RecyclerView.ViewHolder {
-        private TextView productName, quantity, totalPrice, ratePercent, numReviews, cakeSize;
+        private TextView productName, quantity, totalPrice, cakeSize, btnIncrease, btnDecrease;
         private ImageView cakeImage;
-        private Button btnDelete;
+        private Button btnDelete; // Added buttons for quantity adjustment
         private CheckBox checkBox;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -139,27 +159,92 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             productName = itemView.findViewById(R.id.productName);
             quantity = itemView.findViewById(R.id.quantity);
             totalPrice = itemView.findViewById(R.id.totalPrice);
-            ratePercent = itemView.findViewById(R.id.ratePercent);
-            numReviews = itemView.findViewById(R.id.numReviews);
+            cakeSize = itemView.findViewById(R.id.cakeSize);
             cakeImage = itemView.findViewById(R.id.cakeImage);
             checkBox = itemView.findViewById(R.id.checkbox);
-            cakeSize = itemView.findViewById(R.id.cakeSize);
-            btnDelete = itemView.findViewById(R.id.btnDelete); // Add delete button reference
-
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+            btnIncrease = itemView.findViewById(R.id.btnIncrease);
+            btnDecrease = itemView.findViewById(R.id.btnDecrease);
         }
 
         public void bind(CartItemModel item, int position) {
-            Log.d("CartAdapter", "Binding item: " + item.getProductName() + ", docId: " + item.getDocId());
             productName.setText(item.getProductName());
             quantity.setText(String.valueOf(item.getQuantity()));
-            totalPrice.setText(item.getTotalPrice()); // Updated method call
-//            ratePercent.setText(item.getRate() != null ? item.getRate() : "test");
-//            numReviews.setText(item.getNumReviews() != null ? item.getNumReviews() : "test");
+            totalPrice.setText(item.getTotalPrice());
             cakeSize.setText(item.getCakeSize());
 
             Glide.with(itemView.getContext())
                     .load(item.getImageUrl())
                     .into(cakeImage);
+
+            btnIncrease.setOnClickListener(v -> {
+                int newQuantity = item.getQuantity() + 1;
+                updateQuantityAndPrice(item, newQuantity);
+            });
+
+            btnDecrease.setOnClickListener(v -> {
+                if (item.getQuantity() > 1) {
+                    int newQuantity = item.getQuantity() - 1;
+                    updateQuantityAndPrice(item, newQuantity);
+                }
+            });
+        }
+
+
+        private void updateCartItemInFirestore(CartItemModel item) {
+            // Get Firestore instance
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            // Reference to the specific cart item document in Firestore
+            DocumentReference cartItemRef = firestore
+                    .collection("Users")
+                    .document(uid)
+                    .collection("cartItems")
+                    .document(item.getDocId());
+
+            // Create a map of the fields you want to update
+            Map<String, Object> cartItemData = new HashMap<>();
+            cartItemData.put("quantity", item.getQuantity());
+            cartItemData.put("totalPrice", item.getTotalPrice());
+
+            // Update the Firestore document with the new values
+            cartItemRef.update(cartItemData);
+        }
+
+
+        private void updateQuantityAndPrice(CartItemModel item, int newQuantity) {
+            fetchProductPrice(item.getProductId(), price -> {
+                double priceValue = Double.parseDouble(price);
+                double newTotalPrice = priceValue * newQuantity;
+
+                // Format total price based on whether it has decimal places or not
+                String formattedPrice;
+                if (newTotalPrice == (long) newTotalPrice) {
+                    // If price is a whole number, show it as an integer
+                    formattedPrice = "₱" + (long) newTotalPrice;
+                } else {
+                    // If price has decimals, show it with 2 decimal places
+                    formattedPrice = "₱" + String.format("%.2f", newTotalPrice);
+                }
+
+                // Update model directly
+                item.setQuantity(newQuantity);
+                item.setTotalPrice(formattedPrice);
+
+                // Update only the necessary views (quantity and totalPrice)
+                quantity.setText(String.valueOf(newQuantity));
+                totalPrice.setText(formattedPrice);
+
+                // Update the cartItems list dynamically
+                cartItems.set(getAdapterPosition(), item);
+
+                // Save the updated cart item to Firestore
+                updateCartItemInFirestore(item);
+
+                // Notify listener to update the total price of the cart
+                onItemSelectedListener.onItemSelected();
+            });
         }
     }
 }
