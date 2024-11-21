@@ -76,10 +76,10 @@ public class CreateAccountFragment extends Fragment {
                 String password = editable.toString();
 
                 // Check each criterion and update helper text color accordingly
-                helperMinLength.setTextColor(password.length() >= 8 ? Color.GREEN : Color.GRAY);
-                helperUpperCase.setTextColor(Pattern.compile("[A-Z]").matcher(password).find() ? Color.GREEN : Color.GRAY);
-                helperNumber.setTextColor(Pattern.compile("[0-9]").matcher(password).find() ? Color.GREEN : Color.GRAY);
-                helperSpecialChar.setTextColor(Pattern.compile("[^a-zA-Z0-9 ]").matcher(password).find() ? Color.GREEN : Color.GRAY);
+                helperMinLength.setTextColor(password.length() >= 8 ? getResources().getColor(R.color.green) : getResources().getColor(R.color.grey));
+                helperUpperCase.setTextColor(password.matches(".*[A-Z].*") ? getResources().getColor(R.color.green) : getResources().getColor(R.color.grey));
+                helperNumber.setTextColor(password.matches(".*\\d.*") ? getResources().getColor(R.color.green) : getResources().getColor(R.color.grey));
+                helperSpecialChar.setTextColor(password.matches(".*[.@#$%^&+=].*") ? getResources().getColor(R.color.green) : getResources().getColor(R.color.grey));
             }
         });
 

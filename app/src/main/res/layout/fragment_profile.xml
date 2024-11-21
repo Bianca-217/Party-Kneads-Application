@@ -125,7 +125,6 @@
             android:textColor="@color/grey"/>
 
         <LinearLayout
-            android:id="@+id/btnManageProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -134,6 +133,7 @@
             android:background="@drawable/logincont" >
 
             <Button
+                android:id="@+id/btnManageProfile"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:backgroundTint="@color/semiwhite"

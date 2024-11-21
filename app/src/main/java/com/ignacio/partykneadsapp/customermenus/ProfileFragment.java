@@ -72,6 +72,13 @@ public class ProfileFragment extends Fragment {
             navController.navigate(R.id.action_profileFragment_to_termsProfileFragment);
         });
 
+        binding.btnManageProfile.setOnClickListener(v ->{
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_profileFragment_to_manageProfileFragment);
+        });
+
+
     }
 
     private void openGallery() {

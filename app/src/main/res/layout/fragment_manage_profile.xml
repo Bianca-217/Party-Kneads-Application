@@ -105,6 +105,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="First Name"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/pink"
+            app:cursorColor="@color/pink"
             app:hintTextColor="@color/pink"
             app:boxStrokeColor="@color/darkpink"
             app:boxCornerRadiusTopStart="10dp"
@@ -133,6 +136,9 @@
             android:layout_marginTop="10dp"
             android:hint="Last Name"
             app:hintTextColor="@color/pink"
+            app:endIconMode="clear_text"
+            app:cursorColor="@color/pink"
+            app:endIconTint="@color/pink"
             app:boxStrokeColor="@color/darkpink"
             app:boxCornerRadiusTopStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -154,57 +160,24 @@
                 android:scrollbars="vertical" />
         </com.google.android.material.textfield.TextInputLayout>
 
-       <com.google.android.material.textfield.TextInputLayout
+        <Button
+            android:id="@+id/btnChangePassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_marginTop="10dp"
-            android:hint="Change Password"
-            app:hintTextColor="@color/pink"
-            app:boxStrokeColor="@color/darkpink"
-            app:boxCornerRadiusTopStart="10dp"
-            app:boxCornerRadiusTopEnd="10dp"
-            app:boxCornerRadiusBottomStart="10dp"
-            app:boxCornerRadiusBottomEnd="10dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/changepass"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/semiblack"
-                android:textSize="16sp"
-                android:drawableLeft="@drawable/baseline_lock_24"
-                android:drawablePadding="10dp"
-                app:endIconTint="@color/pink"
-                android:inputType="text"
-                android:singleLine="true"
-                android:gravity="start"
-                android:scrollbars="vertical" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Password last change: "
-            android:fontFamily="@font/montserrat_bold"
+            app:cornerRadius="10dp"
+            android:backgroundTint="@color/semiwhite"
+            app:strokeColor="@color/pink"
+            app:strokeWidth="2dp"
+            android:drawableLeft="@drawable/baseline_lock_24"
+            android:text="Change Password"
+            android:fontFamily="@font/montserrat_semibold"
             android:textSize="16sp"
-            android:textColor="@color/semiblack"/>
+            android:textAlignment="textStart"
 
-            <TextView
-                android:id="@+id/datePassChange"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="April 1, 2024 "
-                android:fontFamily="@font/montserrat_bold"
-                android:textSize="16sp"
-                android:textColor="@color/pink"/>
-        </LinearLayout>
+            />
+
+
 
         <Button
             android:id="@+id/btnSave"

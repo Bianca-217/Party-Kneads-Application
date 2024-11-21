@@ -195,6 +195,9 @@
         <action
             android:id="@+id/action_profileFragment_to_termsProfileFragment"
             app:destination="@id/termsProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageProfileFragment"
+            app:destination="@id/manageProfileFragment" />
 
     </fragment>
     <fragment
@@ -419,6 +422,15 @@
         <action
             android:id="@+id/action_shopFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageProfileFragment"
+        android:name="com.ignacio.partykneadsapp.ManageProfileFragment"
+        android:label="fragment_manage_profile"
+        tools:layout="@layout/fragment_manage_profile" >
+        <action
+            android:id="@+id/action_manageProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
 </navigation>
