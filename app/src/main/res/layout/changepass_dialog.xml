@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:id="@+id/changePassDialog">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutdialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_bg"
+        android:padding="20dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/great"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change password"
+            android:gravity="center_horizontal"
+            android:textSize="24sp"
+            android:paddingTop="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            app:layout_constraintTop_toTopOf="@+id/layoutdialog"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/great">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:hint="Current Password"
+                android:layout_marginTop="20dp"
+                android:textColorHint="@color/pink"
+                app:boxStrokeColor="@color/darkpink"
+                app:cursorColor="@color/pink"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/pink"
+                app:hintTextColor="@color/pink">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/currentPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:inputType="textPassword"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="100dp"
+                    android:singleLine="true"
+                    android:textColor="@color/semiblack"
+                    android:textSize="16dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtinputLayoutpass"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:hint="New Password"
+                android:layout_marginTop="10dp"
+                android:textColorHint="@color/pink"
+                app:boxStrokeColor="@color/darkpink"
+                app:cursorColor="@color/pink"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/pink"
+                app:helperText="Password must contain:"
+                app:helperTextEnabled="true"
+                app:helperTextTextAppearance="@font/montserrat_semibold"
+                app:helperTextTextColor="@color/darkpink"
+                app:hintTextColor="@color/pink"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvAgree">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/NewPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:inputType="textPassword"
+                    android:singleLine="true"
+                    android:textColor="@color/semiblack" />
+
+
+                <!-- Helper Text Views for Password Criteria -->
+                <TextView
+                    android:id="@+id/helperMinLength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Minimum of 8 characters"
+                    android:textColor="#808080" />
+
+                <TextView
+                    android:id="@+id/helperUpperCase"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="At least one uppercase letter"
+                    android:textColor="#808080" />
+
+                <TextView
+                    android:id="@+id/helperNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="At least one number"
+                    android:textColor="#808080" />
+
+                <TextView
+                    android:id="@+id/helperSpecialChar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="At least one special character"
+                    android:textColor="#808080" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:hint="Confirm Password"
+                android:textColorHint="@color/pink"
+                app:boxStrokeColor="@color/darkpink"
+                app:cursorColor="@color/pink"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/pink"
+                app:helperTextEnabled="true"
+                app:helperTextTextAppearance="@font/montserrat_semibold"
+                app:helperTextTextColor="@color/darkpink"
+                app:hintTextColor="@color/pink"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvAgree">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirmPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:inputType="textPassword"
+                    android:singleLine="true"
+                    android:textColor="@color/semiblack" />
+
+                <TextView
+                    android:id="@+id/txtNotMatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="New password does not match."
+                    android:textColor="@color/darkpink" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnChangePassword"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:backgroundTint="@color/pink"
+            android:text="Change Password"
+            android:textSize="18sp"
+            app:cornerRadius="10dp"
+            android:textColor="@color/semiwhite"
+            android:fontFamily="@font/montserrat_bold" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/pass"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutdialog"
+        app:layout_constraintBottom_toTopOf="@id/layoutdialog"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

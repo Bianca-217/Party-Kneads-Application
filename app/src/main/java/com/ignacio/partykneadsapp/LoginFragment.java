@@ -94,7 +94,6 @@ public class LoginFragment extends Fragment {
         etPass = view.findViewById(R.id.etPassword);
         btnContinue = view.findViewById(R.id.btnContinue);
         btnSignup = view.findViewById(R.id.btnSignUp);
-        btnFacebook = view.findViewById(R.id.btnFacebook);
         btnGoogle = view.findViewById(R.id.btnGoogle);
 
         btnSignup.setOnClickListener(v -> {
@@ -108,7 +107,6 @@ public class LoginFragment extends Fragment {
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
 
-        setupFacebookLogin();
         setupGoogleSignIn();
     }
 
@@ -146,61 +144,6 @@ public class LoginFragment extends Fragment {
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
-
-    private void setupFacebookLogin() {
-        btnFacebook.setOnClickListener(v -> signInWithFacebook());
-        initializeFacebookLogin();
-    }
-
-    private void signInWithFacebook() {
-        LoginManager.getInstance().logInWithReadPermissions(getActivity(), Arrays.asList("email", "public_profile"));
-    }
-
-    private void initializeFacebookLogin() {
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("LoginFragment", "Facebook login successful");
-                AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
-                FirebaseUser user = mAuth.getCurrentUser();
-
-                if (user != null) {
-                    user.linkWithCredential(credential)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Log.d("FacebookLogin", "Linking successful");
-                                    navigateToUserHomePage();
-                                } else {
-                                    Log.e("FacebookLogin", "Linking failed", task.getException());
-                                    Toast.makeText(getActivity(), "Linking Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } else {
-                    mAuth.signInWithCredential(credential)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    navigateToUserHomePage();
-                                } else {
-                                    Log.e("FacebookLogin", "Firebase Auth failed", task.getException());
-                                    Toast.makeText(getActivity(), "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d("FacebookLogin", "Facebook login canceled");
-                Toast.makeText(getActivity(), "Facebook login canceled", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.e("FacebookLogin", "Error: " + error.getMessage(), error);
-                Toast.makeText(getActivity(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void setupGoogleSignIn() {
