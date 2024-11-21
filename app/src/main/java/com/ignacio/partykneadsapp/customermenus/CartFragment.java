@@ -81,12 +81,12 @@ public class CartFragment extends Fragment implements CartAdapter.OnItemSelected
     }
 
     private void loadCartItems() {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         firestore.collection("Users")
                 .document(uid)
                 .collection("cartItems")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING) // Order by timestamp, latest first
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     cartItemList.clear(); // Clear the existing list to avoid duplicates
@@ -105,6 +105,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnItemSelected
                     Toast.makeText(getContext(), "Failed to load cart items", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     @Override
     public void onItemSelected() {
