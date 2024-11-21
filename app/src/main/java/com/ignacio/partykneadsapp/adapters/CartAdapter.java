@@ -214,37 +214,33 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
 
         private void updateQuantityAndPrice(CartItemModel item, int newQuantity) {
-            fetchProductPrice(item.getProductId(), price -> {
-                double priceValue = Double.parseDouble(price);
-                double newTotalPrice = priceValue * newQuantity;
+            // Calculate unit price dynamically
+            double unitPrice = item.getTotalPriceAsDouble() / item.getQuantity(); // Derive unit price
 
-                // Format total price based on whether it has decimal places or not
-                String formattedPrice;
-                if (newTotalPrice == (long) newTotalPrice) {
-                    // If price is a whole number, show it as an integer
-                    formattedPrice = "₱" + (long) newTotalPrice;
-                } else {
-                    // If price has decimals, show it with 2 decimal places
-                    formattedPrice = "₱" + String.format("%.2f", newTotalPrice);
-                }
+            // Calculate new total price based on the new quantity
+            double newTotalPrice = unitPrice * newQuantity;
 
-                // Update model directly
-                item.setQuantity(newQuantity);
-                item.setTotalPrice(formattedPrice);
+            // Format total price based on whether it has decimal places or not
+            String formattedPrice;
+            if (newTotalPrice == (long) newTotalPrice) {
+                formattedPrice = "₱" + (long) newTotalPrice; // Whole number
+            } else {
+                formattedPrice = "₱" + String.format("%.2f", newTotalPrice); // Decimal format
+            }
 
-                // Update only the necessary views (quantity and totalPrice)
-                quantity.setText(String.valueOf(newQuantity));
-                totalPrice.setText(formattedPrice);
+            // Update the cart item
+            item.setQuantity(newQuantity);
+            item.setTotalPrice(formattedPrice);
 
-                // Update the cartItems list dynamically
-                cartItems.set(getAdapterPosition(), item);
+            // Update views
+            quantity.setText(String.valueOf(newQuantity));
+            totalPrice.setText(formattedPrice);
 
-                // Save the updated cart item to Firestore
-                updateCartItemInFirestore(item);
+            // Update Firestore
+            updateCartItemInFirestore(item);
 
-                // Notify listener to update the total price of the cart
-                onItemSelectedListener.onItemSelected();
-            });
+            // Notify listener
+            onItemSelectedListener.onItemSelected();
         }
     }
 }
