@@ -76,9 +76,6 @@
                             \n\n <b>Thank you for trusting Party Kneads!</b></string>
 
 
-
-
-
     <string name="aboutIntro">We are your one-stop shop for sweet treats and all the party essentials you need to make every occasion special. Whether you\'re celebrating a birthday, anniversary, or simply a joyful get-together, Party Kneads is here to help you create unforgettable moments. With a wide range of freshly baked goods and customizable party supplies, we’ve made it easy to celebrate with ease and joy. From delectable cakes and cupcakes to vibrant balloons and banners, we’ve got everything to help you party like never before.</string>
 
     <string name="ourServices"><b>Our Services:</b>
@@ -102,6 +99,45 @@
 
     <string name="thanks">
         \nWe look forward to making your next celebration an unforgettable one, no matter how big or small. Stay tuned for more exciting updates as we grow and expand!</string>
+
+
+
+    <string name="supportIntro">At Party Kneads, your satisfaction is our top priority. Whether you have questions about your order, payments, delivery, or product details, our support team is here to help you celebrate without worries.</string>
+
+    <string name="contact"><b>Contact Information</b>
+
+                            \n\n• <b>Email Support</b>: <a href="mailto:partykneads@gmail.com">partykneads@gmail.com</a> \nReach us anytime for assistance, and our team will respond within 24-48 hours.
+                            \n• <b>Customer Service Hours:</b> Available from 9 AM - 6 PM, Monday to Saturday.
+                            For urgent concerns during business hours, we’ll prioritize your inquiries to ensure quick resolution.</string>
+
+
+    <string name="help"><b>Common Issues We Can Help With</b>
+
+                          \n\n• <b>Order Issues:</b> Having trouble placing, modifying, or tracking your order? Let us guide you through the process or provide updates about your order status.
+                            \n• <b>Payment Queries:</b> Facing issues with payments? We accept a variety of secure payment methods and are ready to assist with any transaction-related concerns.
+                            \n• <b>Delivery Assistance:</b> Need help with your delivery? Whether it’s updating your address, checking your order’s progress, or resolving delivery issues, we’re here to make it right.
+                            \n• <b>Product Information:</b> Curious about a cake flavor, balloon design, or party supply? Reach out for detailed information on all our products to help you choose the perfect fit for your celebration.</string>
+
+    <string name="FAQS"><b>Frequently Asked Questions (FAQs)</b>
+
+                            \n\n <b>1. What is the delivery time?</b> \nMost orders are delivered within 2-3 business days. For custom orders, delivery may take up to 7 business days, depending on the complexity of the customization. You will receive an email confirmation with tracking details once your order is shipped.
+                            \n <b>2. Can I customize my order?</b> \nAbsolutely! We offer a range of customization options for cakes, balloons, and party supplies. Choose your preferred options when placing your order. If you need assistance or have a special request, feel free to contact our team for guidance.
+                            \n <b>3. What payment methods do you accept?</b> \nCurrently, Party Kneads offers Cash on Delivery (COD) as our primary payment method. This ensures a hassle-free and secure transaction upon receiving your order. We are actively working to expand our payment options soon, including digital and online payment methods, to make your shopping experience even more convenient. Stay tuned for updates!
+                            \n <b>4. What is your return policy?</b> \nIf there’s an issue with your order, please notify us within 24 hours of delivery.
+                            \n• <b>Eligible Returns/Exchanges:</b>  Damaged or incorrect items will be replaced or refunded promptly.
+                            \n• <b>Non-Refundable Items:</b> Custom-made products are non-refundable due to their personalized nature.</string>
+
+
+    <string name="assistance"><b>Still Need Assistance?</b>
+
+                          \n\n• If your concern isn’t listed here, please don’t hesitate to get in touch. We’re committed to resolving your issues as quickly and efficiently as possible.
+                            \n <b>Tips for Faster Support:</b>
+                            \n• Include your <b>Order ID</b> and any relevant details in your email to help us resolve your concern without delay.
+                            \n• If you have a delivery-related issue, please mention your current address and any updates needed.</string>
+
+    <string name="supp">
+        \nWe’re always ready to assist you in creating the most memorable celebrations. Let us handle the details, so you can focus on enjoying your special moments.</string>
+
 
     <string-array name="City">
         <item>Alaminos</item>

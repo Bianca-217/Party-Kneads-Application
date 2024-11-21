@@ -84,6 +84,12 @@ public class ProfileFragment extends Fragment {
             navController.navigate(R.id.action_profileFragment_to_aboutFragment);
         });
 
+        binding.btnSupport.setOnClickListener(v ->{
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_profileFragment_to_supportFragment);
+        });
+
 
     }
 
