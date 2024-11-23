@@ -9,6 +9,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +19,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.databinding.FragmentNewAddressBinding;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class NewAddressFragment extends Fragment {
 
@@ -44,11 +53,94 @@ public class NewAddressFragment extends Fragment {
 
         binding.btnaddAddress.setOnClickListener(v -> {
             if (validateFields()) {
-                Toast.makeText(getContext(), "Address Added", Toast.LENGTH_SHORT).show();
+                saveAddressToFirestore();
             }
         });
 
         setupAutoCompleteTextView();
+        numberMaxDigit();
+    }
+
+    private void saveAddressToFirestore() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get the currently logged-in user's ID
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid(); // Get the UID of the logged-in user
+
+            // Collect data from UI fields
+            String userName = binding.txtUserName.getText().toString().trim();
+            String phoneNumber = binding.contactNum.getText().toString().trim();
+            String city = binding.cities.getText().toString().trim();
+            String barangay = binding.barangays.getText().toString().trim();
+            String postalCode = binding.postalCode.getText().toString().trim();
+            String houseNum = binding.houseNum.getText().toString().trim();
+
+            // Concatenate full address
+            String fullAddress = houseNum + ", " + barangay + ", " + city + ", Laguna, " + postalCode;
+
+            // Prepare the data map to be stored in Firestore
+            Map<String, Object> addressData = new HashMap<>();
+            addressData.put("userName", userName);  // Add userName
+            addressData.put("phoneNumber", phoneNumber);
+            addressData.put("city", city);
+            addressData.put("barangay", barangay);
+            addressData.put("postalCode", postalCode);
+            addressData.put("houseNum", houseNum);
+            addressData.put("location", fullAddress); // Full address from concatenation
+            addressData.put("status", "Active"); // Set the default status as "Active"
+
+            // Add data to the `Locations` subcollection of the current user
+            db.collection("Users")
+                    .document(userId)
+                    .collection("Locations")
+                    .add(addressData)
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(getContext(), "Address saved successfully!", Toast.LENGTH_SHORT).show();
+                        clearFields(); // Optional: Clear fields after successful save
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to save address: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+        } else {
+            // Handle the case where no user is logged in
+            Toast.makeText(getContext(), "No user logged in. Please sign in.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void clearFields() {
+        binding.txtUserName.setText("");
+        binding.contactNum.setText("");
+        binding.cities.setText("");
+        binding.barangays.setText("");
+        binding.postalCode.setText("");
+        binding.houseNum.setText("");
+    }
+
+    public void numberMaxDigit() {
+        binding.contactNum.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed here
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Clear error message when the user starts typing
+                binding.contactNum.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Prevent typing more than 11 digits
+                if (s.length() > 11) {
+                    s.delete(11, s.length()); // Remove excess characters
+                }
+            }
+        });
     }
 
     private void setupAutoCompleteTextView() {
