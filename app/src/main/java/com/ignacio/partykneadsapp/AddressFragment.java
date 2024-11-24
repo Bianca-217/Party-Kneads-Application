@@ -1,5 +1,7 @@
 package com.ignacio.partykneadsapp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +18,9 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.LocationAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentAddressBinding;
@@ -59,6 +63,7 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
             navController.navigate(R.id.action_addressFragment_to_newAddressFragment);
         });
 
+
         // Back Button Click
         binding.btnBack.setOnClickListener(v -> {
             Bundle args1 = new Bundle();
@@ -74,25 +79,62 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         locationRecyclerView.setAdapter(locationAdapter);
 
-        fetchActiveLocations();
+        // Listen for delete address signal
+        getParentFragmentManager().setFragmentResultListener("deleteAddressKey", getViewLifecycleOwner(), (requestKey, result) -> {
+            // Refresh the list of addresses
+            fetchActiveLocations();
+        });
+
+       fetchActiveLocations();
+
+
+        getParentFragmentManager().setFragmentResultListener("requestKey", getViewLifecycleOwner(), (requestKey, result) -> {
+            String updatedLocation = result.getString("updatedLocation");
+            if (updatedLocation != null) {
+                // Refresh the fragment's data or UI
+                fetchActiveLocations();
+            }
+        });
     }
+
+
 
     @Override
     public void onEditClick(int position) {
-        // Navigate to the EditAddressFragment when edit button is clicked
+        // Navigate to the EditAddressFragment when the edit button is clicked
         LocationModel location = activeLocations.get(position); // Get LocationModel object
+
+        // Create a new instance of the DialogFragment
+        EditAddressFragment dialogFragment = new EditAddressFragment();
 
         // Create a bundle to pass userName and location to EditAddressFragment
         Bundle bundle = new Bundle();
         bundle.putString("location", location.getFullAddress()); // Pass the full address
-        bundle.putString("username", userName); // Pass the full address
-        bundle.putString("phonenumber", location.getPhoneNumber()); // Pass the full address
+        bundle.putString("username", location.getUserName()); // Pass the username
+        bundle.putString("phonenumber", location.getPhoneNumber()); // Pass the phone number
+        bundle.putString("city", location.getCity());
+        bundle.putString("barangay", location.getBarangay());
+        bundle.putString("postalCode", location.getPostalCode());
+        bundle.putString("houseNum", location.getHouseNum());
 
 
-        NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_addressFragment_to_editAddressFragment, bundle);
+        dialogFragment.setArguments(bundle); // Set the arguments
+
+        // Show the DialogFragment
+        dialogFragment.show(getParentFragmentManager(), "EditAddressDialog");
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            // Extract the updated location from the result
+            String updatedLocation = data.getStringExtra("updatedLocation");
+
+            // Refresh the active locations list with the updated location
+            fetchActiveLocations();
+        }
+    }
     private void fetchActiveLocations() {
         if (cUser != null) {
             String userId = cUser.getUid();
@@ -141,6 +183,9 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         }
     }
 
+
+
+
     private void fetchUserName(String userId, Runnable onComplete) {
         db.collection("Users").document(userId).get()
                 .addOnCompleteListener(task -> {
@@ -161,5 +206,6 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
                     onComplete.run(); // Ensure to run the callback even on failure
                 });
     }
+
 
 }

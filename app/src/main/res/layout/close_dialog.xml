@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
     android:background="#00FFFFFF"
-    android:id="@+id/confirmaddressdialog">
+    android:id="@+id/closedialog">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutdialog"
@@ -22,7 +22,7 @@
             android:id="@+id/great"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Confirm Address"
+            android:text="Are you leaving?"
             android:gravity="center_horizontal"
             android:textSize="24sp"
             android:paddingTop="20dp"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/montserrat_medium"
-            android:text="Do you want to proceed with this address?"
+            android:text="Changes are not saved. Do you want to discard the changes?"
             android:textAlignment="center"
             android:textColor="@color/grey"
             android:textSize="18sp"
@@ -58,28 +58,29 @@
             app:layout_constraintTop_toBottomOf="@+id/successfullyAdded">
 
             <Button
-                android:id="@+id/btnNo"
-                android:layout_width="150dp"
+                android:id="@+id/btnCancel"
+                android:layout_width="154dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/semiwhite"
-                android:text="No"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Cancel"
+                app:cornerRadius="20dp"
                 android:textColor="@color/pink"
                 android:textSize="16sp"
-                android:fontFamily="@font/montserrat_semibold"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/successfullyAdded"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/successfullyAdded" />
 
             <Button
-                android:id="@+id/btnYes"
+                android:id="@+id/btnDiscard"
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:text="Yes"
+                android:text="Discard"
                 android:backgroundTint="@color/pink"
                 android:textColor="@color/semiwhite"
                 android:fontFamily="@font/montserrat_semibold"
                 android:textSize="16sp"
-                app:cornerRadius="0dp"
+                app:cornerRadius="20dp"
                 android:textAlignment="center"
                 app:layout_constraintTop_toBottomOf="@+id/btnCart"
                 app:layout_constraintStart_toStartOf="parent"

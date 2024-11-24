@@ -23,8 +23,6 @@
             android:clipToPadding="false"
             tools:context=".CheckoutFragment">
 
-
-
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,8 +38,7 @@
                     android:layout_height="50dp"
                     android:src="@drawable/close_button"
                     android:backgroundTint="@color/semiwhite"
-                    android:layout_gravity="end"
-                    />
+                    android:layout_gravity="end" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
