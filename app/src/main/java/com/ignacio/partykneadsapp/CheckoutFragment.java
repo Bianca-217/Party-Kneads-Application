@@ -140,33 +140,47 @@ public class CheckoutFragment extends Fragment {
     private void fetchActiveLocations(String userName) {
         if (cUser != null) {
             String userId = cUser.getUid();
-            db.collection("Users").document(userId).collection("Locations")
+
+            // Use Firestore real-time listener (addSnapshotListener)
+            db.collection("Users")
+                    .document(userId)
+                    .collection("Locations")
                     .whereEqualTo("status", "Active")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+                    .addSnapshotListener((querySnapshot, e) -> {
+                        if (e != null) {
+                            Log.w("CheckoutFragment", "Error fetching active locations", e);
+                            return;
+                        }
+
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
                             activeLocations.clear(); // Clear the list before adding new items
+
+                            // Loop through each document in the snapshot
                             String userNameInLocation = "";
-                            for (QueryDocumentSnapshot document : task.getResult()) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
                                 String location = document.getString("location");
-                                String phoneNumber = document.getString("phoneNumber"); // Fetch the phone number
+                                String phoneNumber = document.getString("phoneNumber");
                                 userNameInLocation = document.getString("userName"); // Fetch the userName
+
+                                // Check if location and phone number exist
                                 if (location != null && phoneNumber != null) {
-                                    // Add both location and phone number as a single string
-                                    activeLocations.add(location + " - " + phoneNumber); // Combine them for display
+                                    // Combine location and phone number as a single string
+                                    activeLocations.add(location + " - " + phoneNumber);
                                 }
                             }
+
+                            // Update the username in the adapter, if needed
                             locationAdapter.setUserName(userNameInLocation);
+
+                            // Notify the adapter that data has been updated
                             locationAdapter.notifyDataSetChanged();
                         } else {
-                            Log.w("CheckoutFragment", "Error getting active locations.", task.getException());
+                            Log.w("CheckoutFragment", "No active locations found.");
                         }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("CheckoutFragment", "Error fetching active locations", e);
                     });
         }
     }
+
 
     private void saveOrderToDatabase() {
         // Check for user's address and phone number first

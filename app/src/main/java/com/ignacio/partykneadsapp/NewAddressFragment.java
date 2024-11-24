@@ -157,7 +157,7 @@ public class NewAddressFragment extends DialogFragment {
             addressData.put("postalCode", postalCode);
             addressData.put("houseNum", houseNum);
             addressData.put("location", fullAddress); // Full address from concatenation
-            addressData.put("status", "Active"); // Set the default status as "Active"
+            addressData.put("status", "Not Active"); // Set the status as "Inactive"
 
             // Add data to the `Locations` subcollection of the current user
             db.collection("Users")
@@ -178,6 +178,7 @@ public class NewAddressFragment extends DialogFragment {
             Toast.makeText(getContext(), "No user logged in. Please sign in.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void clearFields() {
         binding.txtUserName.setText("");

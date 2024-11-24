@@ -103,8 +103,6 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         });
     }
 
-
-
     @Override
     public void onEditClick(int position) {
         // Navigate to the EditAddressFragment when the edit button is clicked
@@ -189,10 +187,6 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         }
     }
 
-
-
-
-
     private void fetchUserName(String userId, Runnable onComplete) {
         db.collection("Users").document(userId).get()
                 .addOnCompleteListener(task -> {
@@ -213,6 +207,4 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
                     onComplete.run(); // Ensure to run the callback even on failure
                 });
     }
-
-
 }

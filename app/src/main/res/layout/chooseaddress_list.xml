@@ -17,6 +17,7 @@
             android:orientation="horizontal" >
 
             <RadioButton
+                android:id="@+id/rdSelect"
                 android:layout_width="30dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/pink"
