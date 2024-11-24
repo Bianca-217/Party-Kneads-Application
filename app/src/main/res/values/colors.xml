@@ -17,5 +17,6 @@
     <color name="dialogOpacity">#BFFD9FC1</color>
     <color name="lightgrey">#d9d9d9</color>
     <color name="green">#00bf63</color>
+    <color name="transparent_pink">#fd9fc1C9</color>
 
 </resources>

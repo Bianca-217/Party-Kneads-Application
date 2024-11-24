@@ -57,11 +57,12 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         mAuth = FirebaseAuth.getInstance();
         cUser = mAuth.getCurrentUser();
 
-        // New Address Button Click
         binding.btnNewAddress.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_addressFragment_to_newAddressFragment);
+            // Show the dialog fragment for adding a new address
+            NewAddressFragment dialogFragment = new NewAddressFragment();
+            dialogFragment.show(getParentFragmentManager(), "NewAddressDialog");
         });
+
 
 
         // Back Button Click
@@ -78,6 +79,11 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
         locationAdapter = new LocationAdapter(activeLocations, this); // Pass the correct type
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         locationRecyclerView.setAdapter(locationAdapter);
+
+        getParentFragmentManager().setFragmentResultListener("newAddressKey", getViewLifecycleOwner(), (requestKey, result) -> {
+            fetchActiveLocations(); // Refresh the list of addresses
+        });
+
 
         // Listen for delete address signal
         getParentFragmentManager().setFragmentResultListener("deleteAddressKey", getViewLifecycleOwner(), (requestKey, result) -> {
@@ -143,7 +149,7 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
             fetchUserName(userId, () -> {
                 // After fetching the userName, proceed with fetching locations
                 db.collection("Users").document(userId).collection("Locations")
-                        .whereEqualTo("status", "Active")
+                        .whereIn("status", List.of("Active", "Not Active")) // Fetch both Active and Not Active locations
                         .get()
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
@@ -182,6 +188,7 @@ public class AddressFragment extends Fragment implements LocationAdapter.OnEditC
             });
         }
     }
+
 
 
 

@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -159,48 +161,71 @@ public class EditAddressFragment extends DialogFragment {
         });
 
         binding.btndeleteAddress.setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-                    .setTitle("Delete Address")
-                    .setMessage("Are you sure you want to delete this address?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        String location = getArguments().getString("location");
+            // Inflate the custom layout (delete_dialog)
+            View deleteDialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_dialog, null);
 
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("Users").document(userId).collection("Locations")
-                                .whereEqualTo("location", location)
-                                .get()
-                                .addOnSuccessListener(querySnapshot -> {
-                                    if (!querySnapshot.isEmpty()) {
-                                        String docId = querySnapshot.getDocuments().get(0).getId();
-                                        db.collection("Users").document(userId).collection("Locations")
-                                                .document(docId)
-                                                .delete()
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(getContext(), "Address deleted successfully!", Toast.LENGTH_SHORT).show();
+            // Create the AlertDialog with the custom view (without custom style)
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setView(deleteDialogView);
 
-                                                    // Notify AddressFragment about the deletion
-                                                    getParentFragmentManager().setFragmentResult("deleteAddressKey", new Bundle());
+            // Create the dialog
+            AlertDialog dialog = builder.create();
+            // Make the background transparent
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            }
 
-                                                    // Close the dialog
-                                                    dismiss();
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Log.e("EditAddress", "Failed to delete address", e);
-                                                    Toast.makeText(getContext(), "Failed to delete address", Toast.LENGTH_SHORT).show();
-                                                });
-                                    } else {
-                                        Toast.makeText(getContext(), "Address not found.", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("EditAddress", "Failed to fetch address for deletion", e);
-                                    Toast.makeText(getContext(), "Failed to fetch address for deletion", Toast.LENGTH_SHORT).show();
-                                });
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+            // Bind the buttons from the custom layout
+            Button btnYes = deleteDialogView.findViewById(R.id.btnYes);
+            Button btnNo = deleteDialogView.findViewById(R.id.btnNo);
+
+            // Set onClickListener for the Yes button
+            btnYes.setOnClickListener(v1 -> {
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String location = getArguments().getString("location");
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("Users").document(userId).collection("Locations")
+                        .whereEqualTo("location", location)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            if (!querySnapshot.isEmpty()) {
+                                String docId = querySnapshot.getDocuments().get(0).getId();
+                                db.collection("Users").document(userId).collection("Locations")
+                                        .document(docId)
+                                        .delete()
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(getContext(), "Address deleted successfully!", Toast.LENGTH_SHORT).show();
+
+                                            // Notify AddressFragment about the deletion
+                                            getParentFragmentManager().setFragmentResult("deleteAddressKey", new Bundle());
+
+                                            // Dismiss the dialog
+                                            dismiss();
+                                            dialog.dismiss();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("EditAddress", "Failed to delete address", e);
+                                            Toast.makeText(getContext(), "Failed to delete address", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Toast.makeText(getContext(), "Address not found.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("EditAddress", "Failed to fetch address for deletion", e);
+                            Toast.makeText(getContext(), "Failed to fetch address for deletion", Toast.LENGTH_SHORT).show();
+                        });
+            });
+
+            // Set onClickListener for the No button to simply dismiss the dialog
+            btnNo.setOnClickListener(v1 -> dialog.dismiss());
+
+            // Show the dialog
+            dialog.show();
         });
+
+
 
         binding.btnClose.setOnClickListener(v -> {
             // Inflate the custom dialog layout

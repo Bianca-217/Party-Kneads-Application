@@ -2,10 +2,15 @@ package com.ignacio.partykneadsapp;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,7 +32,7 @@ import com.ignacio.partykneadsapp.databinding.FragmentNewAddressBinding;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NewAddressFragment extends Fragment {
+public class NewAddressFragment extends DialogFragment {
 
     private ConstraintLayout cl;
     FragmentNewAddressBinding binding;
@@ -40,16 +45,48 @@ public class NewAddressFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            // Set dialog width and height
+            getDialog().getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,  // Set to MATCH_PARENT for full width
+                    ViewGroup.LayoutParams.WRAP_CONTENT  // Set to WRAP_CONTENT for dynamic height
+            );
+
+            // Remove gray background and make it transparent
+            getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        }
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Avoid memory leaks
+    }
+
+
+
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        return dialog;
+    }
+
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
 
-        binding.btnBack.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_newAddressFragment_to_addressFragment);
-        });
+        binding.btnClearAll.setOnClickListener(v -> clearInputFields());
 
         binding.btnaddAddress.setOnClickListener(v -> {
             if (validateFields()) {
@@ -59,6 +96,35 @@ public class NewAddressFragment extends Fragment {
 
         setupAutoCompleteTextView();
         numberMaxDigit();
+
+        binding.btnClose.setOnClickListener(v -> {
+            // Inflate the custom dialog layout
+            View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.close_dialog, null);
+
+            // Create and configure the AlertDialog
+            AlertDialog alertDialog = new AlertDialog.Builder(requireContext())
+                    .setView(dialogView)
+                    .create();
+
+            // Make the background of the dialog transparent
+            if (alertDialog.getWindow() != null) {
+                alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            // Set up the Cancel button
+            dialogView.findViewById(R.id.btnCancel).setOnClickListener(cancelView -> {
+                alertDialog.dismiss(); // Close the custom dialog
+            });
+
+            // Set up the Discard button
+            dialogView.findViewById(R.id.btnDiscard).setOnClickListener(discardView -> {
+                alertDialog.dismiss(); // Close the custom dialog
+                dismiss(); // Close the DialogFragment
+            });
+
+            // Show the dialog
+            alertDialog.show();
+        });
     }
 
     private void saveAddressToFirestore() {
@@ -100,7 +166,9 @@ public class NewAddressFragment extends Fragment {
                     .add(addressData)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(getContext(), "Address saved successfully!", Toast.LENGTH_SHORT).show();
-                        clearFields(); // Optional: Clear fields after successful save
+
+                        getParentFragmentManager().setFragmentResult("newAddressKey", new Bundle());
+                        dismiss();
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(getContext(), "Failed to save address: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -141,6 +209,16 @@ public class NewAddressFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void clearInputFields() {
+        binding.txtUserName.setText("");
+        binding.contactNum.setText("");
+        binding.cities.setText("");
+        binding.barangays.setText("");
+        binding.postalCode.setText("");
+        binding.houseNum.setText("");
+        Toast.makeText(getContext(), "Address fields cleared", Toast.LENGTH_SHORT).show();
     }
 
     private void setupAutoCompleteTextView() {
