@@ -43,21 +43,33 @@ public class SplashFragment extends Fragment {
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT; // Match parent's height
 
             splashVideoView.setLayoutParams(layoutParams);
+
+            // Enable video looping
+            mediaPlayer.setLooping(true);
         });
 
         // Start the video
         splashVideoView.start();
 
-        // Navigate to the next fragment after the video ends
+        // Navigate to the next fragment after the desired condition
+        // Replace the VideoView completion listener with a trigger to proceed
         splashVideoView.setOnCompletionListener(mp -> {
-            if (onBoardingFinished()) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_splashFragment_to_loginFragment);
-            } else {
-                NavHostFragment.findNavController(this).navigate(R.id.action_splashFragment_to_viewPagerFragment);
-            }
+            // This will trigger only if the video is allowed to stop (looping will prevent this)
+            navigateToNextFragment();
         });
 
+        // Use a timer or external condition to proceed
+        view.postDelayed(this::navigateToNextFragment, 3000); // Adjust time as needed
+
         return view;
+    }
+
+    private void navigateToNextFragment() {
+        if (onBoardingFinished()) {
+            NavHostFragment.findNavController(this).navigate(R.id.action_splashFragment_to_loginFragment);
+        } else {
+            NavHostFragment.findNavController(this).navigate(R.id.action_splashFragment_to_viewPagerFragment);
+        }
     }
 
     private boolean onBoardingFinished() {
