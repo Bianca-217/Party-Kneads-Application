@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -38,6 +39,7 @@ public class Add_Items extends Fragment {
     ConstraintLayout cl;
     final int GALLERY_REQ_CODE = 1000;
     Uri selectedImageUri;
+    View progressDialogView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +57,9 @@ public class Add_Items extends Fragment {
         cl.setOnClickListener(v -> hideKeyboard(v));
 
         binding.btnUpload.setOnClickListener(v -> uploadImage());
+
+        // Set up the Clear All button
+        binding.btnClearAll.setOnClickListener(v -> clearAllFields());
 
         // Set up the AutoCompleteTextView for categories
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -75,19 +80,121 @@ public class Add_Items extends Fragment {
                 Toast.makeText(getContext(), "An image must be uploaded!", Toast.LENGTH_SHORT).show();
             } else {
                 String productId = String.valueOf(System.currentTimeMillis()); // Use current time as unique ID
+                showProgressDialog();  // Show progress dialog when uploading
                 uploadImageToFirebase(selectedImageUri, productId);
             }
         });
 
-        binding.btnBack.setOnClickListener(v -> {
+        // Set up the back button
+        binding.btnBack.setOnClickListener(v -> showBackDialog());
+    }
+
+    private void showBackDialog() {
+        // Inflate the custom dialog layout
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.close_dialog, null);
+
+        // Create and customize the dialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Set the background of the dialog to be transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Set up the Cancel button
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+
+        // Set up the Discard button
+        dialogView.findViewById(R.id.btnDiscard).setOnClickListener(v -> {
+            dialog.dismiss();
+            // Navigate back to the homepage
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_add_Items_to_seller_HomePageFragment);
         });
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private void clearAllFields() {
+        // Clear all text fields
+        binding.productName.setText("");
+        binding.description.setText("");
+        binding.productPrice.setText("");
+        binding.categgories.setText("");
+
+        // Reset the ImageView to a placeholder or remove the image
+        binding.itemImg.setImageResource(R.drawable.placeholder); // Replace with your placeholder image resource
+
+        // Clear the selected image URI
+        selectedImageUri = null;
+
+        // Show a toast message for user feedback
+        Toast.makeText(getContext(), "All fields cleared!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showProgressDialog() {
+        // Inflate the progress dialog layout and show it
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        progressDialogView = inflater.inflate(R.layout.progress_bar, null);
+
+        // Set the background of the progress dialog view to the drawable "dialog_pink_bg"
+        progressDialogView.setBackgroundResource(R.drawable.dialog_pink_bg);  // Ensure dialog_pink_bg is applied
+
+        // Create a dimming overlay (a transparent view with a semi-transparent black background)
+        View dimOverlay = new View(getContext());
+        dimOverlay.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.dimmer_color)); // Set a dim color (e.g., semi-transparent black)
+        dimOverlay.setTag("dimOverlay");  // Set a tag to identify the dim overlay
+
+        // Assuming the parent layout is a ConstraintLayout or another type that can hold this dialog
+        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,  // Match parent width
+                ConstraintLayout.LayoutParams.MATCH_PARENT // Match parent height (covers the entire screen)
+        );
+
+        // Apply the layout parameters for the dimming overlay (cover the whole screen)
+        dimOverlay.setLayoutParams(layoutParams);
+
+        // Add the dimming overlay view to the parent layout (ConstraintLayout)
+        cl.addView(dimOverlay);
+
+        // Set up the progress dialog layout parameters
+        ConstraintLayout.LayoutParams progressLayoutParams = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,  // Match parent width
+                ConstraintLayout.LayoutParams.WRAP_CONTENT // Wrap content height
+        );
+
+        // Set horizontal margins for the progress dialog
+        progressLayoutParams.setMargins(60, 0, 60, 0); // 40dp horizontal margin (left and right)
+
+        // Center the progress dialog in the parent layout
+        progressLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        progressLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        progressLayoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        progressLayoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+
+        // Apply layout params to the progress dialog view
+        progressDialogView.setLayoutParams(progressLayoutParams);
+
+        // Add the progress dialog view to the parent layout (ConstraintLayout)
+        cl.addView(progressDialogView);
+    }
+
+
+
+
+    private void dismissProgressDialog() {
+        if (progressDialogView != null) {
+            cl.removeView(progressDialogView);  // Remove the progress dialog view
+        }
     }
 
     private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void uploadImage() {
@@ -122,6 +229,7 @@ public class Add_Items extends Fragment {
             });
         }).addOnFailureListener(e -> {
             // Handle any errors
+            dismissProgressDialog(); // Dismiss the dialog in case of failure
             Toast.makeText(getContext(), "Error uploading image", Toast.LENGTH_SHORT).show();
         });
     }
@@ -148,15 +256,31 @@ public class Add_Items extends Fragment {
         db.collection("products").add(product) // Using add() instead of document(productId)
                 .addOnSuccessListener(documentReference -> {
                     // Successfully added the product
+                    dismissProgressDialog(); // Dismiss the dialog on success
+                    dismissDimOverlay(); // Remove the dimming overlay
+
                     Toast.makeText(getActivity(), "Successfully added item", Toast.LENGTH_SHORT).show();
                     // Reset the form fields
                     resetForm();
                 })
                 .addOnFailureListener(e -> {
+                    dismissProgressDialog(); // Dismiss the dialog on failure
+                    dismissDimOverlay(); // Remove the dimming overlay in case of failure
                     Log.e("Firestore Error", "Error adding item", e);
                     Toast.makeText(getContext(), "Error adding item: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void dismissDimOverlay() {
+        if (cl != null) {
+            // Remove the dimming overlay from the parent layout (ConstraintLayout)
+            View dimOverlay = cl.findViewWithTag("dimOverlay");
+            if (dimOverlay != null) {
+                cl.removeView(dimOverlay);  // Remove the dimming overlay view
+            }
+        }
+    }
+
 
     private void resetForm() {
         binding.productName.setText("");

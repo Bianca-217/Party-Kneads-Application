@@ -59,6 +59,7 @@
             android:layout_width="200dp"
             android:layout_height="220dp"
             android:layout_gravity="center"
+            android:src="@drawable/placeholder"
             android:layout_marginTop="20dp"/>
 
         <Button
@@ -127,7 +128,7 @@
                     android:fontFamily="@font/montserrat_medium"
                     android:textColor="@color/grey"
                     android:singleLine="true"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -144,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_medium"
                     android:textColor="@color/grey"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:singleLine="true"
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -170,7 +171,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/grey"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:inputType="textMultiLine"
                 android:gravity="start"
                 android:minLines="3"
@@ -193,7 +194,7 @@
 
 
                 <Button
-                android:id="@+id/btnDelete"
+                android:id="@+id/btnClearAll"
                 android:layout_width="50dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
@@ -220,7 +221,7 @@
                 android:layout_height="60dp"
                 android:layout_weight="6"
                 android:text="Add Item"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:fontFamily="@font/montserrat_bold"
                 android:backgroundTint="@color/pink"
                 android:textColor="@color/white"

@@ -87,31 +87,54 @@ public class SellerCakeDescription extends Fragment {
             // Get the product ID from the model
             String productId = productShopModel.getId();
 
-            // Show a confirmation dialog before deleting with custom style
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.CustomAlertDialog);
-            builder.setTitle("Delete Product")
-                    .setMessage("Are you sure you want to delete this product?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        // Reference to the Firestore document
-                        firestore.collection("products").document(productId)
-                                .delete()
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(getContext(), "Product deleted successfully", Toast.LENGTH_SHORT).show();
+            // Inflate the custom dialog layout
+            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.delete_product_dialog, null);
 
-                                    // Navigate back to the product list after deletion
-                                    NavController navController = Navigation.findNavController(requireView());
-                                    navController.navigate(R.id.action_sellerCakeDescription_to_myProductFragment);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Failed to delete product", Toast.LENGTH_SHORT).show();
-                                });
-                    })
-                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                    .show();
+            // Create and customize the dialog using your custom style
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setView(dialogView)
+                    .setCancelable(false)
+                    .create();
+
+            // Set the background of the dialog to be transparent
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            // Initialize dialog buttons
+            Button btnYes = dialogView.findViewById(R.id.btnYes);
+            Button btnNo = dialogView.findViewById(R.id.btnNo);
+
+            // Set up Yes button functionality
+            btnYes.setOnClickListener(v -> {
+                dialog.dismiss();
+
+                // Reference to the Firestore document
+                firestore.collection("products").document(productId)
+                        .delete()
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(getContext(), "Product deleted successfully", Toast.LENGTH_SHORT).show();
+
+                            // Navigate back to the product list after deletion
+                            NavController navController = Navigation.findNavController(requireView());
+                            navController.navigate(R.id.action_sellerCakeDescription_to_myProductFragment);
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to delete product", Toast.LENGTH_SHORT).show();
+                        });
+            });
+
+            // Set up No button functionality
+            btnNo.setOnClickListener(v -> dialog.dismiss());
+
+            // Show the dialog
+            dialog.show();
         } else {
             Toast.makeText(getContext(), "Invalid product details", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
 
     public void editItem() {
