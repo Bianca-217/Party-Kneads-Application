@@ -498,15 +498,13 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
     private void setupCategories() {
         categories = binding.categories;
         categoriesModelList = new ArrayList<>();
+        categoriesModelList.add(new CategoriesModel(R.drawable.all, "All Items"));
         categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Desserts"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
         categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.toppers, "Toppers"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.backdrop, "Backdrop"));
         categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
-
 
         categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {});
         categories.setAdapter(categoriesAdapter);

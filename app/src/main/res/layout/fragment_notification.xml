@@ -1,65 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    tools:context=".customermenus.NotificationFragment">
+    tools:context=".customermenus.NotificationFragment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="50dp"
+    android:paddingHorizontal="20dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginVertical="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="@+id/whitecont"
+        tools:layout_editor_absoluteX="0dp">
 
-            <LinearLayout
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_weight="0"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:text="NOTIFICATIONS"
+            android:textAlignment="center"
+            android:textColor="@color/darkpink"
+            android:textSize="28sp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+    </LinearLayout>
+
+        <ScrollView
+
+        android:layout_width="match_parent"
+        android:layout_height="750dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notificationRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_marginTop="50dp"
-                android:paddingHorizontal="20dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginVertical="20dp"
-                    android:orientation="horizontal"
-                    app:layout_constraintTop_toTopOf="@+id/whitecont"
-                    tools:layout_editor_absoluteX="0dp">
-
-                    <Button
-                        android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="25dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/darkpink" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="15dp"
-                        android:layout_weight="0"
-                        android:fontFamily="@font/montserrat_extrabold"
-                        android:text="NOTIFICATIONS"
-                        android:textAlignment="center"
-                        android:textColor="@color/darkpink"
-                        android:textSize="28sp" />
-
-                    <Button
-                        android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_gravity="center"
-                        android:layout_marginRight="25dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/darkpink" />
-                </LinearLayout>
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/notificationRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    tools:itemCount="1"
-                    android:layout_marginBottom="10dp"
-                    tools:listitem="@layout/notifications" />
-
-            </LinearLayout>
-</ScrollView>
+                android:layout_height="wrap_content"
+                tools:itemCount="1"
+                android:layout_marginBottom="10dp"
+                tools:listitem="@layout/notifications" />
+        </ScrollView>
+</LinearLayout>

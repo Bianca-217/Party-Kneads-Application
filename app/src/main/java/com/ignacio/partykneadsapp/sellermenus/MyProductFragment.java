@@ -107,8 +107,6 @@ public class MyProductFragment extends Fragment {
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
         categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.toppers, "Toppers"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.backdrop, "Backdrop"));
         categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
 
         // Initialize adapter and layout manager for categories
