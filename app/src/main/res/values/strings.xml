@@ -101,7 +101,6 @@
         \nWe look forward to making your next celebration an unforgettable one, no matter how big or small. Stay tuned for more exciting updates as we grow and expand!</string>
 
 
-
     <string name="supportIntro">At Party Kneads, your satisfaction is our top priority. Whether you have questions about your order, payments, delivery, or product details, our support team is here to help you celebrate without worries.</string>
 
     <string name="contact"><b>Contact Information</b>
@@ -940,8 +939,11 @@
         <item>Balloons - Number</item>
         <item>Balloons - Letter</item>
         <item>Balloons - LED</item>
-        <item>Party Hats</item>
-        <item>Banners</item>
+        <item>Party Hats - Cartoon</item>
+        <item>Party Hats - Balloon Headress</item>
+        <item>Party Hats - Pompoms</item>
+        <item>Banners - Card</item>
+        <item>Banners - Cursive</item>
         <item>Toppers</item>
         <item>Backdrop</item>
         <item>Customize</item>

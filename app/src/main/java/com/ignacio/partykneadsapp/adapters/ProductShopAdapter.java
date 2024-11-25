@@ -141,6 +141,10 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_balloonClassicDescription, bundle);
             }
+            else if ("Party Hats - Cartoon".equals(category) || ("Party Hats - Pompoms".equals(category)) || ("Party Hats - Balloon Headress".equals(category))){
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.action_homePageFragment_to_partyHatsDescription, bundle);
+            }
         });
     }
 

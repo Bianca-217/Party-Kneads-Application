@@ -1,6 +1,8 @@
 package com.ignacio.partykneadsapp;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
@@ -17,6 +19,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,40 +30,51 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.ignacio.partykneadsapp.adapters.CakeSizeAdapter;
-import com.ignacio.partykneadsapp.adapters.CupcakeSizeAdapter;
-import com.ignacio.partykneadsapp.model.CakeSizeModel;
-import com.ignacio.partykneadsapp.model.CartItemModel;
-import com.ignacio.partykneadsapp.model.CupcakeModel;
-import com.ignacio.partykneadsapp.model.ProductShopModel;
+import com.ignacio.partykneadsapp.adapters.BalloonColorAdapter;
+import com.ignacio.partykneadsapp.adapters.PartyHatsAdapter;
+import com.ignacio.partykneadsapp.databinding.FragmentPartyHatsDescriptionBinding;
 import com.ignacio.partykneadsapp.model.AddToCartModel;
+import com.ignacio.partykneadsapp.model.BalloonColorModel;
+import com.ignacio.partykneadsapp.model.CartItemModel;
+import com.ignacio.partykneadsapp.model.CategoriesModel;
+import com.ignacio.partykneadsapp.model.PartyHatsModel;
+import com.ignacio.partykneadsapp.model.ProductShopModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cupcake_Description extends Fragment {
 
+public class PartyHatsDescription extends Fragment {
     private TextView productName, productPrice, productDescription, ratePercent, numReviews;
     private ImageView productImage, btnBack;
-    private TextView minusButton, quantityTextView, plusButton; // Quantity controls
+    private TextView quantityTextView;
     private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
     private ListenerRegistration productListener;
-
+    private String color;
     private int quantity = 1; // Initial quantity
-    private CupcakeModel selectedCupcakeSize; // Currently selected cake size
+
+    FragmentPartyHatsDescriptionBinding binding;
+    private List<CategoriesModel> categoriesModelList;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        binding = FragmentPartyHatsDescriptionBinding.inflate(getLayoutInflater());
+        return binding.getRoot();
+    }
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cupcake__description, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Initialize Firestore
         firestore = FirebaseFirestore.getInstance();
 
         // Get the passed arguments
@@ -81,38 +96,26 @@ public class Cupcake_Description extends Fragment {
         btnBuyNow = view.findViewById(R.id.btnBuyNow); // Initialize Buy Now button
 
         // Set button click listener for "Add to Cart"
-        btnAddtoCart.setOnClickListener(v -> showAddToCartDialog());
+        btnAddtoCart.setOnClickListener(v -> showAddToCartDialog("", 1));
 
         // Set button click listener for "Buy Now"
-        btnBuyNow.setOnClickListener(v -> handleBuyNow());
+        btnBuyNow.setOnClickListener(v -> handleBuyNow("", 1));
+
 
         if (productShopModel != null) {
             loadProductDetails(productShopModel.getId());
         }
 
-        // Initialize RecyclerView
-        RecyclerView recyclerView = view.findViewById(R.id.cupcakeSizes);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-
-        // Prepare cupcake sizes data
-        List<CupcakeModel> cupcakeSizes = new ArrayList<>();
-        cupcakeSizes.add(new CupcakeModel("Single", "1 Pc", "₱50"));
-        cupcakeSizes.add(new CupcakeModel("Pair", "2 Pcs.", "₱95"));
-        cupcakeSizes.add(new CupcakeModel("Triple", "3 Pcs.", "₱140"));
-        cupcakeSizes.add(new CupcakeModel("Half Dozen", "6 Pcs.", "₱280"));
-        cupcakeSizes.add(new CupcakeModel("Dozen", "12 Pcs", "₱500"));
-
-        // Set the adapter with the listener
-        CupcakeSizeAdapter adapter = new CupcakeSizeAdapter(cupcakeSizes, cupcakeSize -> {
-            selectedCupcakeSize = cupcakeSize; // Update selected cupcake size
-            updateQuantityAndPrice();
-        });
-        recyclerView.setAdapter(adapter);
-
-        // Set default selection to Bento Cake
-        selectedCupcakeSize = cupcakeSizes.get(0); // Bento Cake
-        updateQuantityAndPrice();
+        if (productShopModel.getCategory().equals("Party Hats - Cartoon")) {
+            color = "Barbie";
+            setupCartoonTheme();
+        } else if (productShopModel.getCategory().equals("Party Hats - Pompoms")) {
+            color = "Princess";
+            setupPompomsTheme();
+        } else if (productShopModel.getCategory().equals("Party Hats - Balloon Headress")) {
+            color = "Kuromi";
+            setupHeaddressTheme();
+        }
 
         btnBack.setOnClickListener(v -> {
             Bundle args1 = new Bundle();
@@ -120,27 +123,101 @@ public class Cupcake_Description extends Fragment {
 
             // Replace the current fragment with the menu page fragment and pass the argument
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_cupcake_Description_to_homePageFragment, args1);
+            navController.navigate(R.id.action_partyHatsDescription_to_homePageFragment, args1);
+        });
+    }
+
+    // Define the method for adding to the cart with selected letter and quantity
+    private void addToCartFunctionality(String selectedLetter, int quantityLetter) {
+        // Example logic for adding the item to the cart
+        showAddToCartDialog(selectedLetter, quantityLetter);
+        // Implement your actual add-to-cart logic here
+    }
+
+    private void setupCartoonTheme() {
+        RecyclerView partyHatsTheme = binding.partyHatsTheme;
+        List<PartyHatsModel> partyHatsModelList = new ArrayList<>();
+
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.barbie, "Barbie"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.minions, "Minions"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.avengers, "Avengers"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.bossbaby, "Boss Baby"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.cocomelon, "Cocomelon"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.pepa, "Pepa Pig"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.princess, "Princess"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.shark, "Baby Shark"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.superman, "Superman"));
+
+        // Initialize adapter and layout manager for balloon colors
+        PartyHatsAdapter partyHatsAdapter = new PartyHatsAdapter(requireActivity(), partyHatsModelList, colorSelected -> {
+            color = colorSelected;
         });
 
-        return view; // Return the inflated view
+        partyHatsTheme.setAdapter(partyHatsAdapter);
+        partyHatsTheme.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        partyHatsTheme.setHasFixedSize(true);
+        partyHatsTheme.setNestedScrollingEnabled(false);
     }
 
-    private void updateQuantityAndPrice() {
-        if (selectedCupcakeSize != null) {
-            // Parse the price and calculate total
-            try {
-                int price = Integer.parseInt(selectedCupcakeSize.getPrice().replace("₱", "").trim());
-                int totalPrice = price * quantity; // Multiply by quantity if needed
-                productPrice.setText("₱" + totalPrice); // Update price text dynamically
-            } catch (NumberFormatException e) {
-                Log.e("Cupcake_Description", "Invalid price format", e);
-            }
-        }
+    private void setupPompomsTheme() {
+        RecyclerView partyHatsTheme = binding.partyHatsTheme;
+        List<PartyHatsModel> partyHatsModelList = new ArrayList<>();
+
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.princess_hat, "Princess"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.prince, "Prince"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.bday_girl, "Birthday Girl"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.bday_boy, "Birthday Boy"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.blue_gold, "Blue Gold"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.pink_gold, "Pink Gold"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.colorful_blue, "Colorful Blue"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.colorful_pink, "Colorful Pink"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.heart_hat, "Heart"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.black_hat, "Black Polka"));
+
+        // Initialize adapter and layout manager for balloon colors
+        PartyHatsAdapter partyHatsAdapter = new PartyHatsAdapter(requireActivity(), partyHatsModelList, colorSelected -> {
+            color = colorSelected;
+        });
+
+        partyHatsTheme.setAdapter(partyHatsAdapter);
+        partyHatsTheme.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        partyHatsTheme.setHasFixedSize(true);
+        partyHatsTheme.setNestedScrollingEnabled(false);
+    }
+
+    private void setupHeaddressTheme() {
+        RecyclerView partyHatsTheme = binding.partyHatsTheme;
+        List<PartyHatsModel> partyHatsModelList = new ArrayList<>();
+
+        // Add balloon colors to the list (Images should exist in drawable folder)
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.kuromi, "Kuromi"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.kuromi_pink, "Kuromi Pink"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.christmashat, "Christmas"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.snowman, "Snow Man"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.mickey, "Mickey"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.minnie, "Minnie"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.princess_balloon, "Princess"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.cat, "Cat"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.dog, "Dog"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.cow, "Cow"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.elephant, "Elephant"));
+        partyHatsModelList.add(new PartyHatsModel(R.drawable.monkey, "Monkey"));
+
+        // Initialize adapter and layout manager for balloon colors
+        PartyHatsAdapter partyHatsAdapter = new PartyHatsAdapter(requireActivity(), partyHatsModelList, colorSelected -> {
+            color = colorSelected;
+        });
+
+        partyHatsTheme.setAdapter(partyHatsAdapter);
+        partyHatsTheme.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
+        partyHatsTheme.setHasFixedSize(true);
+        partyHatsTheme.setNestedScrollingEnabled(false);
     }
 
 
-    private void showAddToCartDialog() {
+    private void showAddToCartDialog(String selectedLetter, int quantityLetter) {
         // Create a dialog
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.addtocartdialog); // Inflate your dialog layout
@@ -157,7 +234,7 @@ public class Cupcake_Description extends Fragment {
 
         // Automatically add item to the cart when the dialog is shown
         if (userId != null) {
-            saveCartItem(userId); // Method to add to cart
+            saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
         } else {
             Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
         }
@@ -179,37 +256,37 @@ public class Cupcake_Description extends Fragment {
         dialog.show();
     }
 
-    private void saveCartItem(String userId) {
-        // Extract product details
-        String imageUrl = productShopModel.getimageUrl(); // Ensure this accesses the image URL correctly
-        String productName = productShopModel.getName();
-        String cupcakeSize = selectedCupcakeSize.getSize();
+    private void saveCartItem(String userId, String selectedLetter, int quantityLetter) {
+        // Extract the product details
         String priceText = productPrice.getText().toString();
-        int unitPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", "")); // Convert price to integer
-        int totalPrice = unitPrice * quantity;
-        long timestamp = System.currentTimeMillis(); // Get the current timestamp
+        int unitPrice = Integer.parseInt(priceText.replaceAll("[^\\d]", ""));
+        int totalPrice = unitPrice * quantityLetter;
+        String imageUrl = productShopModel.getimageUrl();
+        long timestamp = System.currentTimeMillis();
+        String productName = productShopModel.getName();
+        String uniqueKey = color + selectedLetter; // Create a unique key for color and letter combination
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Check if the product with the same name and cupcake size already exists in the cart
+        // Check if the product with the same color and letter already exists in the cart
         db.collection("Users")
                 .document(userId)
                 .collection("cartItems")
                 .whereEqualTo("productName", productName)
-                .whereEqualTo("cakeSize", cupcakeSize)
+                .whereEqualTo("cakeSize", uniqueKey)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        // Item exists, update the quantity and total price
+                        // Item exists, update the quantity and totalPrice
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String docId = document.getId();
                             int existingQuantity = document.getLong("quantity").intValue();
                             String existingTotalPriceStr = document.getString("totalPrice");
 
                             // Calculate the new quantity and total price
-                            int newQuantity = existingQuantity + quantity;
+                            int newQuantity = existingQuantity + quantityLetter;
                             int existingTotalPrice = Integer.parseInt(existingTotalPriceStr.replaceAll("[^\\d]", ""));
-                            int newTotalPrice = existingTotalPrice + (unitPrice * quantity);
+                            int newTotalPrice = existingTotalPrice + (unitPrice * quantityLetter);
 
                             // Update the existing cart item
                             db.collection("Users")
@@ -218,6 +295,7 @@ public class Cupcake_Description extends Fragment {
                                     .document(docId)
                                     .update("quantity", newQuantity, "totalPrice", "₱" + newTotalPrice)
                                     .addOnSuccessListener(aVoid -> {
+                                        // Successfully updated the cart item
                                         Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
                                     })
                                     .addOnFailureListener(e -> {
@@ -230,14 +308,14 @@ public class Cupcake_Description extends Fragment {
                         AddToCartModel cartItem = new AddToCartModel(
                                 productShopModel.getId(),
                                 productName,
-                                cupcakeSize,
-                                quantity,
+                                uniqueKey,
+                                quantityLetter,
                                 "₱" + totalPrice,
                                 imageUrl,
                                 timestamp
                         );
 
-                        // Save the new item to the cart
+                        // Add the new item to the cart
                         db.collection("Users")
                                 .document(userId)
                                 .collection("cartItems")
@@ -256,18 +334,18 @@ public class Cupcake_Description extends Fragment {
     }
 
 
-    private void handleBuyNow() {
+
+    private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {
         // Create a CartItemModel for the selected cake and quantity
-        String size = selectedCupcakeSize.getSize();
-        int price = Integer.parseInt(selectedCupcakeSize.getPrice().replace("₱", ""));
-        int totalPrice = price * quantity;
+        int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
+        int totalPrice = price * quantityNumLetter;
 
         // Create a CartItemModel for this selection
         CartItemModel cartItem = new CartItemModel(
                 productShopModel.getId(),
                 productShopModel.getName(),
-                size,
-                quantity,
+                color + selectedNumLetter,
+                quantityNumLetter,
                 "₱" + totalPrice, // Include price with quantity
                 productShopModel.getimageUrl() // Product Image URL
         );
@@ -285,7 +363,7 @@ public class Cupcake_Description extends Fragment {
 
         // Navigate to CheckoutFragment and pass the selected items
         NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_cupcake_Description_to_checkoutFragment, bundle);
+        navController.navigate(R.id.action_partyHatsDescription_to_checkoutFragment, bundle);
     }
 
     private void loadProductDetails(String productId) {
@@ -306,24 +384,24 @@ public class Cupcake_Description extends Fragment {
                     String description = documentSnapshot.getString("description");
                     String rate = documentSnapshot.getString("rate");
                     String numReviewsStr = documentSnapshot.getString("numreviews");
+                    String price = documentSnapshot.getString("price");
 
                     // Populate the views with data
-                    Glide.with(Cupcake_Description  .this).load(imageUrl).into(productImage); // Load image with Glide
+                    Glide.with(PartyHatsDescription.this).load(imageUrl).into(productImage); // Load image with Glide
                     productName.setText(name);
                     productDescription.setText(description);
                     ratePercent.setText(rate);
                     numReviews.setText(numReviewsStr);
+                    productPrice.setText("₱" +  price);
                     productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
                 }
             }
         });
     }
 
-
-
     private void goToCart() {
         NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_cupcake_Description_to_cartFragment);
+        navController.navigate(R.id.action_partyHatsDescription_to_cartFragment);
     }
 
     private void goToShop() {
@@ -334,7 +412,7 @@ public class Cupcake_Description extends Fragment {
 
         // Replace the current fragment with the menu page fragment and pass the argument
         NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_cupcake_Description_to_homePageFragment, args);
+        navController.navigate(R.id.action_partyHatsDescription_to_homePageFragment, args);
     }
 
     @Override
