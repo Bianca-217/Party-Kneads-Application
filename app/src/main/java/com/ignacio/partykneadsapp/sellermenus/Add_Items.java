@@ -72,18 +72,54 @@ public class Add_Items extends Fragment {
             String productDescription = binding.description.getText().toString().trim();
             String productCategory = binding.categgories.getText().toString().trim();
 
-            // Check if any of the fields are empty
-            if (productName.isEmpty() || productPrice.isEmpty() || productDescription.isEmpty() || productCategory.isEmpty()) {
-                Toast.makeText(getContext(), "All fields must be filled up!", Toast.LENGTH_SHORT).show();
-            } else if (selectedImageUri == null) {
-                // If no image is selected, show a warning
-                Toast.makeText(getContext(), "An image must be uploaded!", Toast.LENGTH_SHORT).show();
+            boolean hasError = false;
+
+            // Check if Product Name is empty
+            if (productName.isEmpty()) {
+                binding.productName.setError("Product name is required!");
+                hasError = true;
             } else {
+                binding.productName.setError(null); // Clear any previous error
+            }
+
+            // Check if Product Price is empty
+            if (productPrice.isEmpty()) {
+                binding.productPrice.setError("Product price is required!");
+                hasError = true;
+            } else {
+                binding.productPrice.setError(null); // Clear any previous error
+            }
+
+            // Check if Product Description is empty
+            if (productDescription.isEmpty()) {
+                binding.description.setError("Product description is required!");
+                hasError = true;
+            } else {
+                binding.description.setError(null); // Clear any previous error
+            }
+
+            // Check if Product Category is empty
+            if (productCategory.isEmpty()) {
+                binding.categgories.setError("Product category is required!");
+                hasError = true;
+            } else {
+                binding.categgories.setError(null); // Clear any previous error
+            }
+
+            // Check if an image is selected
+            if (selectedImageUri == null) {
+                Toast.makeText(getContext(), "An image must be uploaded!", Toast.LENGTH_SHORT).show();
+                hasError = true;
+            }
+
+            // Proceed only if there are no errors
+            if (!hasError) {
                 String productId = String.valueOf(System.currentTimeMillis()); // Use current time as unique ID
-                showProgressDialog();  // Show progress dialog when uploading
+                showProgressDialog(); // Show progress dialog when uploading
                 uploadImageToFirebase(selectedImageUri, productId);
             }
         });
+
 
         // Set up the back button
         binding.btnBack.setOnClickListener(v -> showBackDialog());

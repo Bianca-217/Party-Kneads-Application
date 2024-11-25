@@ -200,14 +200,45 @@ public class Edit_Items extends Fragment {
         String updatedCategory = binding.categgories.getText().toString().trim();
 
         // Validate inputs
-        if (updatedName.isEmpty() || updatedDescription.isEmpty() || updatedPrice.isEmpty() || updatedCategory.isEmpty()) {
-            Toast.makeText(getContext(), "All fields must be filled up!", Toast.LENGTH_SHORT).show();
+        boolean isValid = true;
+
+        if (updatedName.isEmpty()) {
+            binding.productName.setError("Product name is required!");
+            isValid = false;
+        } else {
+            binding.productName.setError(null); // Clear error if valid
+        }
+
+        if (updatedDescription.isEmpty()) {
+            binding.description.setError("Description is required!");
+            isValid = false;
+        } else {
+            binding.description.setError(null); // Clear error if valid
+        }
+
+        if (updatedPrice.isEmpty()) {
+            binding.productPrice.setError("Price is required!");
+            isValid = false;
+        } else {
+            binding.productPrice.setError(null); // Clear error if valid
+        }
+
+        if (updatedCategory.isEmpty()) {
+            binding.categgories.setError("Category is required!");
+            isValid = false;
+        } else {
+            binding.categgories.setError(null); // Clear error if valid
+        }
+
+        if (!isValid) {
+            // If any field is invalid, stop further processing
+            Toast.makeText(getContext(), "Please fill in all required fields!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Show progress dialog before saving and dim the background
         progressDialog.setVisibility(View.VISIBLE);
-        getView().setAlpha(0.5f);  // Dim the background when saving
+        getView().setAlpha(0.5f); // Dim the background when saving
 
         if (selectedImageUri != null) {
             uploadImageToFirebase(selectedImageUri, updatedName, updatedDescription, updatedPrice, updatedCategory);
@@ -215,6 +246,7 @@ public class Edit_Items extends Fragment {
             updateProductDetails(imageUrl, updatedName, updatedDescription, updatedPrice, updatedCategory);
         }
     }
+
 
     private void uploadImageToFirebase(Uri imageUri, String name, String description, String price, String category) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference()
