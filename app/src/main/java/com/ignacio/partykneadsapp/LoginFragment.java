@@ -6,6 +6,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -105,7 +107,16 @@ public class LoginFragment extends Fragment {
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
 
+        // Set up VideoView to play and loop the video
+        VideoView loginVideoView = view.findViewById(R.id.loginVideoView);
+        Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.login_animate);
+        loginVideoView.setVideoURI(videoUri);
+        loginVideoView.setOnPreparedListener(mp -> {
+            mp.setLooping(true);  // Set looping to true
+            loginVideoView.start();  // Start the video
+        });
     }
+
 
     private void loginWithEmail() {
         String email = etEmail.getText().toString();
