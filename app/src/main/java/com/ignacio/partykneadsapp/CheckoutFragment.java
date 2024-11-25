@@ -474,17 +474,26 @@ public class CheckoutFragment extends Fragment {
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            // Loop through the cart items and delete the ones that match the checked-out product IDs
+                            // Loop through the cart items and delete the ones that match the checked-out product IDs, cakeSize, productName, and totalPrice
                             for (CartItemModel item : selectedItems) {
                                 String productIdToDelete = item.getProductId();
+                                String cakeSizeToDelete = item.getCakeSize();  // Get the cakeSize from selected item
+                                String productNameToDelete = item.getProductName();  // Get the productName from selected item
+                                String totalPriceToDelete = item.getTotalPrice();  // Get the totalPrice from selected item
 
-                                // Check if the product ID matches any in the cart
+                                // Check if the productId, cakeSize, productName, and totalPrice match any in the cart
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     CartItemModel cartItem = document.toObject(CartItemModel.class);
-                                    if (cartItem.getProductId().equals(productIdToDelete)) {
+
+                                    // Match the productId, cakeSize, productName, and totalPrice
+                                    if (cartItem.getProductId().equals(productIdToDelete) &&
+                                            cartItem.getCakeSize().equals(cakeSizeToDelete) &&
+                                            cartItem.getProductName().equals(productNameToDelete) &&
+                                            cartItem.getTotalPrice().equals(totalPriceToDelete)) {
+
                                         // Delete the matching cart item
                                         document.getReference().delete()
-                                                .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item with ID " + productIdToDelete + " deleted successfully"))
+                                                .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item deleted successfully"))
                                                 .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error deleting cart item", e));
                                     }
                                 }
@@ -500,5 +509,4 @@ public class CheckoutFragment extends Fragment {
             Log.w("CheckoutFragment", "No current user is logged in.");
         }
     }
-
 }
