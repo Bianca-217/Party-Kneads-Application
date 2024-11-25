@@ -16,12 +16,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Colors:"
-            android:fontFamily="@font/montserrat_semibold"
-            android:textSize="16sp"
-            android:textColor="@color/semiblack"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Numbers or Letters"
+            android:textColor="@color/semiblack"
+            android:textSize="16sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -113,20 +113,52 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/addToCartBtn"
+
+        <FrameLayout
+
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:backgroundTint="@color/pink"
-            android:text="Add to cart"
-            android:textSize="16sp"
-            android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="20dp"
-            android:drawableLeft="@drawable/addtocart"
-            android:fontFamily="@font/montserrat_semibold"
-            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/addressListRecyclerView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            />
+            <Button
+                android:id="@+id/addToCartBtn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginHorizontal="20dp"
+                android:backgroundTint="@color/pink"
+                app:cornerRadius="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/semiwhite"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/addtocart"
+                    android:layout_gravity="center"
+                    android:contentDescription="Add Icon"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="Add to Cart"
+                    android:layout_gravity="center"
+                    android:textColor="@color/semiwhite"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </FrameLayout>
 
     </LinearLayout>
 

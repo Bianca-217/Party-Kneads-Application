@@ -125,6 +125,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_partyHatsDescription"
             app:destination="@id/partyHatsDescription" />
+        <action
+            android:id="@+id/action_homePageFragment_to_bannerDescription"
+            app:destination="@id/bannerDescription" />
 
     </fragment>
 
@@ -241,6 +244,9 @@
         <action
             android:id="@+id/action_cartFragment_to_partyHatsDescription"
             app:destination="@id/partyHatsDescription" />
+        <action
+            android:id="@+id/action_cartFragment_to_bannerDescription"
+            app:destination="@id/bannerDescription" />
     </fragment>
     <fragment
         android:id="@+id/cake_Description"
@@ -283,6 +289,9 @@
         <action
             android:id="@+id/action_checkoutFragment_to_partyHatsDescription"
             app:destination="@id/partyHatsDescription" />
+        <action
+            android:id="@+id/action_checkoutFragment_to_bannerDescription"
+            app:destination="@id/bannerDescription" />
 
     </fragment>
     <fragment
@@ -481,6 +490,21 @@
             app:destination="@id/homePageFragment" />
         <action
             android:id="@+id/action_partyHatsDescription_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bannerDescription"
+        android:name="com.ignacio.partykneadsapp.BannerDescription"
+        android:label="fragment_banner_description"
+        tools:layout="@layout/fragment_banner_description" >
+        <action
+            android:id="@+id/action_bannerDescription_to_cartFragment"
+            app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_bannerDescription_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_bannerDescription_to_checkoutFragment"
             app:destination="@id/checkoutFragment" />
     </fragment>
 

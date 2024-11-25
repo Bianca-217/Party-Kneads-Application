@@ -66,10 +66,10 @@
         <ImageView
             android:id="@+id/productImage"
             android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_height="250dp"
             android:layout_gravity="center|bottom"
             android:layout_marginTop="70dp"
-            android:src="@drawable/berry_delight" />
+            android:src="@drawable/plain_banner" />
 
     </FrameLayout>
 
@@ -125,16 +125,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Quantities:"
+                android:text="Colors"
                 android:fontFamily="@font/montserrat_bold"
                 android:textSize="18sp"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/cupcakeSizes"
+                android:id="@+id/bannerColors"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                tools:listitem="@layout/cupcake_sizes"
+                tools:listitem="@layout/banner_colors"
                 tools:itemCount="1" />
 
             <TextView

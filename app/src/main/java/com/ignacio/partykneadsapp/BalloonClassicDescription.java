@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -157,7 +158,7 @@ public class BalloonClassicDescription extends Fragment {
                 // Check if the category is "Balloons - Classic" or "Balloons - Latex"
                 if (productCategory.equals("Balloons - Classic") || productCategory.equals("Balloons - Latex")) {
                     // Directly show the second dialog without quantity and dropdown
-                    showAddToCartDialog("Assorted", 1);
+                    showAddToCartDialog("color", 1);
                 } else if (productShopModel.getCategory().equals("Balloons - Letter")){
                     // Show the original dialog with quantity and dropdown
                     showLetterAddDialog();
@@ -299,7 +300,7 @@ public class BalloonClassicDescription extends Fragment {
         });
 
         // Inside this dialog, find the confirmation button (addToCartBtn)
-        Button confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        FrameLayout confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
         confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -527,7 +528,6 @@ public class BalloonClassicDescription extends Fragment {
 
                 // Your logic for confirming adding to cart with the selected letter and quantity
                 addToCartFunctionality(selectedLetter, quantity[0]);
-
                 // Dismiss the dialog after confirmation
                 dialog.dismiss();
             }
@@ -746,7 +746,7 @@ public class BalloonClassicDescription extends Fragment {
         String imageUrl = productShopModel.getimageUrl();
         long timestamp = System.currentTimeMillis();
         String productName = productShopModel.getName();
-        String uniqueKey = color + " | " + selectedLetter; // Create a unique key for color and letter combination
+        String uniqueKey = selectedLetter + " | " + color; // Create a unique key for color and letter combination
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 

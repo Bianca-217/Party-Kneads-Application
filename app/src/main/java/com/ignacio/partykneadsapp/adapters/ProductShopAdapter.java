@@ -140,10 +140,12 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
             } else if ("Balloons - Classic".equals(category) || "Balloons - Latex".equals(category) || "Balloons - LED".equals(category) || "Balloons - Number".equals(category) || "Balloons - Letter".equals(category)) {
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_balloonClassicDescription, bundle);
-            }
-            else if ("Party Hats - Cartoon".equals(category) || ("Party Hats - Pompoms".equals(category)) || ("Party Hats - Balloon Headress".equals(category))){
+            } else if ("Party Hats - Cartoon".equals(category) || ("Party Hats - Pompoms".equals(category)) || ("Party Hats - Balloon Headress".equals(category))){
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_partyHatsDescription, bundle);
+            } else if ("Banners - Card".equals(category) || ("Banners - Cursive".equals(category))){
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.action_homePageFragment_to_bannerDescription, bundle);
             }
         });
     }

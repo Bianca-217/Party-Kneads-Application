@@ -950,6 +950,20 @@
 
     </string-array>
 
+    <string-array name="Occasions">
+        <item>Happy Birthday</item>
+        <item>Happy New Year</item>
+        <item>Merry Christmas</item>
+        <item>Happy Christening</item>
+        <item>Happy Father\'s Day </item>
+        <item>Happy Mother\'s Day</item>
+        <item>Happy Graduation Day</item>
+        <item>Congratulations</item>
+        <item>Happy Anniversary</item>
+        <item>Bride to be</item>
+        <item>Gender Reveal</item>
+    </string-array>
+
     <string-array name="Numbers">
         <item>Number - 0</item>
         <item>Number - 1</item>
