@@ -44,6 +44,9 @@
         <action
             android:id="@+id/action_loginFragment_to_seller_HomePageFragment"
             app:destination="@id/seller_HomePageFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPassword"
+            app:destination="@id/forgotPassword" />
     </fragment>
     <fragment
         android:id="@+id/termsFragment2"
@@ -506,6 +509,15 @@
         <action
             android:id="@+id/action_bannerDescription_to_checkoutFragment"
             app:destination="@id/checkoutFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPassword"
+        android:name="com.ignacio.partykneadsapp.ForgotPassword"
+        android:label="fragment_forgot_password"
+        tools:layout="@layout/fragment_forgot_password" >
+        <action
+            android:id="@+id/action_forgotPassword_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 
 </navigation>

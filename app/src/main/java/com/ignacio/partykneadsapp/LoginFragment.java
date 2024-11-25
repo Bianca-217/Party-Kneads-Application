@@ -61,6 +61,7 @@ public class LoginFragment extends Fragment {
     private TextView btnSignup;
     private ConstraintLayout cl;
     private CallbackManager callbackManager;
+    private TextView btnForgotpass;
 
     private static final int RC_SIGN_IN = 100; // Request code for Google Sign-In
 
@@ -95,6 +96,14 @@ public class LoginFragment extends Fragment {
         etPass = view.findViewById(R.id.etPassword);
         btnContinue = view.findViewById(R.id.btnContinue);
         btnSignup = view.findViewById(R.id.btnSignUp);
+        btnForgotpass = view.findViewById(R.id.btnForgotPass);
+
+
+        btnForgotpass.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_loginFragment_to_forgotPassword);
+        });
+
 
         btnSignup.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(v);
