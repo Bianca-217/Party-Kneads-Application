@@ -44,6 +44,10 @@ public class SellerHome extends Fragment {
         // Initialize Firestore
         firestore = FirebaseFirestore.getInstance();
 
+        binding.myproduct.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_seller_HomePageFragment_to_myProductFragment);
+        });
 
         // Initialize Firebase instances
         mAuth = FirebaseAuth.getInstance();
