@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.ignacio.partykneadsapp.adapters.ToCompleteAdapter;
 import com.ignacio.partykneadsapp.adapters.ToReceiveAdapter;  // Use ToReceiveAdapter (modify if necessary)
 import com.ignacio.partykneadsapp.model.OrderItemModel;
 import com.ignacio.partykneadsapp.model.ToShipModel;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 public class CompletedFragment extends Fragment {
     private RecyclerView completedRecycler;
-    private ToReceiveAdapter toCompleteAdapter;  // Adapter for completed orders
+    private ToCompleteAdapter toCompleteAdapter;  // Adapter for completed orders
     private List<ToShipModel> orderList = new ArrayList<>();  // List of completed orders (ToShipModel)
     private FirebaseFirestore db;
 
@@ -35,7 +36,7 @@ public class CompletedFragment extends Fragment {
 
         // Initialize RecyclerView and Adapter
         completedRecycler = view.findViewById(R.id.completedRecyclerview);
-        toCompleteAdapter = new ToReceiveAdapter(orderList, getContext());  // Use the adapter for ToShipModel
+        toCompleteAdapter = new ToCompleteAdapter(orderList, getContext());  // Use the adapter for ToShipModel
         completedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         completedRecycler.setAdapter(toCompleteAdapter);
 

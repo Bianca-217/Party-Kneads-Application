@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ToShipFragment extends Fragment {
-    private RecyclerView toShipRecycler;
-    private ToShipAdapter toShipAdapter;
+    private RecyclerView preparingOrderRecycler;
+    private ToShipAdapter preparingOrderAdapter;
     private List<ToShipModel> orderList = new ArrayList<>();
     private FirebaseFirestore db;
 
@@ -35,18 +34,18 @@ public class ToShipFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_to_ship, container, false);
 
         // Initialize RecyclerView and Adapter
-        toShipRecycler = view.findViewById(R.id.toShipRecycler);
-        toShipAdapter = new ToShipAdapter(orderList, getContext());
-        toShipRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        toShipRecycler.setAdapter(toShipAdapter);
+        preparingOrderRecycler = view.findViewById(R.id.toShipRecycler);
+        preparingOrderAdapter = new ToShipAdapter(orderList, getContext());
+        preparingOrderRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        preparingOrderRecycler.setAdapter(preparingOrderAdapter);
 
-        // Fetch orders
-        fetchToShipOrders();
+        // Fetch only preparing orders
+        fetchPreparingOrders();
 
         return view;
     }
 
-    private void fetchToShipOrders() {
+    private void fetchPreparingOrders() {
         db = FirebaseFirestore.getInstance();
         String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
@@ -60,7 +59,7 @@ public class ToShipFragment extends Fragment {
                         db.collection("Users").document(adminUid)
                                 .collection("Orders")
                                 .whereEqualTo("userEmail", currentUserEmail)
-                                .whereIn("status", List.of("placed", "preparing order"))
+                                .whereEqualTo("status", "preparing order") // Fetch only "preparing order" orders
                                 .get()
                                 .addOnSuccessListener(orderSnapshots -> {
                                     orderList.clear();
@@ -69,7 +68,7 @@ public class ToShipFragment extends Fragment {
                                         String referenceId = doc.getId();
                                         fetchFirstItemFromOrder(doc, referenceId, status);
                                     }
-                                    toShipAdapter.notifyDataSetChanged(); // Update the adapter with new data
+                                    preparingOrderAdapter.notifyDataSetChanged(); // Update the adapter with new data
                                 })
                                 .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
                     }
@@ -90,19 +89,8 @@ public class ToShipFragment extends Fragment {
             String totalPrice = (String) firstItem.get("totalPrice");
             String imageUrl = (String) firstItem.get("imageUrl");
 
-            // Display-friendly status mapping
-            String displayStatus;
-            switch (status.toLowerCase()) {
-                case "preparing order":
-                    displayStatus = "Seller is preparing your order";
-                    break;
-                case "placed":
-                    displayStatus = "Order has been placed";
-                    break;
-                default:
-                    displayStatus = "Unknown status";
-                    break;
-            }
+            // Display-friendly status
+            String displayStatus = "Seller is preparing your order";
 
             // Create the order model and add to the list
             ToShipModel order = new ToShipModel(

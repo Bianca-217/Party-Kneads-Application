@@ -33,6 +33,7 @@ public class OrderHistory extends Fragment {
                 getChildFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
         );
+        fragmentViewPagerAdapter.addFragment(new PendingFragment(), "Pending");
         fragmentViewPagerAdapter.addFragment(new ToShipFragment(), "To Ship");
         fragmentViewPagerAdapter.addFragment(new ToReceiveFragment(), "To Receive");
         fragmentViewPagerAdapter.addFragment(new CompletedFragment(), "Completed");

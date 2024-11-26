@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/plainwhitebg"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".OrderHistory">
 
@@ -69,32 +70,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabIconTint="@color/pink"
+        android:layout_marginHorizontal="10dp"
+        app:tabTextAppearance="@style/TabTextAppearance"
         app:tabTextColor="@color/semiblack"
+        android:background="@color/semiwhite"
         app:tabSelectedTextColor="@color/pink"
+        app:tabPaddingStart="16dp"
+        app:tabPaddingEnd="16dp"
+        app:tabPaddingTop="8dp"
+        app:tabPaddingBottom="8dp"
         app:tabIndicatorColor="@color/pink"
         app:tabMode="scrollable">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:text="Pending" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:text="To Ship" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:text="To Receive" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:text="Completed" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:text="Cancelled" />
     </com.google.android.material.tabs.TabLayout>
 
