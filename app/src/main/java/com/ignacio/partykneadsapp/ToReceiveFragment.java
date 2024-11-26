@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ToReceiveOrderListFragment#newInstance} factory method to
+ * Use the {@link ToReceiveFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ToReceiveOrderListFragment extends Fragment {
+public class ToReceiveFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +24,7 @@ public class ToReceiveOrderListFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ToReceiveOrderListFragment() {
+    public ToReceiveFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +34,11 @@ public class ToReceiveOrderListFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ToReceiveOrderListFragment.
+     * @return A new instance of fragment ToReceiveFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ToReceiveOrderListFragment newInstance(String param1, String param2) {
-        ToReceiveOrderListFragment fragment = new ToReceiveOrderListFragment();
+    public static ToReceiveFragment newInstance(String param1, String param2) {
+        ToReceiveFragment fragment = new ToReceiveFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,6 +59,6 @@ public class ToReceiveOrderListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_to_receive_order_list, container, false);
+        return inflater.inflate(R.layout.fragment_to_receive, container, false);
     }
 }

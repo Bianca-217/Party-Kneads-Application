@@ -183,6 +183,11 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(view));
 
+        binding.imgUserProfile.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_cont);
+            navController.navigate(R.id.action_homePageFragment_to_profileFragment);
+        });
+
         // Initialize location services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         locationTextView = view.findViewById(R.id.location);

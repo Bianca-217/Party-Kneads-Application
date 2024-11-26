@@ -70,12 +70,35 @@ public class ManageProfileFragment extends Fragment {
 
         // Save changes button listener
         binding.btnSaveChanges.setOnClickListener(v -> {
-            String updatedFirstName = binding.userFName.getText().toString();
-            String updatedLastName = binding.userLname.getText().toString();
+            String updatedFirstName = binding.userFName.getText().toString().trim();
+            String updatedLastName = binding.userLname.getText().toString().trim();
 
-            if (updatedFirstName.isEmpty() || updatedLastName.isEmpty()) {
-                Toast.makeText(getActivity(), "Please fill in both fields", Toast.LENGTH_SHORT).show();
+            boolean isValid = true;
+
+            // Validation for empty first name
+            if (updatedFirstName.isEmpty()) {
+                binding.userFName.setError("First name cannot be empty");
+                isValid = false;
+            } else if (!updatedFirstName.matches("^[a-zA-Z]+$")) {
+                binding.userFName.setError("First name must contain letters only");
+                isValid = false;
             } else {
+                binding.userFName.setError(null); // Clear error
+            }
+
+            // Validation for empty last name
+            if (updatedLastName.isEmpty()) {
+                binding.userLname.setError("Last name cannot be empty");
+                isValid = false;
+            } else if (!updatedLastName.matches("^[a-zA-Z]+$")) {
+                binding.userLname.setError("Last name must contain letters only");
+                isValid = false;
+            } else {
+                binding.userLname.setError(null); // Clear error
+            }
+
+            // Proceed only if all inputs are valid
+            if (isValid) {
                 // Assuming you have a method to get the user ID
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 updateUserInfo(userId, updatedFirstName, updatedLastName);
@@ -83,7 +106,7 @@ public class ManageProfileFragment extends Fragment {
         });
     }
 
-    private void hideKeyboard(View view) {
+        private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
