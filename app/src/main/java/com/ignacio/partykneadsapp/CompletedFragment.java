@@ -1,64 +1,109 @@
 package com.ignacio.partykneadsapp;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CompletedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.ignacio.partykneadsapp.adapters.ToReceiveAdapter;  // Use ToReceiveAdapter (modify if necessary)
+import com.ignacio.partykneadsapp.model.OrderItemModel;
+import com.ignacio.partykneadsapp.model.ToShipModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class CompletedFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public CompletedFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CompletedFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CompletedFragment newInstance(String param1, String param2) {
-        CompletedFragment fragment = new CompletedFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RecyclerView completedRecycler;
+    private ToReceiveAdapter toCompleteAdapter;  // Adapter for completed orders
+    private List<ToShipModel> orderList = new ArrayList<>();  // List of completed orders (ToShipModel)
+    private FirebaseFirestore db;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_completed, container, false);
+        View view = inflater.inflate(R.layout.fragment_completed, container, false);
+
+        // Initialize RecyclerView and Adapter
+        completedRecycler = view.findViewById(R.id.completedRecyclerview);
+        toCompleteAdapter = new ToReceiveAdapter(orderList, getContext());  // Use the adapter for ToShipModel
+        completedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        completedRecycler.setAdapter(toCompleteAdapter);
+
+        // Fetch completed orders
+        fetchToCompleteOrders();
+
+        return view;
+    }
+
+    private void fetchToCompleteOrders() {
+        db = FirebaseFirestore.getInstance();
+        String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";  // Replace with actual admin email if necessary
+
+        db.collection("Users")
+                .whereEqualTo("email", adminEmail)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
+
+                        // Fetch orders where the user email matches and the status is "Complete Order"
+                        db.collection("Users").document(adminUid)
+                                .collection("Orders")
+                                .whereEqualTo("userEmail", currentUserEmail)
+                                .whereEqualTo("status", "Complete Order")
+                                .get()
+                                .addOnSuccessListener(orderSnapshots -> {
+                                    orderList.clear();  // Clear the existing list before adding new orders
+                                    for (QueryDocumentSnapshot doc : orderSnapshots) {
+                                        String status = doc.getString("status");
+                                        String referenceId = doc.getId();
+                                        fetchFirstItemFromOrder(doc, referenceId, status);
+                                    }
+                                    toCompleteAdapter.notifyDataSetChanged();  // Update the adapter after data is loaded
+                                })
+                                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+    }
+
+    private void fetchFirstItemFromOrder(QueryDocumentSnapshot doc, String referenceId, String status) {
+        List<Map<String, Object>> items = (List<Map<String, Object>>) doc.get("items");
+
+        if (items != null && !items.isEmpty()) {
+            Map<String, Object> firstItem = items.get(0);
+            String productName = (String) firstItem.get("productName");
+            String cakeSize = (String) firstItem.get("cakeSize");
+            long quantity = firstItem.get("quantity") != null ? (long) firstItem.get("quantity") : 0;
+            String totalPrice = (String) firstItem.get("totalPrice");
+            String imageUrl = (String) firstItem.get("imageUrl");
+
+            // Determine the display status based on the order status
+            String displayStatus = "Your order has been delivered.";  // For "Complete Order"
+
+            // Create the OrderItemModel for the item
+            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice);
+
+            // Create a ToShipModel with the item and other order details
+            List<OrderItemModel> itemList = new ArrayList<>();
+            itemList.add(item);
+
+            // Construct the ToShipModel object with the full order details
+            ToShipModel order = new ToShipModel(referenceId, displayStatus, totalPrice, productName, cakeSize, imageUrl, (int) quantity, itemList);
+
+            // Add the order to the list
+            orderList.add(order);
+        }
     }
 }

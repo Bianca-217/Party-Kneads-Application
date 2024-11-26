@@ -108,8 +108,8 @@
             android:id="@+id/action_homePageFragment_to_addressFragment"
             app:destination="@id/addressFragment" />
         <action
-            android:id="@+id/action_homePageFragment_to_orderFragment"
-            app:destination="@id/orderFragment" />
+            android:id="@+id/action_homePageFragment_to_orderHistoryFragment"
+            app:destination="@id/orderHistoryFragment" />
         <action
             android:id="@+id/action_homePageFragment_to_cupcake_Description"
             app:destination="@id/cupcake_Description" />
@@ -345,6 +345,17 @@
             android:id="@+id/action_orderFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/orderHistoryFragment"
+        android:name="com.ignacio.partykneadsapp.OrderHistory"
+        android:label="fragment_order_history"
+        tools:layout="@layout/fragment_order_history" >
+        <action
+            android:id="@+id/action_orderHistoryFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/cupcake_Description"
         android:name="com.ignacio.partykneadsapp.Cupcake_Description"
