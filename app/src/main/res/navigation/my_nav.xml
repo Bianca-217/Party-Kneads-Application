@@ -168,6 +168,9 @@
         <action
             android:id="@+id/action_seller_HomePageFragment_to_add_Items"
             app:destination="@id/add_Items" />
+        <action
+            android:id="@+id/action_seller_HomePageFragment_to_OrderSellerSideFragment"
+            app:destination="@id/OrderSellerSideFragment" />
     </fragment>
 
     <fragment
@@ -528,6 +531,14 @@
         tools:layout="@layout/fragment_forgot_password" >
         <action
             android:id="@+id/action_forgotPassword_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/OrderSellerSideFragment"
+        android:name="com.ignacio.partykneadsapp.sellermenus.Seller_HomePageFragment"
+        android:label="Order_Seller" >
+        <action
+            android:id="@+id/action_OrderSellerFragment_to_seller_HomePageFragment"
             app:destination="@id/loginFragment" />
     </fragment>
 </navigation>

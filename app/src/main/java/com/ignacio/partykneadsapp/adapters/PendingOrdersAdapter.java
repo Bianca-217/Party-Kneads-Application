@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +81,10 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
             updateOrderStatus(order, newStatus, position);
         });
 
+        // Set OnClickListener for cancel button
+        holder.btnCancelOrder.setOnClickListener(v -> showCancelDialog(order, position));
+
+
         // Set OnClickListener to show detailed order dialog
         holder.itemView.setOnClickListener(v -> showOrderDetailsDialog(order));
     }
@@ -92,7 +97,7 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
     public static class PendingOrdersViewHolder extends RecyclerView.ViewHolder {
         TextView txtUserName, contactNum, location, productName, cakeSize, quantity, totalPrice;
         ImageView cakeImage;
-        Button btnAcceptOrder;
+        Button btnAcceptOrder, btnCancelOrder;
 
         public PendingOrdersViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -105,8 +110,85 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
             totalPrice = itemView.findViewById(R.id.totalPrice);
             cakeImage = itemView.findViewById(R.id.cakeImage);
             btnAcceptOrder = itemView.findViewById(R.id.btnAcceptOrder);
+            btnCancelOrder = itemView.findViewById(R.id.btnCancelOrder);
         }
     }
+
+    // Show cancellation dialog
+    private void showCancelDialog(PendingOrdersModel order, int position) {
+        // Create a dialog with custom view (your XML layout)
+        Dialog cancelDialog = new Dialog(context);
+        cancelDialog.setContentView(R.layout.cancel_dialog_seller);
+
+        // Initialize RadioButtons for cancellation reasons
+        RadioButton cancel1 = cancelDialog.findViewById(R.id.cancel1);
+        RadioButton cancel2 = cancelDialog.findViewById(R.id.cancel2);
+        RadioButton cancel3 = cancelDialog.findViewById(R.id.cancel3);
+        RadioButton cancel4 = cancelDialog.findViewById(R.id.cancel4);
+        RadioButton cancel5 = cancelDialog.findViewById(R.id.cancel5);
+        RadioButton cancel6 = cancelDialog.findViewById(R.id.cancel6);
+        RadioButton cancel7 = cancelDialog.findViewById(R.id.cancel7);
+
+        // Handle "Back" button click
+        cancelDialog.findViewById(R.id.btnBack).setOnClickListener(v -> cancelDialog.dismiss());
+
+        // Handle the cancellation reason selection
+        View.OnClickListener cancelReasonClickListener = v -> {
+            String cancellationReason = null;
+
+            // Check which RadioButton is selected
+            if (cancel1.isChecked()) cancellationReason = "Item Out of Stock";
+            else if (cancel2.isChecked()) cancellationReason = "Customization Request Cannot Be Fulfilled";
+            else if (cancel3.isChecked()) cancellationReason = "Operational/Logistical Challenges";
+            else if (cancel4.isChecked()) cancellationReason = "Unrealistic Customer Expectations";
+            else if (cancel5.isChecked()) cancellationReason = "Order Volume Exceeds Capacity";
+            else if (cancel6.isChecked()) cancellationReason = "Delivery Constraints (Weather, Location, etc.)";
+            else if (cancel7.isChecked()) cancellationReason = "Others";
+
+            // If a reason is selected, update the order status
+            if (cancellationReason != null) {
+                // Update the order status and save the cancellation reason
+                updateOrderStatusToCancelled(order, cancellationReason, position);
+                cancelDialog.dismiss(); // Close the dialog after the reason is saved
+            }
+        };
+
+        // Set the OnClickListener for all radio buttons
+        cancel1.setOnClickListener(cancelReasonClickListener);
+        cancel2.setOnClickListener(cancelReasonClickListener);
+        cancel3.setOnClickListener(cancelReasonClickListener);
+        cancel4.setOnClickListener(cancelReasonClickListener);
+        cancel5.setOnClickListener(cancelReasonClickListener);
+        cancel6.setOnClickListener(cancelReasonClickListener);
+        cancel7.setOnClickListener(cancelReasonClickListener);
+
+        cancelDialog.show();
+    }
+
+    // Method to update the order status to "Cancelled" and save the reason
+    private void updateOrderStatusToCancelled(PendingOrdersModel order, String cancellationReason, int position) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        CollectionReference ordersRef = FirebaseFirestore.getInstance()
+                .collection("Users")
+                .document(uid)
+                .collection("Orders");
+
+        String orderId = order.getOrderId();
+
+        // Update the Firestore document for the order to set status as "Cancelled" and save the reason
+        ordersRef.document(orderId)
+                .update("status", "Cancelled", "reason", cancellationReason)
+                .addOnSuccessListener(aVoid -> {
+                    // Notify user and update UI after cancellation
+                    showToast("Order has been cancelled for reason: " + cancellationReason);
+                    removeItem(position); // Remove item from list
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Failed to update order status.");
+                    Log.e("CancelOrder", "Failed to update order status", e);
+                });
+    }
+
 
     // Method to update the mode
     public void toggleMode(String status) {
