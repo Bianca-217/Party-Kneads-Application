@@ -44,7 +44,7 @@ public class Seller_HomePageFragment extends Fragment {
         });
         binding.orders.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new SellerOrderFragment())
+                    .replace(R.id.fragment_contseller, new OrderSellerSideFragment())
                     .commit();
         });
 
