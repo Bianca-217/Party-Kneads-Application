@@ -21,9 +21,9 @@
                 android:id="@+id/rdSelect"
                 android:layout_width="30dp"
                 android:layout_height="20dp"
+                android:layout_gravity="center"
                 android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/dialogOpacity"
-                />
+                android:outlineAmbientShadowColor="@color/pink" />
 
 
             <TextView

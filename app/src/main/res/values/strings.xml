@@ -14,7 +14,7 @@
     <string name="success">Your order has been placed successfully! Get ready for an amazing party!</string>
     <string name="forgotpass"><u>Forgot Password?</u></string>
 
-
+    <string name="cancellation_reasons">Please select a cancellation reason. Please take note that this will cancel all items in the order and the action cannot be undone.</string>
 
 
     <string name="Terms_and_Conditions"><b>Party Kneads – Terms and Conditions</b></string>

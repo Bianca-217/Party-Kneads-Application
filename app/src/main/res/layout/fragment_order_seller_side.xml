@@ -6,7 +6,8 @@
     android:orientation="vertical"
     android:background="@drawable/plainwhitebg"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".OrderHistory">
+    tools:context=".sellermenus.OrderSellerSideFragment">
+
 
 
     <FrameLayout
@@ -50,7 +51,7 @@
             android:layout_marginHorizontal="15dp"
             android:layout_weight="0"
             android:fontFamily="@font/montserrat_extrabold"
-            android:text="MY PURCHASES"
+            android:text="ORDERS"
             android:textAlignment="center"
             android:textColor="@color/darkpink"
             android:textSize="26sp" />
@@ -93,20 +94,15 @@
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="To Ship" />
+            android:text="To Deliver" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="To Receive" />
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
             android:text="Completed" />
+
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
