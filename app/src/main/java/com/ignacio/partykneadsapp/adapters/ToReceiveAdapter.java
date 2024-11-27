@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.model.NotificationViewModel;
@@ -29,6 +30,7 @@ import com.ignacio.partykneadsapp.model.ToShipModel;
 import com.ignacio.partykneadsapp.model.OrderItemModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -140,24 +142,26 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
         // Get the current user's email
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userEmail = currentUser != null ? currentUser.getEmail() : null;
+        String currentUserEmail = currentUser != null ? currentUser.getEmail() : null;
 
-        if (userEmail == null) {
-            Log.e("Notification", "Error: User email is null.");
-            return;
+        // The target emails
+        List<String> targetEmails = new ArrayList<>();
+        targetEmails.add("sweetkatrinabiancaignacio@gmail.com"); // Add the first email
+        if (currentUserEmail != null && !currentUserEmail.isEmpty()) {
+            targetEmails.add(currentUserEmail); // Add the current user email
         }
 
-        // Create a notification message based on the user type
+        // Create the notification details
         String orderStatus;
         String userRateComment;
-        String cakeImageUrl = orderList.get(position).getImageUrl();  // Use the image URL from the order
+        String cakeImageUrl = shipModel.getImageUrl(); // Use the image URL from the order
 
         if (cakeImageUrl == null || cakeImageUrl.isEmpty()) {
-            cakeImageUrl = "default_image_url";  // Use a default image if URL is missing
+            cakeImageUrl = "default_image_url"; // Use a default image if URL is missing
         }
 
         // Check if the user is admin or customer
-        if (isAdmin(userEmail)) {
+        if (isAdmin(currentUserEmail)) {
             orderStatus = "Order Received by Customer";
             userRateComment = "The customer has received their order successfully. Great work on completing the delivery process!";
         } else {
@@ -165,33 +169,42 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
             userRateComment = "Your order has been successfully completed! We appreciate your trust. Thank you for choosing Party Kneads.";
         }
 
-        // Create the NotificationViewModel
-        NotificationViewModel notification = new NotificationViewModel(orderStatus, userRateComment, cakeImageUrl);
+        // Create the notification data
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("orderStatus", orderStatus);
+        notificationData.put("userRateComment", userRateComment);
+        notificationData.put("imageUrl", cakeImageUrl);
+        notificationData.put("createdAt", FieldValue.serverTimestamp());
 
-        // Now add the notification to the Firestore user's Notifications collection
-        db.collection("Users")
-                .whereEqualTo("email", userEmail)  // Use the dynamically fetched email here
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                        DocumentSnapshot userDoc = task.getResult().getDocuments().get(0);
-                        String uid = userDoc.getId();
+        // Iterate over the target emails to send notifications
+        for (String email : targetEmails) {
+            db.collection("Users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                            DocumentSnapshot userDoc = task.getResult().getDocuments().get(0);
+                            String uid = userDoc.getId();
 
-                        // Add the notification to the user's Notifications subcollection
-                        db.collection("Users")
-                                .document(uid)
-                                .collection("Notifications")
-                                .add(notification)
-                                .addOnSuccessListener(documentReference -> {
-                                    // Notification successfully added
-                                    Log.d("Notification", "Notification added successfully.");
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("Notification", "Error adding notification", e);
-                                });
-                    }
-                });
+                            // Add the notification to the user's Notifications subcollection
+                            db.collection("Users")
+                                    .document(uid)
+                                    .collection("Notifications")
+                                    .add(notificationData)
+                                    .addOnSuccessListener(documentReference -> {
+                                        // Notification successfully added
+                                        Log.d("Notification", "Notification added successfully for " + email);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("Notification", "Error adding notification for " + email, e);
+                                    });
+                        } else {
+                            Log.e("Notification", "User not found for email: " + email);
+                        }
+                    });
+        }
     }
+
 
     private boolean isAdmin(String email) {
         // Implement logic to check if the email belongs to an admin user
