@@ -16,27 +16,11 @@
         android:orientation="vertical"
         android:background="@color/footerpink"
         android:padding="15dp">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="20dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/btnDelete"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_gravity="right"
-                android:src="@drawable/delete_pink" />
-        </FrameLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             android:orientation="horizontal">
 
             <ImageView
