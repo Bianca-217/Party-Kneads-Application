@@ -169,8 +169,8 @@
             android:id="@+id/action_seller_HomePageFragment_to_add_Items"
             app:destination="@id/add_Items" />
         <action
-            android:id="@+id/action_seller_HomePageFragment_to_OrderSellerSideFragment"
-            app:destination="@id/OrderSellerSideFragment" />
+            android:id="@+id/action_seller_HomePageFragment_to_orderSellerSideFragment"
+            app:destination="@id/orderSellerSideFragment" />
     </fragment>
 
     <fragment
@@ -534,11 +534,12 @@
             app:destination="@id/loginFragment" />
     </fragment>
     <fragment
-        android:id="@+id/OrderSellerSideFragment"
-        android:name="com.ignacio.partykneadsapp.sellermenus.Seller_HomePageFragment"
-        android:label="Order_Seller" >
+        android:id="@+id/orderSellerSideFragment"
+        android:name="com.ignacio.partykneadsapp.sellermenus.OrderSellerSideFragment"
+        android:label="fragment_order_seller_side"
+        tools:layout="@layout/fragment_order_seller_side" >
         <action
-            android:id="@+id/action_OrderSellerFragment_to_seller_HomePageFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_orderSellerSideFragment_to_seller_HomePageFragment"
+            app:destination="@id/seller_HomePageFragment" />
     </fragment>
 </navigation>

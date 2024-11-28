@@ -4,9 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
@@ -93,7 +96,7 @@ public class PendingItemAdapter extends RecyclerView.Adapter<PendingItemAdapter.
 
         // Query the 'Users' collection for the document with the specified email
         db.collection("Users")
-                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com") // Make sure email is correctly stored in Firestore
+                .whereEqualTo("email", "sweetkatrinabiancaignacio@gmail.com")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -102,9 +105,9 @@ public class PendingItemAdapter extends RecyclerView.Adapter<PendingItemAdapter.
 
                         // Access the Orders collection and the specific order by referenceId
                         db.collection("Users")
-                                .document(userDocument.getId()) // Get the user document ID
+                                .document(userDocument.getId())
                                 .collection("Orders")
-                                .document(referenceId) // Reference to the specific order document
+                                .document(referenceId)
                                 .get()
                                 .addOnSuccessListener(orderSnapshot -> {
                                     if (orderSnapshot.exists()) {
@@ -118,6 +121,26 @@ public class PendingItemAdapter extends RecyclerView.Adapter<PendingItemAdapter.
                                         // Set the dialog background to transparent
                                         if (dialog.getWindow() != null) {
                                             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        }
+
+                                        // Set margin of 20dp horizontally and center the dialog
+                                        Window window = dialog.getWindow();
+                                        if (window != null) {
+                                            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                                            layoutParams.copyFrom(window.getAttributes());
+
+                                            // Convert dp to pixels
+                                            int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
+
+                                            // Set width to match parent with 20dp margin on each side
+                                            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
+                                            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // Height to wrap content
+
+                                            // Set the gravity to center the dialog
+                                            layoutParams.gravity = Gravity.CENTER;
+
+                                            // Apply the layout parameters
+                                            window.setAttributes(layoutParams);
                                         }
 
                                         // Get references to the TextViews in the dialog
@@ -197,6 +220,5 @@ public class PendingItemAdapter extends RecyclerView.Adapter<PendingItemAdapter.
                     Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
                 });
     }
-
 
 }

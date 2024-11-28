@@ -48,7 +48,7 @@ public class CheckoutFragment extends Fragment {
     private RecyclerView recyclerView;
     private CheckoutAdapter coutAdapter;
     private List<CartItemModel> selectedItems;
-    private TextView itemTotalTextView;
+    private TextView subTotalTextView;
     private TextView totalCostTextView;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -72,7 +72,7 @@ public class CheckoutFragment extends Fragment {
         // Initialize UI elements
         btnBack = view.findViewById(R.id.btnBack);
         recyclerView = view.findViewById(R.id.recyclerViewCart);
-        itemTotalTextView = view.findViewById(R.id.itemTotal);
+        subTotalTextView = view.findViewById(R.id.subTotal);
         totalCostTextView = view.findViewById(R.id.totalCost);
         txtUserName = view.findViewById(R.id.txtUserName);
 
@@ -448,7 +448,7 @@ public class CheckoutFragment extends Fragment {
         double totalCost = itemTotal - discount;
 
         // Update TextViews
-        itemTotalTextView.setText("₱" + String.format("%.2f", itemTotal));
+        subTotalTextView.setText("₱" + String.format("%.2f", itemTotal));
         totalCostTextView.setText("₱" + String.format("%.2f", totalCost));
 
         // Toggle TextView visibility
@@ -456,7 +456,7 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void toggleTextViewVisibility(boolean hasItems) {
-        itemTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        subTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
         totalCostTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
     }
 

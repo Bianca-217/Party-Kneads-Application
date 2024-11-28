@@ -151,7 +151,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="Cash On Delivery"
+                    android:text="Cash On Delivery (COD)"
                     android:textColor="@color/semiblack" />
             </LinearLayout>
 
@@ -165,22 +165,26 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="Item Total"
+                    android:text="Subtotal:"
                     android:textColor="@color/grey"
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/itemTotal"
+                    android:id="@+id/subTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="P 750.00"
+                    android:text="P750.00"
                     android:textColor="@color/semiblack" />
             </LinearLayout>
+
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+
                 android:orientation="horizontal">
 
                 <TextView
@@ -201,6 +205,29 @@
                     android:textColor="@color/semiblack" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Item Total:"
+                    android:textColor="@color/grey"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/itemTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="P 750.00"
+                    android:textColor="@color/semiblack" />
+            </LinearLayout>
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
@@ -217,12 +244,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="Total Cost:"
+                    android:text="Total Payment:"
                     android:textColor="@color/grey"
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/totalCost"
+                    android:id="@+id/totalPayment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_bold"

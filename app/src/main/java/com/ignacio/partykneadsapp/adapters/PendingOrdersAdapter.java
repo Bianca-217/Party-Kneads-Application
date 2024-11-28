@@ -1,16 +1,23 @@
 package com.ignacio.partykneadsapp.adapters;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +88,8 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
             updateOrderStatus(order, newStatus, position);
         });
 
+
+
         // Set OnClickListener for cancel button
         holder.btnCancelOrder.setOnClickListener(v -> showCancelDialog(order, position));
 
@@ -114,56 +123,64 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
         }
     }
 
-    // Show cancellation dialog
     private void showCancelDialog(PendingOrdersModel order, int position) {
-        // Create a dialog with custom view (your XML layout)
-        Dialog cancelDialog = new Dialog(context);
-        cancelDialog.setContentView(R.layout.cancel_dialog_seller);
+        // Create the AlertDialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        // Initialize RadioButtons for cancellation reasons
-        RadioButton cancel1 = cancelDialog.findViewById(R.id.cancel1);
-        RadioButton cancel2 = cancelDialog.findViewById(R.id.cancel2);
-        RadioButton cancel3 = cancelDialog.findViewById(R.id.cancel3);
-        RadioButton cancel4 = cancelDialog.findViewById(R.id.cancel4);
-        RadioButton cancel5 = cancelDialog.findViewById(R.id.cancel5);
-        RadioButton cancel6 = cancelDialog.findViewById(R.id.cancel6);
-        RadioButton cancel7 = cancelDialog.findViewById(R.id.cancel7);
+        // Inflate the custom layout
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.cancel_dialog_seller, null);
+        builder.setView(dialogView);
 
-        // Handle "Back" button click
-        cancelDialog.findViewById(R.id.btnBack).setOnClickListener(v -> cancelDialog.dismiss());
+        // Create the AlertDialog
+        AlertDialog cancelDialog = builder.create();
 
-        // Handle the cancellation reason selection
-        View.OnClickListener cancelReasonClickListener = v -> {
+        // Make the background fully transparent
+        if (cancelDialog.getWindow() != null) {
+            cancelDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        // Set dialog width and apply margins programmatically
+        Window window = cancelDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - 40 * context.getResources().getDisplayMetrics().density); // 20dp margin on each side
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(layoutParams);
+        }
+
+        // Initialize the RadioGroup
+        RadioGroup radioGroupCancelReasons = dialogView.findViewById(R.id.radioGroupCancelReasons);
+
+        // Confirm cancellation button
+        Button btnConfirmCancel = dialogView.findViewById(R.id.btnConfirmCancel);
+        btnConfirmCancel.setOnClickListener(v -> {
             String cancellationReason = null;
 
-            // Check which RadioButton is selected
-            if (cancel1.isChecked()) cancellationReason = "Item Out of Stock";
-            else if (cancel2.isChecked()) cancellationReason = "Customization Request Cannot Be Fulfilled";
-            else if (cancel3.isChecked()) cancellationReason = "Operational/Logistical Challenges";
-            else if (cancel4.isChecked()) cancellationReason = "Unrealistic Customer Expectations";
-            else if (cancel5.isChecked()) cancellationReason = "Order Volume Exceeds Capacity";
-            else if (cancel6.isChecked()) cancellationReason = "Delivery Constraints (Weather, Location, etc.)";
-            else if (cancel7.isChecked()) cancellationReason = "Others";
-
-            // If a reason is selected, update the order status
-            if (cancellationReason != null) {
-                // Update the order status and save the cancellation reason
-                updateOrderStatusToCancelled(order, cancellationReason, position);
-                cancelDialog.dismiss(); // Close the dialog after the reason is saved
+            // Get the selected RadioButton's ID
+            int selectedId = radioGroupCancelReasons.getCheckedRadioButtonId();
+            if (selectedId != -1) { // Ensure a RadioButton is selected
+                RadioButton selectedRadioButton = dialogView.findViewById(selectedId);
+                cancellationReason = selectedRadioButton.getText().toString();
             }
-        };
 
-        // Set the OnClickListener for all radio buttons
-        cancel1.setOnClickListener(cancelReasonClickListener);
-        cancel2.setOnClickListener(cancelReasonClickListener);
-        cancel3.setOnClickListener(cancelReasonClickListener);
-        cancel4.setOnClickListener(cancelReasonClickListener);
-        cancel5.setOnClickListener(cancelReasonClickListener);
-        cancel6.setOnClickListener(cancelReasonClickListener);
-        cancel7.setOnClickListener(cancelReasonClickListener);
+            // Validate that a reason is selected
+            if (cancellationReason != null) {
+                // Proceed with cancellation
+                updateOrderStatusToCancelled(order, cancellationReason, position);
+                cancelDialog.dismiss(); // Close the dialog
+            } else {
+                // Show a toast message prompting the user to select a reason
+                Toast.makeText(context, "Please select a cancellation reason before proceeding.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        // Show the AlertDialog
         cancelDialog.show();
     }
+
+
+
 
     // Method to update the order status to "Cancelled" and save the reason
     private void updateOrderStatusToCancelled(PendingOrdersModel order, String cancellationReason, int position) {
@@ -395,17 +412,45 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
                 .addOnFailureListener(e -> showToast("Failed to fetch order details"));
     }
 
-    // Method to show order details in a dialog
     private void showOrderDetailsDialog(List<Map<String, Object>> itemsData, String orderId) {
+        // Create a new Dialog instance
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.view_order_details);
 
+        // Remove background and make it transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        // Set the dialog window width and add horizontal margin (20dp)
+        Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+
+            // Convert dp to pixels
+            int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
+
+            // Set width to match parent with 20dp margin on each side
+            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
+            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT; // Height to match parent
+
+            // Set the dialog position to center the window both horizontally and vertically
+            layoutParams.gravity = Gravity.CENTER; // Ensures the dialog is centered on the screen
+
+            // Apply the layout parameters
+            window.setAttributes(layoutParams);
+        }
+
+        // Initialize the views
         TextView orderIdTextView = dialog.findViewById(R.id.OrderID);
         TextView itemTotalTextView = dialog.findViewById(R.id.itemTotal);
         RecyclerView productsRecyclerView = dialog.findViewById(R.id.recyclerViewCart);
 
+        // Set RecyclerView layout manager
         productsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
+        // Prepare the list of items and calculate total price
         List<OrderItemModel> items = new ArrayList<>();
         double totalPrice = 0;
 
@@ -428,11 +473,14 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
             }
         }
 
+        // Set order details
         orderIdTextView.setText(orderId);
         itemTotalTextView.setText("₱" + String.format("%.2f", totalPrice));
 
+        // Set the RecyclerView adapter
         productsRecyclerView.setAdapter(new OrderItemsAdapter(items, context));
 
+        // Show the dialog
         dialog.show();
     }
 }

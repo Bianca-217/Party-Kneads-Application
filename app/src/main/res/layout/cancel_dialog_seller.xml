@@ -2,28 +2,28 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/whitecont">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/dialog_bg"
         android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:background="@drawable/completeorder_bg"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Select Cancellation Reasons"
-                android:textColor="@color/semiwhite"
+                android:textColor="@color/pink"
+                android:layout_marginHorizontal="20dp"
                 android:textSize="16sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:layout_gravity="center"
                 android:textAlignment="center"/>
@@ -62,179 +62,102 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="10dp"
                 android:fontFamily="@font/montserrat_medium"
-
                 android:text="@string/cancellation_reasons"/>
 
         </LinearLayout>
 
-        <LinearLayout
+        <RadioGroup
+            android:id="@+id/radioGroupCancelReasons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="20dp">
 
             <RadioButton
                 android:id="@+id/cancel1"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Item Out of Stock"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel2"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Customization Request Cannot Be Fulfilled"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel3"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Operational/Logistical Challenges"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel4"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Unrealistic Customer Expectations"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel5"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Order Volume Exceeds Capacity"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel6"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Delivery Constraints (Weather, Location, etc.)"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="30dp"
-            android:orientation="horizontal">
+                android:textColor="@color/semiblack" />
 
             <RadioButton
                 android:id="@+id/cancel7"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:buttonTint="@color/pink"
-                android:outlineAmbientShadowColor="@color/pink"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:buttonTint="@color/pink"
                 android:text="Others"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="14sp"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/semiblack"/>
-        </LinearLayout>
+                android:textColor="@color/semiblack" />
+        </RadioGroup>
+
+
+        <Button
+            android:id="@+id/btnConfirmCancel"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="20dp"
+            android:backgroundTint="@color/pink"
+            app:cornerRadius="10dp"
+            android:text="Confirm Cancellation"
+            android:textColor="@color/semiwhite"
+            android:fontFamily="@font/montserrat_semibold"
+            android:textSize="16sp"
+            android:layout_marginBottom="20dp"/>
 
 
     </LinearLayout>
