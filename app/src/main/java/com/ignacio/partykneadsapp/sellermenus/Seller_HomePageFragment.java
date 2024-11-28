@@ -17,10 +17,11 @@ import com.ignacio.partykneadsapp.databinding.FragmentSellersMenuBinding;
 import com.ignacio.partykneadsapp.customermenus.LikesFragment;
 import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 
-
 public class Seller_HomePageFragment extends Fragment {
 
     private FragmentSellersMenuBinding binding;
+    private long lastClickTime = 0; // Track the last click time
+    private static final long CLICK_DEBOUNCE_TIME = 500; // 500 milliseconds debounce time
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,7 +29,7 @@ public class Seller_HomePageFragment extends Fragment {
 
         if (savedInstanceState == null) {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new SellerHome()) // assuming Frag1 is FragmentOne
+                    .replace(R.id.fragment_contseller, new SellerHome())
                     .commit();
         }
     }
@@ -37,35 +38,22 @@ public class Seller_HomePageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.home.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new SellerHome())
-                    .commit();
-        });
-        binding.orders.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new OrderSellerSideFragment())
-                    .commit();
-        });
-
+        binding.home.setOnClickListener(v -> handleMenuClick(new SellerHome()));
+        binding.orders.setOnClickListener(v -> handleMenuClick(new OrderSellerSideFragment()));
         binding.addItem.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_seller_HomePageFragment_to_add_Items);
+            if (isClickAllowed()) {
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_seller_HomePageFragment_to_add_Items);
+            }
         });
-
-        binding.notif.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_contseller, new NotificationFragment())
-                    .commit();
-        });
-
+        binding.notif.setOnClickListener(v -> handleMenuClick(new NotificationFragment()));
         binding.profile.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_seller_HomePageFragment_to_profileFragment);
+            if (isClickAllowed()) {
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_seller_HomePageFragment_to_profileFragment);
+            }
         });
-
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -73,14 +61,30 @@ public class Seller_HomePageFragment extends Fragment {
         // Inflate the layout for this fragment using View Binding
         binding = FragmentSellersMenuBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
+    // Helper method to handle fragment replacement with debounce
+    private void handleMenuClick(Fragment fragment) {
+        if (isClickAllowed()) {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_contseller, fragment)
+                    .commit();
+        }
+    }
+
+    // Check if enough time has passed since the last click
+    private boolean isClickAllowed() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastClickTime >= CLICK_DEBOUNCE_TIME) {
+            lastClickTime = currentTime;
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
-
 }

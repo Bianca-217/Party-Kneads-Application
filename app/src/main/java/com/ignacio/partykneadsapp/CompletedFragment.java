@@ -87,21 +87,35 @@ public class CompletedFragment extends Fragment {
             String productName = (String) firstItem.get("productName");
             String cakeSize = (String) firstItem.get("cakeSize");
             long quantity = firstItem.get("quantity") != null ? (long) firstItem.get("quantity") : 0;
-            String totalPrice = (String) firstItem.get("totalPrice");
+            String totalPriceString = (String) firstItem.get("totalPrice");
+            double parsedPrice = 0.0; // Default value in case parsing fails
             String imageUrl = (String) firstItem.get("imageUrl");
+
+            if (totalPriceString != null) {
+                try {
+                    // Remove "₱" and parse the price
+                    totalPriceString = totalPriceString.replace("₱", "").trim();
+                    parsedPrice = Double.parseDouble(totalPriceString);
+                } catch (NumberFormatException e) {
+                    Log.e("Parsing Error", "Invalid price format: " + totalPriceString, e);
+                }
+            }
 
             // Determine the display status based on the order status
             String displayStatus = "Your order has been delivered.";  // For "Complete Order"
 
+            // Use the parsed price (converted back to a string for consistency, if needed)
+            String formattedPrice = String.format("₱%.2f", parsedPrice); // Display with currency symbol
+
             // Create the OrderItemModel for the item
-            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice);
+            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, formattedPrice);
 
             // Create a ToShipModel with the item and other order details
             List<OrderItemModel> itemList = new ArrayList<>();
             itemList.add(item);
 
             // Construct the ToShipModel object with the full order details
-            ToShipModel order = new ToShipModel(referenceId, displayStatus, totalPrice, productName, cakeSize, imageUrl, (int) quantity, itemList);
+            ToShipModel order = new ToShipModel(referenceId, displayStatus, formattedPrice, productName, cakeSize, imageUrl, (int) quantity, itemList);
 
             // Add the order to the list
             orderList.add(order);

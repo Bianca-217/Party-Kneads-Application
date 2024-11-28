@@ -16,10 +16,11 @@ import com.ignacio.partykneadsapp.databinding.FragmentCustomersMenuPageBinding;
 import com.ignacio.partykneadsapp.customermenus.LikesFragment;
 import com.ignacio.partykneadsapp.customermenus.NotificationFragment;
 import com.ignacio.partykneadsapp.customermenus.ShopFragment;
-
 public class HomePageFragment extends Fragment {
 
     private FragmentCustomersMenuPageBinding binding;
+    private long lastClickTime = 0; // Track the last click time
+    private static final long CLICK_DEBOUNCE_TIME = 500; // 500 milliseconds debounce time
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,31 +49,25 @@ public class HomePageFragment extends Fragment {
 
         setActiveIcon(R.id.home); // Default active icon to Home on launch
 
-        binding.home.setOnClickListener(v -> {
-            loadFragment(new HomeFragment());
-            setActiveIcon(R.id.home);
-        });
-
-        binding.likes.setOnClickListener(v -> {
-            loadFragment(new LikesFragment());
-            setActiveIcon(R.id.likes);
-        });
-
-        binding.shop.setOnClickListener(v -> {
-            loadFragment(new ShopFragment());
-            setActiveIcon(R.id.shop);
-        });
-
-        binding.notif.setOnClickListener(v -> {
-            loadFragment(new NotificationFragment());
-            setActiveIcon(R.id.notif);
-        });
-
+        binding.home.setOnClickListener(v -> handleMenuClick(R.id.home, new HomeFragment()));
+        binding.likes.setOnClickListener(v -> handleMenuClick(R.id.likes, new LikesFragment()));
+        binding.shop.setOnClickListener(v -> handleMenuClick(R.id.shop, new ShopFragment()));
+        binding.notif.setOnClickListener(v -> handleMenuClick(R.id.notif, new NotificationFragment()));
         binding.profile.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_homePageFragment_to_profileFragment);
-            setActiveIcon(R.id.profile);
+            if (isClickAllowed()) {
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_homePageFragment_to_profileFragment);
+                setActiveIcon(R.id.profile);
+            }
         });
+    }
+
+    // Helper method to handle menu item clicks
+    private void handleMenuClick(int menuId, Fragment fragment) {
+        if (isClickAllowed()) {
+            loadFragment(fragment);
+            setActiveIcon(menuId);
+        }
     }
 
     // Helper method to update icons based on selected menu
@@ -89,6 +84,16 @@ public class HomePageFragment extends Fragment {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_cont, fragment)
                 .commit();
+    }
+
+    // Check if enough time has passed since the last click
+    private boolean isClickAllowed() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastClickTime >= CLICK_DEBOUNCE_TIME) {
+            lastClickTime = currentTime;
+            return true;
+        }
+        return false;
     }
 
     @Override

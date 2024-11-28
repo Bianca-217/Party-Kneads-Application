@@ -202,11 +202,17 @@ public class ToCompleteAdapter extends RecyclerView.Adapter<ToCompleteAdapter.Or
 
                                                 // Add item to the list if the required fields are present
                                                 if (productName != null && cakeSize != null && price != null) {
-                                                    productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, price));
-                                                    totalPrice += Double.parseDouble(price.replace("P", "")); // Add price after removing "P"
+                                                    try {
+                                                        // Remove "₱" and parse the price
+                                                        double parsedPrice = Double.parseDouble(price.replace("₱", "").trim());
+                                                        productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, String.format("₱%.2f", parsedPrice)));
+
+                                                        totalPrice += parsedPrice; // Accumulate the total
+                                                    } catch (NumberFormatException e) {
+                                                        Log.e("Price Parsing Error", "Failed to parse price: " + price, e);
+                                                    }
                                                 }
                                             }
-
                                             // Notify the adapter to update the RecyclerView
                                             adapter.notifyDataSetChanged();
 
