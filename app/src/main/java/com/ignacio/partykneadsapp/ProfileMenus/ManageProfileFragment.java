@@ -68,30 +68,33 @@ public class ManageProfileFragment extends Fragment {
             dialogFragment.show(getParentFragmentManager(), "ChangePasswordDialog");
         });
 
-        // Save changes button listener
+// Save changes button listener
         binding.btnSaveChanges.setOnClickListener(v -> {
             String updatedFirstName = binding.userFName.getText().toString().trim();
             String updatedLastName = binding.userLname.getText().toString().trim();
 
             boolean isValid = true;
 
-            // Validation for empty first name
+            // Regular expression to allow letters, spaces, and periods
+            String nameRegex = "^[a-zA-Z .]+$";
+
+            // Validation for empty or invalid first name
             if (updatedFirstName.isEmpty()) {
                 binding.userFName.setError("First name cannot be empty");
                 isValid = false;
-            } else if (!updatedFirstName.matches("^[a-zA-Z]+$")) {
-                binding.userFName.setError("First name must contain letters only");
+            } else if (!updatedFirstName.matches(nameRegex)) {
+                binding.userFName.setError("First name contains invalid characters");
                 isValid = false;
             } else {
                 binding.userFName.setError(null); // Clear error
             }
 
-            // Validation for empty last name
+            // Validation for empty or invalid last name
             if (updatedLastName.isEmpty()) {
                 binding.userLname.setError("Last name cannot be empty");
                 isValid = false;
-            } else if (!updatedLastName.matches("^[a-zA-Z]+$")) {
-                binding.userLname.setError("Last name must contain letters only");
+            } else if (!updatedLastName.matches(nameRegex)) {
+                binding.userLname.setError("Last name contains invalid characters");
                 isValid = false;
             } else {
                 binding.userLname.setError(null); // Clear error
@@ -99,7 +102,6 @@ public class ManageProfileFragment extends Fragment {
 
             // Proceed only if all inputs are valid
             if (isValid) {
-                // Assuming you have a method to get the user ID
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 updateUserInfo(userId, updatedFirstName, updatedLastName);
             }

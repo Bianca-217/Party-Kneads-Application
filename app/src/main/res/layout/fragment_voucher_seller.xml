@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/plainwhitebg"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".sellermenus.VoucherSellerFragment">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="80dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/back_bg" />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/back" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/addtextview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_weight="0"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:text="ADD VOUCHERS"
+            android:textAlignment="center"
+            android:textColor="@color/darkpink"
+            android:textSize="26sp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/twentyPercentVoucher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/semiwhite"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/vten"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/footerpink"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="24sp"
+                        android:text="10% Discount"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/pink"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:layout_marginEnd="5dp"
+                        android:text="You’ve got a sweet discount—enjoy!"
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="40dp"
+                        android:textColor="@color/semiblack"/>
+
+                    <FrameLayout
+                        android:layout_width="70dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginRight="10dp">
+                        <Button
+                            android:id="@+id/btnAddVoucher1"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            app:cornerRadius="5dp"
+                            android:backgroundTint="@color/pink" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add"
+                            android:textSize="12sp"
+                            android:textAlignment="center"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:textColor="@color/semiwhite"
+                            android:layout_gravity="center"/>
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tenPercentVoucher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/semiwhite"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/vtwenty"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/footerpink"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="24sp"
+                        android:text="20% Discount"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/pink"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:layout_marginEnd="5dp"
+                        android:text="for orders above ₱1000.00! Enjoy, Sweets!"
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="40dp"
+                        android:textColor="@color/semiblack"/>
+
+                    <FrameLayout
+                        android:layout_width="70dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginRight="10dp">
+                        <Button
+                            android:id="@+id/btnAddVoucher2"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            app:cornerRadius="5dp"
+                            android:backgroundTint="@color/pink" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add"
+                            android:textSize="12sp"
+                            android:textAlignment="center"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:textColor="@color/semiwhite"
+                            android:layout_gravity="center"/>
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fifteenPercentVoucher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/semiwhite"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/vfifteen"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/footerpink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:text="15% Discount"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/pink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginEnd="5dp"
+                            android:text="Holiday Special - Enjoy 15% discount for all items! "
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="40dp"
+                            android:textColor="@color/semiblack"/>
+
+                        <FrameLayout
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom|right"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="10dp">
+                            <Button
+                                android:id="@+id/btnAddVoucher3"
+                                android:layout_width="70dp"
+                                android:layout_height="30dp"
+                                app:cornerRadius="5dp"
+                                android:backgroundTint="@color/pink" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add"
+                                android:textSize="12sp"
+                                android:textAlignment="center"
+                                android:fontFamily="@font/montserrat_semibold"
+                                android:textColor="@color/semiwhite"
+                                android:layout_gravity="center"/>
+                        </FrameLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/oneHundredVoucher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/semiwhite"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/vone"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/footerpink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:text="₱100.00 Off"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/pink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginEnd="5dp"
+                            android:text="for orders above ₱500.00! Enjoy, Sweets!"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="40dp"
+                            android:textColor="@color/semiblack"/>
+
+                        <FrameLayout
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom|right"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="10dp">
+                            <Button
+                                android:id="@+id/btnAddVoucher4"
+                                android:layout_width="70dp"
+                                android:layout_height="30dp"
+                                app:cornerRadius="5dp"
+                                android:backgroundTint="@color/pink" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add"
+                                android:textSize="12sp"
+                                android:textAlignment="center"
+                                android:fontFamily="@font/montserrat_semibold"
+                                android:textColor="@color/semiwhite"
+                                android:layout_gravity="center"/>
+                        </FrameLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/twoHundredVoucher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/semiwhite"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/vtwo"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/footerpink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:text="₱200.00 Off"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/pink"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginEnd="5dp"
+                            android:text="for orders above ₱800.00! Enjoy, Sweets!"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="40dp"
+                            android:textColor="@color/semiblack"/>
+
+                        <FrameLayout
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom|right"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="10dp">
+                            <Button
+                                android:id="@+id/btnAddVoucher5"
+                                android:layout_width="70dp"
+                                android:layout_height="30dp"
+                                app:cornerRadius="5dp"
+                                android:backgroundTint="@color/pink" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add"
+                                android:textSize="12sp"
+                                android:textAlignment="center"
+                                android:fontFamily="@font/montserrat_semibold"
+                                android:textColor="@color/semiwhite"
+                                android:layout_gravity="center"/>
+                        </FrameLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

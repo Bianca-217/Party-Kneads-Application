@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:backgroundTint="@color/semiwhite">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/semiwhite"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp">
+
+        <LinearLayout
+            android:id="@+id/tenPercenVoucher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/vten"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/footerpink"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:text="10% Discount"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/pink"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:text="You’ve got a sweet discount—enjoy!"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="40dp"
+                    android:textColor="@color/semiblack"/>
+
+                <FrameLayout
+                    android:layout_width="70dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginRight="10dp">
+                    <Button
+                        android:id="@+id/btnClaim"
+                        android:layout_width="70dp"
+                        android:layout_height="30dp"
+                        app:cornerRadius="5dp"
+                        android:backgroundTint="@color/pink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add"
+                        android:textSize="12sp"
+                        android:textAlignment="center"
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:textColor="@color/semiwhite"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

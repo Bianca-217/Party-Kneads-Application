@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import com.ignacio.partykneadsapp.databinding.FragmentVoucherBinding;
 
 
-public class VoucherFragment extends Fragment {
+public class VoucherFragment extends Fragment{
 
    private FragmentVoucherBinding binding;
 
