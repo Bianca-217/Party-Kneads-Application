@@ -44,6 +44,7 @@ public class OrderHistory extends Fragment {
         fragmentViewPagerAdapter.addFragment(new ToShipFragment(), "To Ship");
         fragmentViewPagerAdapter.addFragment(new ToReceiveFragment(), "To Receive");
         fragmentViewPagerAdapter.addFragment(new CompletedFragment(), "Completed");
+        fragmentViewPagerAdapter.addFragment(new CancelCustomer(), "Cancelled");
 
         // Link ViewPager to the adapter and TabLayout
         viewPager.setAdapter(fragmentViewPagerAdapter);

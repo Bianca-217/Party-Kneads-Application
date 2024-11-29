@@ -11,6 +11,7 @@ public class ToShipModel {
     private String imageUrl;
     private int quantity;
     private List<OrderItemModel> items; // Nested list of individual items
+    private String cancellationReason;
 
     // Default constructor required for Firestore
     public ToShipModel() {
@@ -92,5 +93,13 @@ public class ToShipModel {
 
     public void setItems(List<OrderItemModel> items) {
         this.items = items;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
     }
 }
