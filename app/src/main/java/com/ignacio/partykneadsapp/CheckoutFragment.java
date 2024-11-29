@@ -58,6 +58,7 @@ public class CheckoutFragment extends Fragment {
     private CheckoutLocationAdapter locationAdapter;
     private List<String> activeLocations;
     private TextView txtUserName;
+    private TextView itemTotalTextView;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -73,6 +74,7 @@ public class CheckoutFragment extends Fragment {
         btnBack = view.findViewById(R.id.btnBack);
         recyclerView = view.findViewById(R.id.recyclerViewCart);
         subTotalTextView = view.findViewById(R.id.subTotal);
+        itemTotalTextView = view.findViewById(R.id.itemTotal);
         totalCostTextView = view.findViewById(R.id.totalCost);
         txtUserName = view.findViewById(R.id.txtUserName);
 
@@ -436,28 +438,50 @@ public class CheckoutFragment extends Fragment {
         alertDialog.show();
     }
 
-
     private void updateTotals() {
-        double itemTotal = 0;
-        double discount = 0; // Set discount value if applicable
+        double subTotal = 0;   // This will hold the total price of items before discount
+        double discount = 0;   // Set discount value if applicable
 
+        // Sum the total price of all selected items to get subTotal
         for (CartItemModel item : selectedItems) {
-            itemTotal += item.getTotalPriceAsDouble(); // Assuming getTotalPriceAsDouble() is implemented correctly
+            subTotal += item.getTotalPriceAsDouble();  // Assuming getTotalPriceAsDouble() works correctly
         }
 
-        double totalCost = itemTotal - discount;
+        // itemTotal is the total after applying discounts
+        double itemTotal = subTotal - discount;
 
-        // Update TextViews
-        subTotalTextView.setText("₱" + String.format("%.2f", itemTotal));
-        totalCostTextView.setText("₱" + String.format("%.2f", totalCost));
+        // totalCost will be used for the total cost after discounts
+        double totalCost = itemTotal;
 
-        // Toggle TextView visibility
+        // Update the TextViews with the calculated totals
+        if (subTotalTextView != null) {
+            subTotalTextView.setText("₱" + String.format("%.2f", subTotal));  // Display subtotal
+        }
+
+        if (itemTotalTextView != null) {
+            itemTotalTextView.setText("₱" + String.format("%.2f", itemTotal));  // Display item total after discount
+        }
+
+        if (totalCostTextView != null) {
+            totalCostTextView.setText("₱" + String.format("%.2f", totalCost));  // Display total cost after discount
+        }
+
+        // Toggle TextView visibility depending on whether there are items in the cart
         toggleTextViewVisibility(!selectedItems.isEmpty());
     }
 
     private void toggleTextViewVisibility(boolean hasItems) {
-        subTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
-        totalCostTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        if (subTotalTextView != null) {
+            subTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        }
+
+        if (itemTotalTextView != null) {
+            itemTotalTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        }
+
+        if (totalCostTextView != null) {
+            totalCostTextView.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void clearCart() {
