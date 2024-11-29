@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginHorizontal="20dp"
+    android:id="@+id/clayout">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutdialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_bg"
+        android:padding="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/close_button"
+            android:backgroundTint="@color/semiwhite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/addtextview"
+            android:layout_gravity="right" />
+
+        <LinearLayout
+            android:id="@+id/addtextview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="30dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="@+id/layoutdialog">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="25dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/darkpink" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_weight="0"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:text="VOUCHERS"
+                android:textAlignment="center"
+                android:textColor="@color/pink"
+                android:textSize="26sp" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="25dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/darkpink" />
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/voucherListRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="550dp"
+            android:nestedScrollingEnabled="true"
+            tools:itemCount="2"
+            android:layout_marginTop="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addtextview"
+            tools:listitem="@layout/choosevoucher_list">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/disc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutdialog"
+        app:layout_constraintBottom_toTopOf="@id/layoutdialog" />
+</androidx.constraintlayout.widget.ConstraintLayout>

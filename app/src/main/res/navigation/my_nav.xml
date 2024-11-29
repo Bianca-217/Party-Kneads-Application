@@ -131,6 +131,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_bannerDescription"
             app:destination="@id/bannerDescription" />
+        <action
+            android:id="@+id/action_homePageFragment_to_voucherFragment"
+            app:destination="@id/voucherFragment" />
 
     </fragment>
 
@@ -469,6 +472,9 @@
         <action
             android:id="@+id/action_shopFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_shopFragment_to_voucherFragment"
+            app:destination="@id/voucherFragment" />
     </fragment>
     <fragment
         android:id="@+id/manageProfileFragment"
@@ -553,5 +559,17 @@
         <action
             android:id="@+id/action_voucherSellerFragment_to_myProductFragment"
             app:destination="@id/myProductFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/voucherFragment"
+        android:name="com.ignacio.partykneadsapp.VoucherFragment"
+        android:label="fragment_voucher"
+        tools:layout="@layout/fragment_voucher" >
+        <action
+            android:id="@+id/action_voucherFragment_to_shopFragment"
+            app:destination="@id/shopFragment" />
+        <action
+            android:id="@+id/action_voucherFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
     </fragment>
 </navigation>

@@ -43,6 +43,7 @@ import com.ignacio.partykneadsapp.model.NotificationViewModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class CheckoutFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -59,6 +60,8 @@ public class CheckoutFragment extends Fragment {
     private List<String> activeLocations;
     private TextView txtUserName;
     private TextView itemTotalTextView;
+    private TextView discount;
+    private Button showVouchers;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -75,8 +78,11 @@ public class CheckoutFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewCart);
         subTotalTextView = view.findViewById(R.id.subTotal);
         itemTotalTextView = view.findViewById(R.id.itemTotal);
-        totalCostTextView = view.findViewById(R.id.totalCost);
+        totalCostTextView = view.findViewById(R.id.totalPayment);
         txtUserName = view.findViewById(R.id.txtUserName);
+        showVouchers = view.findViewById(R.id.showVouchers);
+        discount = view.findViewById(R.id.discount);
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -112,6 +118,16 @@ public class CheckoutFragment extends Fragment {
             navController.navigate(R.id.action_checkoutFragment_to_cartFragment);
         });
 
+        showVouchers.setOnClickListener(v -> {
+            ChooseVoucherFragment dialogFragment = new ChooseVoucherFragment();
+            dialogFragment.setVoucherSelectedListener(selectedVoucher -> {
+                // Handle the selected voucher
+                discount.setText(selectedVoucher);
+                updateTotals();
+            });
+            dialogFragment.show(requireActivity().getSupportFragmentManager(), "ChooseVoucherDialog");
+        });
+
         // Checkout button listener
         Button btnCheckout = view.findViewById(R.id.btncheckout);
         btnCheckout.setOnClickListener(v -> {
@@ -122,6 +138,8 @@ public class CheckoutFragment extends Fragment {
         updateTotals();
         return view;
     }
+
+
 
     private void fetchUserNameAndLocations() {
         if (cUser != null) {
@@ -245,7 +263,7 @@ public class CheckoutFragment extends Fragment {
             itemData.put("productId", item.getProductId());
             itemData.put("productName", item.getProductName());
             itemData.put("quantity", item.getQuantity());
-            itemData.put("totalPrice", item.getTotalPrice());
+            itemData.put("totalPrice", itemTotalTextView.getText().toString());
             itemData.put("imageUrl", item.getImageUrl());  // Add imageUrl to the item data
             itemData.put("cakeSize", item.getCakeSize());
             itemsList.add(itemData);
@@ -440,15 +458,51 @@ public class CheckoutFragment extends Fragment {
 
     private void updateTotals() {
         double subTotal = 0;   // This will hold the total price of items before discount
-        double discount = 0;   // Set discount value if applicable
+        String discountText = discount.getText().toString();  // Get discount as text from TextView
+
+        double discountValue = 0;  // Variable to hold the discount value in numeric form
+
+        // Check if the discount string is not null or empty
+        if (discountText != null && !discountText.isEmpty()) {
+            // If discount is in the format "20%" (percentage)
+            if (discountText.endsWith("%")) {
+                try {
+                    // Extract the numeric part and convert to a percentage (e.g., "20%" -> 20)
+                    double discountPercentage = Double.parseDouble(discountText.replace("%", ""));
+                    discountValue = discountPercentage / 100; // Convert percentage to a decimal (e.g., 20% -> 0.20)
+                } catch (NumberFormatException e) {
+                    // Handle cases where the discount format is incorrect
+                    Log.e("updateTotals", "Invalid discount format (percentage)");
+                }
+            }
+            // If the discount is a fixed amount (e.g., "₱100")
+            else if (discountText.startsWith("₱")) {
+                try {
+                    // Extract the numeric part and convert to a fixed value (e.g., "₱100" -> 100)
+                    discountValue = Double.parseDouble(discountText.replace("₱", ""));
+                } catch (NumberFormatException e) {
+                    Log.e("updateTotals", "Invalid discount format (fixed amount)");
+                }
+            }
+        }
 
         // Sum the total price of all selected items to get subTotal
         for (CartItemModel item : selectedItems) {
             subTotal += item.getTotalPriceAsDouble();  // Assuming getTotalPriceAsDouble() works correctly
         }
 
-        // itemTotal is the total after applying discounts
-        double itemTotal = subTotal - discount;
+        // If the discount is a percentage, apply it to the subtotal
+        if (discountText.endsWith("%") && discountValue > 0) {
+            discountValue *= subTotal;  // Apply percentage discount to subtotal
+        }
+
+        // itemTotal is the total after applying the discount
+        double itemTotal = subTotal - discountValue;
+
+        // Ensure itemTotal is not negative, set it to 0 if negative
+        if (itemTotal < 0) {
+            itemTotal = 0;
+        }
 
         // totalCost will be used for the total cost after discounts
         double totalCost = itemTotal;
@@ -469,6 +523,8 @@ public class CheckoutFragment extends Fragment {
         // Toggle TextView visibility depending on whether there are items in the cart
         toggleTextViewVisibility(!selectedItems.isEmpty());
     }
+
+
 
     private void toggleTextViewVisibility(boolean hasItems) {
         if (subTotalTextView != null) {

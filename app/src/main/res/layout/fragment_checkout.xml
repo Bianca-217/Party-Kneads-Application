@@ -109,6 +109,7 @@
                 tools:listitem="@layout/cartcheckout_items" />
 
             <Button
+                android:id="@+id/showVouchers"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginVertical="20dp"
