@@ -131,6 +131,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_bannerDescription"
             app:destination="@id/bannerDescription" />
+        <action
+            android:id="@+id/action_homePageFragment_to_shopFragment"
+            app:destination="@id/shopFragment" />
 
     </fragment>
 

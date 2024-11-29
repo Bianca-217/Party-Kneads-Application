@@ -190,27 +190,6 @@
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal" />
 
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="25dp"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:text="Categories"
-                    android:textColor="@color/semiblack"
-                    android:textSize="18sp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/categories"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="5dp"
-                    tools:itemCount="1"
-                    tools:listitem="@layout/categories" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
