@@ -44,6 +44,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ignacio.partykneadsapp.adapters.CarouselAdapter;
 import com.ignacio.partykneadsapp.adapters.CategoriesAdapter;
@@ -54,6 +55,7 @@ import com.ignacio.partykneadsapp.databinding.FragmentHomeBinding;
 import com.ignacio.partykneadsapp.model.CategoriesModel;
 import com.ignacio.partykneadsapp.model.OrderHistoryModel;
 import com.ignacio.partykneadsapp.model.PopularModel;
+import com.ignacio.partykneadsapp.model.ProductShopModel;
 import com.ignacio.partykneadsapp.model.SearchProduct;
 
 import java.io.IOException;
@@ -135,7 +137,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         setupDotsIndicator(); // Setup dots after initializing adapter
 
         // Initialize category, popular, and order history
-        setupCategories();
+//        setupCategories();
         setupPopularProducts();
 
         // Enable infinite looping behavior
@@ -490,9 +492,6 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         }
     }
 
-
-
-
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(INPUT_METHOD_SERVICE);
         if (imm != null) {
@@ -500,37 +499,82 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         }
     }
 
-    private void setupCategories() {
-        categories = binding.categories;
-        categoriesModelList = new ArrayList<>();
-        categoriesModelList.add(new CategoriesModel(R.drawable.all, "All Items"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
-
-        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {});
-        categories.setAdapter(categoriesAdapter);
-        categories.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
-        categories.setHasFixedSize(true);
-        categories.setNestedScrollingEnabled(false);
-    }
-
     // Set up popular products
     private void setupPopularProducts() {
         popular = binding.popular;
         popularProductList = new ArrayList<>();
-        popularProductList.add(new PopularModel("Strawberry Bean", "5.0 (100)", "₱700.00",  R.drawable.strawberry, "20 sold"));
-        popularProductList.add(new PopularModel("Matcha", "5.0 (100)", "₱800.00", R.drawable.matcha, "23 sold"));
-        popularProductList.add(new PopularModel("Strawberry Shortcake 3", "5.0 (100)", "₱900.00", R.drawable.shortcake, "15 sold"));
-
-        popularAdapter = new PopularAdapter(getActivity(), popularProductList);
+        PopularAdapter popularAdapter = new PopularAdapter(getActivity(), popularProductList);
         popular.setAdapter(popularAdapter);
         popular.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
         popular.setHasFixedSize(true);
         popular.setNestedScrollingEnabled(false);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Fetch orders from Firestore
+        db.collection("Users")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    HashMap<String, Integer> productCountMap = new HashMap<>();
+                    HashMap<String, String> productImageMap = new HashMap<>(); // Store image URLs for each product
+                    HashMap<String, String> productPriceMap = new HashMap<>(); // Store prices for each product
+
+                    for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+                        CollectionReference ordersRef = userSnapshot.getReference().collection("Orders");
+                        ordersRef.get().addOnSuccessListener(orderSnapshots -> {
+                            for (QueryDocumentSnapshot orderSnapshot : orderSnapshots) {
+                                List<Map<String, Object>> items = (List<Map<String, Object>>) orderSnapshot.get("items");
+                                if (items != null) {
+                                    for (Map<String, Object> item : items) {
+                                        String productName = (String) item.get("productName");
+                                        String imageUrl = (String) item.get("imageUrl"); // Fetch image URL
+                                        if (productName != null) {
+                                            productCountMap.put(productName, productCountMap.getOrDefault(productName, 0) + 1);
+                                            productImageMap.put(productName, imageUrl); // Save the image URL for the product
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Fetch product prices from the "products" collection
+                            db.collection("products").get().addOnSuccessListener(productSnapshots -> {
+                                for (QueryDocumentSnapshot productSnapshot : productSnapshots) {
+                                    String name = productSnapshot.getString("name");
+                                    String price = productSnapshot.getString("price");
+                                    if (name != null && price != null) {
+                                        productPriceMap.put(name, price); // Save the price for each product
+                                    }
+                                }
+
+                                // Populate the list
+                                popularProductList.clear();
+                                for (Map.Entry<String, Integer> entry : productCountMap.entrySet()) {
+                                    String productName = entry.getKey();
+                                    int quantitySold = entry.getValue();
+                                    String imageUrl = productImageMap.get(productName); // Get the image URL
+                                    String price = productPriceMap.getOrDefault(productName, "₱0.00"); // Get the price
+
+                                    popularProductList.add(new PopularModel(
+                                            productName,
+                                            quantitySold + " sold",
+                                            "₱" + price, // Use the price from Firestore
+                                            imageUrl // Image URL from Firestore
+                                    ));
+                                }
+
+                                // Sort the list by quantity sold
+                                Collections.sort(popularProductList, (product1, product2) -> {
+                                    int quantity1 = Integer.parseInt(product1.getSold().split(" ")[0]);
+                                    int quantity2 = Integer.parseInt(product2.getSold().split(" ")[0]);
+                                    return Integer.compare(quantity2, quantity1);
+                                });
+
+                                popularAdapter.notifyDataSetChanged();
+                            });
+                        });
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FirestoreError", "Error fetching products: " + e.getMessage()));
     }
 
     private String capitalizeFirstLetter(String str) {
