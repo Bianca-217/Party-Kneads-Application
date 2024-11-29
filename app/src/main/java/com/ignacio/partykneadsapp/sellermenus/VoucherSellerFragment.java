@@ -1,11 +1,14 @@
 package com.ignacio.partykneadsapp.sellermenus;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,8 +61,6 @@ public class VoucherSellerFragment extends Fragment {
             showConfirmVoucherDialog("₱200 Off");
         });
 
-
-
     }
 
     // Function to display the confirmation dialog
@@ -72,6 +73,11 @@ public class VoucherSellerFragment extends Fragment {
                 .setView(dialogView)
                 .setCancelable(false)
                 .create();
+
+        // Make the background fully transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         // Get references to dialog buttons
         Button btnNo = dialogView.findViewById(R.id.btnNo);
@@ -88,6 +94,7 @@ public class VoucherSellerFragment extends Fragment {
         // Show the dialog
         dialog.show();
     }
+
 
     // Function to add voucher to all users (from previous implementation)
     private void addVoucherToAllUsers(String discount) {

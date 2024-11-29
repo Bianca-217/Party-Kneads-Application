@@ -16,6 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -137,7 +138,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         setupDotsIndicator(); // Setup dots after initializing adapter
 
         // Initialize category, popular, and order history
-//        setupCategories();
+        setupCategories();
         setupPopularProducts();
 
         // Enable infinite looping behavior
@@ -499,14 +500,31 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         }
     }
 
+    private void setupCategories() {
+        categories = binding.categories;
+        categoriesModelList = new ArrayList<>();
+        categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
+        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
+
+        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {});
+        categories.setAdapter(categoriesAdapter);
+        categories.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
+        categories.setHasFixedSize(true);
+        categories.setNestedScrollingEnabled(false);
+    }
+
     // Set up popular products
     private void setupPopularProducts() {
         popular = binding.popular;
         popularProductList = new ArrayList<>();
         PopularAdapter popularAdapter = new PopularAdapter(getActivity(), popularProductList);
         popular.setAdapter(popularAdapter);
-        popular.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
-        popular.setHasFixedSize(true);
+        popular.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        popular.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         popular.setNestedScrollingEnabled(false);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

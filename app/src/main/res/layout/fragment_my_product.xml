@@ -42,7 +42,7 @@
         android:orientation="horizontal">
 
         <SearchView
-            android:id="@+id/searchView"
+            android:id="@+id/shopsearchView"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
@@ -65,85 +65,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <Button
+                android:id="@+id/vouchers"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="10dp"
-                android:orientation="horizontal">
-
-                <!-- Existing Home LinearLayout -->
-                <LinearLayout
-                    android:id="@+id/transactions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:id="@+id/homeMenu"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:src="@drawable/order_pink" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Transactions"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:textSize="12sp"
-                        android:textColor="@color/semiblack"
-                        android:gravity="center" />
-                </LinearLayout>
-
-
-
-                <LinearLayout
-                    android:id="@+id/vouchers"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:src="@drawable/vouchers" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Add Voucher"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:textSize="12sp"
-                        android:textColor="@color/semiblack"
-                        android:gravity="center" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:src="@drawable/rate" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ratings"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:textSize="12sp"
-                        android:textColor="@color/semiblack"
-                        android:gravity="center" />
-                </LinearLayout>
-            </LinearLayout>
+                android:layout_height="60dp"
+                android:layout_marginVertical="20dp"
+                android:backgroundTint="@color/semiwhite"
+                android:drawableLeft="@drawable/discount"
+                android:drawableRight="@drawable/nextt"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Add Voucher"
+                android:layout_marginHorizontal="10dp"
+                android:textAlignment="textStart"
+                android:textColor="@color/semiblack"
+                app:cornerRadius="10dp"
+                app:strokeColor="@color/pink"
+                app:strokeWidth="2dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

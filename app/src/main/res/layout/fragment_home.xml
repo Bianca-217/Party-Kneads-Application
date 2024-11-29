@@ -156,7 +156,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_marginTop="20dp"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="10dp">
 
                     <!-- SearchView for input -->
                     <SearchView
@@ -175,10 +177,22 @@
 
                 </LinearLayout>
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/categories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginVertical="5dp"
+                    tools:itemCount="1"
+                    android:layout_marginBottom="20dp"
+                    tools:listitem="@layout/categories" />
+
+
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginHorizontal="20dp" />
 
                 <!-- Dot Indicator -->
@@ -189,6 +203,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal" />
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -206,7 +221,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/montserrat_bold"
-                        android:text="For you"
+                        android:text="Popular Products"
                         android:layout_marginBottom="10dp"
                         android:textColor="@color/semiblack"
                         android:textSize="18sp" />
@@ -218,8 +233,8 @@
                     android:id="@+id/popular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
                     android:layout_marginBottom="10dp"
+                    android:layout_marginHorizontal="10dp"
                     tools:itemCount="1"
                     android:orientation="vertical"
                     app:spanCount="2"

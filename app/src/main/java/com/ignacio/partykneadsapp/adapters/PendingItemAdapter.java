@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
@@ -126,47 +127,50 @@ public class PendingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Dialog cancelDialog = new Dialog(context);
         cancelDialog.setContentView(R.layout.cancel_dialog_customer); // Your custom cancel dialog layout
 
-        // Initialize the Radio buttons
-        RadioButton cancel1 = cancelDialog.findViewById(R.id.cancel1);
-        RadioButton cancel2 = cancelDialog.findViewById(R.id.cancel2);
-        RadioButton cancel3 = cancelDialog.findViewById(R.id.cancel3);
-        RadioButton cancel4 = cancelDialog.findViewById(R.id.cancel4);
-        RadioButton cancel5 = cancelDialog.findViewById(R.id.cancel5);
+        // Make the background fully transparent
+        if (cancelDialog.getWindow() != null) {
+            cancelDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
-        // Set up OnClickListeners for radio buttons
-        cancel1.setOnClickListener(v -> {
-            String cancellationReason = "Need to Change Delivery Address";
-            proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
-            cancelDialog.dismiss();  // Automatically close the dialog
-        });
+        // Set dialog width and apply margins programmatically
+        Window window = cancelDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - 40 * context.getResources().getDisplayMetrics().density); // 20dp margin on each side
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(layoutParams);
+        }
 
-        cancel2.setOnClickListener(v -> {
-            String cancellationReason = "Need to Modify (size, color, quantity, etc.)";
-            proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
-            cancelDialog.dismiss();  // Automatically close the dialog
-        });
+        // Initialize the RadioGroup and Confirm Button
+        RadioGroup radioGroupCancelReasons = cancelDialog.findViewById(R.id.radioGroupCancelReasons);
+        Button btnConfirmCancel = cancelDialog.findViewById(R.id.btnConfirmCancel);
 
-        cancel3.setOnClickListener(v -> {
-            String cancellationReason = "Found Cheaper elsewhere";
-            proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
-            cancelDialog.dismiss();  // Automatically close the dialog
-        });
+        // Confirm cancellation button logic
+        btnConfirmCancel.setOnClickListener(v -> {
+            // Get the selected RadioButton's ID
+            int selectedId = radioGroupCancelReasons.getCheckedRadioButtonId();
+            if (selectedId != -1) { // Ensure a RadioButton is selected
+                RadioButton selectedRadioButton = cancelDialog.findViewById(selectedId);
+                String cancellationReason = selectedRadioButton.getText().toString();
 
-        cancel4.setOnClickListener(v -> {
-            String cancellationReason = "Don't want to buy anymore";
-            proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
-            cancelDialog.dismiss();  // Automatically close the dialog
-        });
+                // Proceed with cancellation
+                proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
 
-        cancel5.setOnClickListener(v -> {
-            String cancellationReason = "Others";
-            proceedWithCancellation(referenceId, cancellationReason, cancelDialog, position);
-            cancelDialog.dismiss();  // Automatically close the dialog
+                // Close the dialog
+                cancelDialog.dismiss();
+            } else {
+                // Show a toast message prompting the user to select a reason
+                Toast.makeText(context, "Please select a cancellation reason before proceeding.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Show the dialog
         cancelDialog.show();
     }
+
+
+
 
     // Method to handle the cancellation process and update Firestore
     private void proceedWithCancellation(String referenceId, String cancellationReason, Dialog dialog, int position) {

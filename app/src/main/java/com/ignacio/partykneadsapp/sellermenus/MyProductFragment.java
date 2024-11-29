@@ -83,10 +83,7 @@ public class MyProductFragment extends Fragment {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_myProductFragment_to_seller_HomePageFragment);
         });
-        binding.transactions.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_myProductFragment_to_sellerTransactions);
-        });
+       
         binding.vouchers.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_myProductFragment_to_voucherSellerFragment);
