@@ -11,6 +11,8 @@ public class ProductShopModel implements Serializable {
     private String rate;
     private String numreviews;
     private String category;
+    private String productId;
+
 
     // Constructor
     public ProductShopModel(String id, String imageUrl, String name, String price, String description, String rate, String numreviews, String category) {
@@ -22,6 +24,13 @@ public class ProductShopModel implements Serializable {
         this.rate = rate;
         this.numreviews = numreviews;
         this.category = category;
+        this.productId = productId;
+
+    }
+
+    // Getter for productId
+    public String getProductId() {
+        return productId;
     }
 
     // Getter methods

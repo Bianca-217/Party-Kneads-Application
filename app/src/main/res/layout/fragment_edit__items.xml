@@ -150,7 +150,27 @@
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Stock"
+                app:hintTextColor="@color/pink"
+                app:boxStrokeColor="@color/darkpink">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/stockInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:textColor="@color/grey"
+                    android:textSize="16sp"
+                    android:singleLine="true"
+                    android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
+
 
 
         <com.google.android.material.textfield.TextInputLayout

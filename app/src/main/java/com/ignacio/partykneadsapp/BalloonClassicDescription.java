@@ -4,7 +4,6 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
@@ -55,7 +54,7 @@ import java.util.List;
 public class BalloonClassicDescription extends Fragment {
     private TextView productName, productPrice, productDescription;
     private ImageView productImage, btnBack;
-    private TextView quantityTextView;
+    private TextView quantityTextView, stockValue;
     private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
@@ -91,6 +90,7 @@ public class BalloonClassicDescription extends Fragment {
         }
 
         // Initialize views
+        stockValue = view.findViewById(R.id.stockValue);
         productImage = view.findViewById(R.id.productImage);
         productName = view.findViewById(R.id.productName);
         productPrice = view.findViewById(R.id.productPrice);
@@ -105,23 +105,33 @@ public class BalloonClassicDescription extends Fragment {
 
         // Set button click listener for "Buy Now"
         btnBuyNow.setOnClickListener(v -> {
+            String stock = stockValue.getText().toString(); // Get the stock value from the TextView
 
-                    String productCategory1 = productShopModel.getCategory();
+            // First check if stock is available
+            if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+                // Show "Out of Stock" dialog
+                showNoStockDialog();
+            } else {
+                // Proceed based on product category
+                String productCategory1 = productShopModel.getCategory();
 
-                    // Check if the category is "Balloons - Classic" or "Balloons - Latex"
-                    if (productCategory1.equals("Balloons - Classic") || productCategory1.equals("Balloons - Latex")) {
-                        // Directly show the second dialog without quantity and dropdown
-                        handleBuyNow("", 1);
-                    } else if (productShopModel.getCategory().equals("Balloons - Letter")) {
-                        // Show the original dialog with quantity and dropdown
-                        showLetterBuyDialog();
-                    } else if (productShopModel.getCategory().equals("Balloons - Number")) {
-                        showNumberBuyDialog();
-                    } else if (productShopModel.getCategory().equals("Balloons - LED")) {
-                        showLEDBuyDialog();
-                    }
+                // Check if the category is "Balloons - Classic" or "Balloons - Latex"
+                if (productCategory1.equals("Balloons - Classic") || productCategory1.equals("Balloons - Latex")) {
+                    // Proceed directly with checkout if category matches, no need for a dialog
+                    handleBuyNow("", 1);
+                } else if (productCategory1.equals("Balloons - Letter")) {
+                    // Show dialog for Letter category and proceed when confirmed
+                    String productId = productShopModel.getProductId(); // Fetch productId using the correct getter
+                    showLetterBuyDialog(productId); // Pass productId to showLetterBuyDialog
+                } else if (productCategory1.equals("Balloons - Number")) {
+                    // Show dialog for Number category and proceed when confirmed
+                    showNumberBuyDialog();
+                } else if (productCategory1.equals("Balloons - LED")) {
+                    // Show dialog for LED category and proceed when confirmed
+                    showLEDBuyDialog();
                 }
-        );
+            }
+        });
 
 
         if (productShopModel != null) {
@@ -185,7 +195,26 @@ public class BalloonClassicDescription extends Fragment {
         }
     }
 
-    private void showLetterBuyDialog() {
+    private void showNoStockDialog() {
+        // Create the dialog for "Out of Stock"
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.nostock_dialog); // Inflate your "Out of Stock" dialog layout
+        dialog.setCancelable(true);
+
+        // Make the dialog background transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // Set button click listener for the dialog
+        Button btnClose = dialog.findViewById(R.id.btnClose); // Assuming there's a "Close" button in the dialog
+        btnClose.setOnClickListener(v -> dialog.dismiss()); // Dismiss the dialog when clicked
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private void showLetterBuyDialog(String productId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.numletterbuy_dialog, null);
@@ -209,17 +238,38 @@ public class BalloonClassicDescription extends Fragment {
         TextView minusButton = dialogView.findViewById(R.id.minus);
         TextView plusButton = dialogView.findViewById(R.id.plus);
 
-        // Set up initial quantity
-        int[] quantity = {1}; // Use an array to modify the value within inner classes
-        quantityTextView.setText(String.valueOf(quantity[0]));
+        // Initialize the stock quantity
+        final int[] maxQuantity = {1}; // Default to 1 if stock is unavailable
+        quantityTextView.setText(String.valueOf(maxQuantity[0]));
+
+        // Fetch the product's stock from Firestore (using the productId passed dynamically)
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference productRef = db.collection("products").document(productId);
+
+        productRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Fetch the stock value from Firestore
+                String stock = documentSnapshot.getString("stock");
+                if (stock != null) {
+                    try {
+                        maxQuantity[0] = Integer.parseInt(stock); // Set the max quantity from Firestore stock
+                    } catch (NumberFormatException e) {
+                        maxQuantity[0] = 1; // Fallback to 1 if the stock is not a valid number
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> {
+            // Handle the error (e.g., show a Toast or set maxQuantity to a default value)
+            maxQuantity[0] = 1;
+        });
 
         // Handle the minus button click
-        minusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (quantity[0] > 1) {
-                    quantity[0]--;
-                    quantityTextView.setText(String.valueOf(quantity[0]));
+        minusButton.setOnClickListener(v -> {
+            if (maxQuantity[0] > 1) {
+                int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    quantityTextView.setText(String.valueOf(currentQuantity));
                 } else {
                     Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
                 }
@@ -227,36 +277,35 @@ public class BalloonClassicDescription extends Fragment {
         });
 
         // Handle the plus button click
-        plusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                quantity[0]++;
-                quantityTextView.setText(String.valueOf(quantity[0]));
+        plusButton.setOnClickListener(v -> {
+            int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+            if (currentQuantity < maxQuantity[0]) {
+                currentQuantity++;
+                quantityTextView.setText(String.valueOf(currentQuantity));
+            } else {
+                Toast.makeText(getContext(), "Cannot exceed stock limit", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Inside this dialog, find the confirmation button (addToCartBtn)
-        Button confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
-        confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the selected letter from the AutoCompleteTextView
-                String selectedLetter = autoCompleteTextView.getText().toString();
+        // Inside this dialog, find the confirmation button (buyBtn)
+        Button confirmBuyBtn = dialogView.findViewById(R.id.buyBtn);
+        confirmBuyBtn.setOnClickListener(v -> {
+            // Get the selected letter from the AutoCompleteTextView
+            String selectedLetter = autoCompleteTextView.getText().toString();
 
-                // Check if the selected letter is empty
-                if (selectedLetter.isEmpty()) {
-                    // Show a warning message if no letter is selected
-                    autoCompleteTextView.setError("Please select a letter");
-                    autoCompleteTextView.requestFocus();
-                    return; // Stop further execution until a letter is selected
-                }
-
-                // Your logic for confirming adding to cart with the selected letter and quantity
-                handleBuyNow(selectedLetter, quantity[0]);
-
-                // Dismiss the dialog after confirmation
-                dialog.dismiss();
+            // Check if the selected letter is empty
+            if (selectedLetter.isEmpty()) {
+                // Show a warning message if no letter is selected
+                autoCompleteTextView.setError("Please select a letter");
+                autoCompleteTextView.requestFocus();
+                return; // Stop further execution until a letter is selected
             }
+
+            // Handle the purchase with the selected letter and quantity
+            handleBuyNow(selectedLetter, Integer.parseInt(quantityTextView.getText().toString()));
+
+            // Dismiss the dialog after confirmation
+            dialog.dismiss();
         });
 
         dialog.show(); // Display the dialog
@@ -286,64 +335,74 @@ public class BalloonClassicDescription extends Fragment {
         TextView minusButton = dialogView.findViewById(R.id.minus);
         TextView plusButton = dialogView.findViewById(R.id.plus);
 
-        // Set up initial quantity
-        int[] quantity = {1}; // Use an array to modify the value within inner classes
-        quantityTextView.setText(String.valueOf(quantity[0]));
+        // Initialize the stock quantity
+        final int[] maxQuantity = {1}; // Default to 1 if stock is unavailable
+        quantityTextView.setText(String.valueOf(maxQuantity[0]));
+
+        // Fetch the stock quantity from Firestore (using a static value for now)
+        String stock = "10"; // You can replace this with a reference to your stock value (e.g., Firestore data)
+
+        // Parse the stock value (this can come from Firestore or another data source)
+        int availableStock = 0;
+        try {
+            availableStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            // Handle invalid stock value
+            Toast.makeText(getContext(), "Invalid stock value", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if the stock is invalid
+        }
+
+        // If stock is 0 or out of stock, show a message and return
+        if (availableStock <= 0) {
+            Toast.makeText(getContext(), "Out of Stock", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Set the maxQuantity based on the available stock
+        maxQuantity[0] = availableStock;
 
         // Handle the minus button click
-        minusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (quantity[0] > 1) {
-                    quantity[0]--;
-                    quantityTextView.setText(String.valueOf(quantity[0]));
-                } else {
-                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
-                }
+        minusButton.setOnClickListener(v -> {
+            int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                quantityTextView.setText(String.valueOf(currentQuantity));
+            } else {
+                Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Handle the plus button click
-        plusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                quantity[0]++;
-                quantityTextView.setText(String.valueOf(quantity[0]));
+        plusButton.setOnClickListener(v -> {
+            int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+            if (currentQuantity < maxQuantity[0]) {
+                currentQuantity++;
+                quantityTextView.setText(String.valueOf(currentQuantity));
+            } else {
+                Toast.makeText(getContext(), "Cannot exceed available stock", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Inside this dialog, find the confirmation button (addToCartBtn)
-        FrameLayout confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
-        confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the selected letter from the AutoCompleteTextView
-                String selectedLetter = autoCompleteTextView.getText().toString();
+        // Inside this dialog, find the confirmation button (buyBtn)
+        FrameLayout confirmBuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        confirmBuyBtnToCartBtn.setOnClickListener(v -> {
+            // Handle the purchase with the selected quantity
+            handleBuyNow("", Integer.parseInt(quantityTextView.getText().toString()));
 
-                // Check if the selected letter is empty
-                if (selectedLetter.isEmpty()) {
-                    // Show a warning message if no letter is selected
-                    autoCompleteTextView.setError("Please select a number");
-                    autoCompleteTextView.requestFocus();
-                    return; // Stop further execution until a letter is selected
-                }
-
-                // Your logic for confirming adding to cart with the selected letter and quantity
-                handleBuyNow(selectedLetter, quantity[0]);
-
-                // Dismiss the dialog after confirmation
-                dialog.dismiss();
-            }
+            // Dismiss the dialog after confirmation
+            dialog.dismiss();
         });
 
         dialog.show(); // Display the dialog
     }
+
 
     private void showLEDBuyDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.quantobuy, null);
         builder.setView(dialogView);
+
         // Create and show the dialog
         AlertDialog dialog = builder.create();
 
@@ -352,44 +411,62 @@ public class BalloonClassicDescription extends Fragment {
         TextView minusButton = dialogView.findViewById(R.id.minus);
         TextView plusButton = dialogView.findViewById(R.id.plus);
 
-        // Set up initial quantity
-        int[] quantity = {1}; // Use an array to modify the value within inner classes
-        quantityTextView.setText(String.valueOf(quantity[0]));
+        // Initialize the stock quantity
+        final int[] maxQuantity = {1}; // Default to 1 if stock is unavailable
+        quantityTextView.setText(String.valueOf(maxQuantity[0]));
+
+        // Fetch the stock quantity from Firestore (using product ID or a static value)
+        String stock = stockValue.getText().toString(); // Assume `stockValue` is a valid reference to the stock data
+
+        // Parse the stock from the TextView (this can be fetched from Firestore or another source)
+        int availableStock = 0;
+        try {
+            availableStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            // Handle invalid stock value
+            Toast.makeText(getContext(), "Invalid stock value", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if the stock is invalid
+        }
+
+        // If stock is 0 or out of stock, show a message and return
+        if (availableStock <= 0) {
+            Toast.makeText(getContext(), "Out of Stock", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Set the maxQuantity based on the available stock
+        maxQuantity[0] = availableStock;
 
         // Handle the minus button click
-        minusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (quantity[0] > 1) {
-                    quantity[0]--;
-                    quantityTextView.setText(String.valueOf(quantity[0]));
-                } else {
-                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
-                }
+        minusButton.setOnClickListener(v -> {
+            int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                quantityTextView.setText(String.valueOf(currentQuantity));
+            } else {
+                Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Handle the plus button click
-        plusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                quantity[0]++;
-                quantityTextView.setText(String.valueOf(quantity[0]));
+        plusButton.setOnClickListener(v -> {
+            int currentQuantity = Integer.parseInt(quantityTextView.getText().toString());
+            if (currentQuantity < maxQuantity[0]) {
+                currentQuantity++;
+                quantityTextView.setText(String.valueOf(currentQuantity));
+            } else {
+                Toast.makeText(getContext(), "Cannot exceed available stock", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Inside this dialog, find the confirmation button (addToCartBtn)
+        // Inside this dialog, find the confirmation button (buyBtn)
         Button confirmAddToCartBtn = dialogView.findViewById(R.id.buyBtn);
-        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        confirmAddToCartBtn.setOnClickListener(v -> {
+            // Handle the purchase with the selected quantity
+            handleBuyNow("", Integer.parseInt(quantityTextView.getText().toString()));
 
-                // Your logic for confirming adding to cart with the selected letter and quantity
-                handleBuyNow("", quantity[0]);
-
-                // Dismiss the dialog after confirmation
-                dialog.dismiss();
-            }
+            // Dismiss the dialog after confirmation
+            dialog.dismiss();
         });
 
         dialog.show(); // Display the dialog
@@ -828,37 +905,84 @@ public class BalloonClassicDescription extends Fragment {
                 });
     }
 
-
-
     private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {
-        // Create a CartItemModel for the selected cake and quantity
-        int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
-        int totalPrice = price * quantityNumLetter;
+        // Get the stock value from the UI (stockValue TextView)
+        String stockStr = stockValue.getText().toString();
 
-        // Create a CartItemModel for this selection
-        CartItemModel cartItem = new CartItemModel(
-                productShopModel.getId(),
-                productShopModel.getName(),
-                color + " | " + selectedNumLetter,
-                quantityNumLetter,
-                "₱" + totalPrice, // Include price with quantity
-                productShopModel.getimageUrl() // Product Image URL
-        );
+        // Check if stock is available
+        if ("0".equals(stockStr) || "Out of Stock".equals(stockStr)) {
+            // Show "Out of Stock" dialog if no stock is available
+            showNoStockDialog();
+        } else {
+            // Parse the stock and ensure it's a valid number
+            int currentStock = 0;
+            try {
+                currentStock = Integer.parseInt(stockStr);
+            } catch (NumberFormatException e) {
+                Log.e("StockParseError", "Invalid stock value: " + stockStr);
+            }
 
-        // Bundle the cart item to pass to the CheckoutFragment
-        List<CartItemModel> selectedItems = new ArrayList<>();
-        selectedItems.add(cartItem);
+            // Check if there is enough stock available
+            if (currentStock > 0) {
+                // Reduce stock by 1
+                int updatedStock = currentStock - 1;
 
-        // Log the details of the cart item
-        Log.d("CartItem", "Item: " + cartItem.getProductName() + ", Quantity: " + cartItem.getQuantity() + ", Total Price: " + cartItem.getTotalPrice());
+                // Update the stock in Firestore
+                updateStockInFirestore(updatedStock);
 
-        // Create a Bundle to pass the selected items to CheckoutFragment
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("selectedItems", (ArrayList<? extends Parcelable>) selectedItems);
+                // Get the product price and calculate the total price based on quantity
+                int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
+                int totalPrice = price * quantityNumLetter;
 
-        // Navigate to CheckoutFragment and pass the selected items
-        NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_balloonClassicDescription_to_checkoutFragment, bundle);
+                // Create the CartItemModel for this item
+                CartItemModel cartItem = new CartItemModel(
+                        productShopModel.getId(),
+                        productShopModel.getName(),
+                        color + " | " + selectedNumLetter,
+                        quantityNumLetter,
+                        "₱" + totalPrice, // Include price with quantity
+                        productShopModel.getimageUrl() // Product Image URL
+                );
+
+                // Create a list to pass the cart item to the CheckoutFragment
+                List<CartItemModel> selectedItems = new ArrayList<>();
+                selectedItems.add(cartItem);
+
+                // Log the details of the cart item for debugging
+                Log.d("CartItem", "Item: " + cartItem.getProductName() + ", Quantity: " + cartItem.getQuantity() + ", Total Price: " + cartItem.getTotalPrice());
+
+                // Create a Bundle to pass the selected items to CheckoutFragment
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("selectedItems", (ArrayList<? extends Parcelable>) selectedItems);
+
+                // Navigate to the CheckoutFragment with the selected items
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_balloonClassicDescription_to_checkoutFragment, bundle);
+            } else {
+                // If stock is 0 or less, show out of stock message
+                showNoStockDialog();
+            }
+        }
+    }
+
+    private void updateStockInFirestore(int newStock) {
+        // Get the product ID from the productShopModel
+        String productId = productShopModel.getId();
+
+        // Get the reference to the Firestore product document
+        DocumentReference productRef = firestore.collection("products").document(productId);
+
+        // Update the stock value in Firestore
+        productRef.update("stock", String.valueOf(newStock))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Stock", "Stock updated successfully: " + newStock);
+                    // Optionally update the UI with the new stock value
+                    stockValue.setText(String.valueOf(newStock));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Stock", "Error updating stock: ", e);
+                    Toast.makeText(getActivity(), "Failed to update stock", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void loadProductDetails(String productId) {
@@ -873,24 +997,35 @@ public class BalloonClassicDescription extends Fragment {
                 }
 
                 if (documentSnapshot != null && documentSnapshot.exists()) {
-                    // Fetch and display product details
-                    String imageUrl = documentSnapshot.getString("imageUrl"); // Fetch the imageUrl
+                    // Fetch product details from Firestore
+                    String imageUrl = documentSnapshot.getString("imageUrl");
                     String name = documentSnapshot.getString("name");
                     String description = documentSnapshot.getString("description");
                     String rate = documentSnapshot.getString("rate");
                     String numReviewsStr = documentSnapshot.getString("numreviews");
                     String price = documentSnapshot.getString("price");
 
+                    // Fetch the stock value from Firestore
+                    String stock = documentSnapshot.getString("stock"); // Assuming "stock" is the field name in Firestore
+
                     // Populate the views with data
-                    Glide.with(BalloonClassicDescription.this).load(imageUrl).into(productImage); // Load image with Glide
+                    Glide.with(BalloonClassicDescription.this).load(imageUrl).into(productImage);
                     productName.setText(name);
                     productDescription.setText(description);
-                    productPrice.setText("₱" +  price);
-                    productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
+                    productPrice.setText("₱" + price);
+                    productShopModel.setimageUrl(imageUrl);
+
+                    // Set the stock value to stockValue TextView
+                    if (stock != null) {
+                        stockValue.setText(stock); // Set the stock value (assuming "stock" is a string number)
+                    } else {
+                        stockValue.setText("Out of Stock");
+                    }
                 }
             }
         });
     }
+
 
     private void goToCart() {
         NavController navController = Navigation.findNavController(requireView());
