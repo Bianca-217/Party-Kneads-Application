@@ -23,7 +23,7 @@ public class SplashFragment extends Fragment {
         VideoView splashVideoView = view.findViewById(R.id.splashVideoView);
 
         // Set the video path
-        Uri videoUri = Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.raw.splash_final);
+        Uri videoUri = Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.raw.splash_new);
         splashVideoView.setVideoURI(videoUri);
 
         // Adjust the size of the VideoView when the video is prepared

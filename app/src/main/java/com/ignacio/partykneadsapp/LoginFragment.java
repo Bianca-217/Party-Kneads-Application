@@ -118,7 +118,7 @@ public class LoginFragment extends Fragment {
 
         // Set up VideoView to play and loop the video
         VideoView loginVideoView = view.findViewById(R.id.loginVideoView);
-        Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.login_animate);
+        Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.login_new);
         loginVideoView.setVideoURI(videoUri);
         loginVideoView.setOnPreparedListener(mp -> {
             mp.setLooping(true);  // Set looping to true
