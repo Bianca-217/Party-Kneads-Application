@@ -124,34 +124,15 @@
                 android:fontFamily="@font/montserrat_bold"
                 android:text="" />
 
-            <LinearLayout
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
 
                 <Button
-                    android:layout_width="15dp"
-                    android:layout_height="wrap_content"
-                    android:text="Rate"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    app:cornerRadius="5dp"
-                    android:backgroundTint="@color/footerpink"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/grey" />
-
-                <Button
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/pink"
-                    app:cornerRadius="5dp"
-                    android:textAlignment="center"
+                    app:cornerRadius="20dp"
                     android:layout_weight="1"
+                    android:layout_gravity="right"
+                    android:layout_marginBottom="20dp"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Buy Again"
                     android:textColor="@color/semiwhite" />
@@ -159,8 +140,5 @@
             </LinearLayout>
 
         </LinearLayout>
-    </LinearLayout>
-
-
 
 </androidx.cardview.widget.CardView>

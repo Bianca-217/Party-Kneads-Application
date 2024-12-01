@@ -2,10 +2,15 @@ package com.ignacio.partykneadsapp.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
@@ -162,9 +167,29 @@ public class ToCompleteAdapter extends RecyclerView.Adapter<ToCompleteAdapter.Or
                                         Dialog dialog = new Dialog(context);
                                         dialog.setContentView(R.layout.view_order_details);
 
-                                        // Make dialog background transparent
+                                        // Set the dialog background to transparent
                                         if (dialog.getWindow() != null) {
-                                            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        }
+
+                                        // Set margin of 20dp horizontally and center the dialog
+                                        Window window = dialog.getWindow();
+                                        if (window != null) {
+                                            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                                            layoutParams.copyFrom(window.getAttributes());
+
+                                            // Convert dp to pixels
+                                            int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
+
+                                            // Set width to match parent with 20dp margin on each side
+                                            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
+                                            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // Height to wrap content
+
+                                            // Set the gravity to center the dialog
+                                            layoutParams.gravity = Gravity.CENTER;
+
+                                            // Apply the layout parameters
+                                            window.setAttributes(layoutParams);
                                         }
 
                                         // Get references to the TextViews in the dialog
@@ -200,42 +225,48 @@ public class ToCompleteAdapter extends RecyclerView.Adapter<ToCompleteAdapter.Or
                                                 String imageUrl = (String) item.get("imageUrl");
                                                 String price = (String) item.get("totalPrice");
 
-                                                // Add item to the list if the required fields are present
-                                                if (productName != null && cakeSize != null && price != null) {
-                                                    try {
-                                                        // Remove "₱" and parse the price
-                                                        double parsedPrice = Double.parseDouble(price.replace("₱", "").trim());
-                                                        productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, String.format("₱%.2f", parsedPrice)));
+                                                // Add item to the list if the required fields are not null
+                                                if (productName != null && price != null) {
+                                                    productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, price));
 
-                                                        totalPrice += parsedPrice; // Accumulate the total
+                                                    // Sum the totalPrice (assuming the price is stored with the "₱" symbol)
+                                                    try {
+                                                        String priceWithoutSymbol = price.replace("₱", "").trim();  // Remove "₱" symbol and spaces
+                                                        double itemPrice = Double.parseDouble(priceWithoutSymbol);  // Convert to double
+                                                        totalPrice += itemPrice * quantity;  // Multiply by quantity and add to totalPrice
                                                     } catch (NumberFormatException e) {
-                                                        Log.e("Price Parsing Error", "Failed to parse price: " + price, e);
+                                                        Log.e("ParseError", "Invalid price format: " + price);
                                                     }
                                                 }
                                             }
-                                            // Notify the adapter to update the RecyclerView
+
+                                            // Notify adapter of the new data
                                             adapter.notifyDataSetChanged();
 
-                                            // Set the total cost
-                                            itemTotalTextView.setText("Total Items: " + items.size());
-                                            totalCosttTextView.setText("Total Cost: P" + totalPrice);
+                                            // Set the total price to the itemTotal TextView
+                                            itemTotalTextView.setText("₱" + String.format("%.2f", totalPrice)); // Format to 2 decimal places
+                                            totalCosttTextView.setText(itemTotalTextView.getText());
                                         }
 
-                                        // Show the dialog
+                                        // Show the dialog after all data is set
                                         dialog.show();
                                     } else {
-                                        Log.d("OrderDetailsDialog", "Order not found in Firestore.");
+                                        Log.d("OrderDetailsDialog", "Order document not found.");
+                                        Toast.makeText(context, "Order not found.", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("OrderDetailsDialog", "Error fetching order details", e);
+                                    Log.e("Firestore Error", e.getMessage());
+                                    Toast.makeText(context, "Failed to fetch order details.", Toast.LENGTH_SHORT).show();
                                 });
                     } else {
-                        Log.e("OrderDetailsDialog", "User not found.");
+                        Log.d("OrderDetailsDialog", "User document not found.");
+                        Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("OrderDetailsDialog", "Error querying Users collection", e);
+                    Log.e("Firestore Error", e.getMessage());
+                    Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
                 });
     }
 }
