@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/pinkbg"
     android:orientation="vertical"
+    android:id="@+id/clayout"
     tools:context=".BalloonClassicDescription">
 
 
@@ -148,81 +149,41 @@
                 android:textColor="@color/semiblack"
                 android:textSize="16sp" />
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notes: "
+                android:layout_margin="0dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/semiblack"
+                android:textSize="18sp"/>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:hint="Notes:"
+                app:hintTextColor="@color/pink"
+                app:boxStrokeColor="@color/darkpink"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                android:layout_marginBottom="40dp"
+                app:boxCornerRadiusBottomEnd="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ratings"
-                    android:layout_margin="0dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:textColor="@color/semiblack"
-                    android:textSize="18sp"/>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/star"
-                    android:layout_marginLeft="10dp" />
-
-                <TextView
-                    android:id="@+id/ratePercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/semiblack"
-                    android:text="4.8"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:layout_margin="2dp"/> <!-- No margins -->
-
-                <TextView
-                    android:id="@+id/numReviews"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:textColor="@color/grey"
-                    android:text="{210 Reviews)"
-                    android:layout_margin="5dp"/> <!-- No margins -->
-
-                <TextView
-                    android:id="@+id/btnViewAll"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="View All >"
-                    android:gravity="center|end"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp"
-                    android:layout_margin="0dp"/> <!-- No margins -->
-            </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@color/footerpink">
-
-                <TextView
-                    android:id="@+id/noRatingsTextView"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No ratings yet"
-                    android:layout_gravity="center"
-                    android:textAlignment="center"
-                    android:textColor="@color/grey"
-                    android:paddingHorizontal="50dp"
-
                     android:fontFamily="@font/montserrat_medium"
-                    android:textSize="16sp" />
-            </FrameLayout>
+                    android:textColor="@color/grey"
+                    android:textSize="16sp"
+                    android:inputType="textMultiLine"
+                    android:gravity="start"
+                    android:minLines="3"
+                    android:maxLines="6"
+                    android:scrollbars="vertical" />
+            </com.google.android.material.textfield.TextInputLayout>
 
 
             <LinearLayout

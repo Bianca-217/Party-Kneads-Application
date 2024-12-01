@@ -140,8 +140,7 @@ public class Add_Items extends Fragment {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Set up the Cancel button
-        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        // Set up the Cancel buttonadd
 
         // Set up the Discard button
         dialogView.findViewById(R.id.btnDiscard).setOnClickListener(v -> {

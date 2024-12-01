@@ -8,7 +8,10 @@
     android:background="@drawable/whitebg"
     tools:context=".CustomizeOrderFragment">
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,7 +25,9 @@
             android:id="@+id/btnBack"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/back_bg" />
+            android:src="@drawable/back_bg"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <ImageView
             android:layout_width="25dp"
@@ -30,68 +35,76 @@
             android:layout_marginRight="2dp"
             android:layout_gravity="center"
             android:src="@drawable/back"
+            android:clickable="false"
+            android:focusable="false"
             />
 
     </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <ScrollView
+
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="120dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="30dp">
 
         <LinearLayout
-            android:id="@+id/addtextview"
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginVertical="20dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="@+id/whitecont"
-            tools:layout_editor_absoluteX="0dp">
+            android:layout_marginHorizontal="20dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="25dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/darkpink" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/addtextview"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="15dp"
-                android:layout_weight="0"
-                android:fontFamily="@font/montserrat_extrabold"
-                android:text="CUSTOMIZE ORDER"
-                android:textAlignment="center"
-                android:textColor="@color/darkpink"
-                android:textSize="26sp" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="2dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="25dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/darkpink" />
-        </LinearLayout>
+                android:layout_marginVertical="20dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="@+id/whitecont"
+                tools:layout_editor_absoluteX="0dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="25dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/darkpink" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="0"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:text="CUSTOMIZE ORDER"
+                    android:textAlignment="center"
+                    android:textColor="@color/darkpink"
+                    android:textSize="26sp" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="25dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/darkpink" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
 
                     <ImageView
                         android:id="@+id/itemImg"
@@ -103,190 +116,230 @@
                         android:id="@+id/btnUpload"
                         android:layout_width="150dp"
                         android:layout_height="50dp"
-                        android:text="Upload"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/semiwhite"
                         android:layout_marginTop="15dp"
                         android:backgroundTint="@color/pink"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:text="Upload"
+                        android:textColor="@color/semiwhite"
+                        android:textSize="16sp"
                         app:cornerRadius="10dp" />
-                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/footerpink"
+                        app:boxBackgroundColor="@color/footerpink"
+                        app:boxStrokeColor="@color/darkpink"
+                        app:hintTextColor="@color/darkpink"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/cakeType"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/semiwhite"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:hint="Cake Types"
+                            android:inputType="none"
+                            android:popupBackground="@color/semiwhite"
+                            android:textColor="@color/semiblack"
+                            android:textColorHint="@color/darkpink"
+                            app:hintTextColor="@color/pink" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/footerpink"
+                        app:boxBackgroundColor="@color/footerpink"
+                        app:boxStrokeColor="@color/darkpink"
+                        app:hintTextColor="@color/darkpink"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/cakeSizes"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/semiwhite"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:hint="Cake Sizes"
+                            android:inputType="none"
+                            android:popupBackground="@color/semiwhite"
+                            android:textColor="@color/semiblack"
+                            android:textColorHint="@color/darkpink"
+                            app:hintTextColor="@color/pink" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:hint="Theme (ex: Barbie - Birthday)"
+                        app:boxCornerRadiusBottomEnd="10dp"
+                        app:boxCornerRadiusBottomStart="10dp"
+                        app:boxCornerRadiusTopEnd="10dp"
+                        app:boxCornerRadiusTopStart="10dp"
+                        app:boxStrokeColor="@color/darkpink"
+                        app:hintTextColor="@color/pink">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/theme"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:gravity="start"
+                            android:inputType="textMultiLine"
+                            android:maxLines="6"
+                            android:minLines="3"
+                            android:scrollbars="vertical"
+                            android:textColor="@color/grey"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginVertical="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="Price: "
+                    android:textAlignment="textStart"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/itemPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="₱0.00"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/pink"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/footerpink"
+                android:hint="Notes:"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
                 app:boxStrokeColor="@color/darkpink"
-                app:hintTextColor="@color/darkpink"
-                app:boxBackgroundColor="@color/footerpink"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+                app:hintTextColor="@color/pink">
 
-                <AutoCompleteTextView
-                    android:id="@+id/cakeType"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/notes"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_medium"
-                    android:textColor="@color/semiblack"
-                    android:inputType="none"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/semiwhite"
-                    app:hintTextColor="@color/pink"
-                    android:popupBackground="@color/semiwhite"
-                    android:textColorHint="@color/darkpink"
-                    android:hint="Cake Types" />
-
+                    android:gravity="start"
+                    android:inputType="textMultiLine"
+                    android:maxLines="6"
+                    android:minLines="3"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/grey"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:backgroundTint="@color/footerpink"
-                    app:boxStrokeColor="@color/darkpink"
-                    app:hintTextColor="@color/darkpink"
-                    app:boxBackgroundColor="@color/footerpink"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/cakeSizes"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:textColor="@color/semiblack"
-                        android:inputType="none"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+
+                    <Button
+                        android:id="@+id/btnAddToCart"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/semiwhite"
-                        app:hintTextColor="@color/pink"
-                        android:popupBackground="@color/semiwhite"
-                        android:textColorHint="@color/darkpink"
-                        android:hint="Cake Sizes" />
+                        android:backgroundTint="@color/darkpink"
+                        android:drawableStart="@drawable/delete"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:textColor="@color/white"
+                        android:textSize="16dp"
+                        app:cornerRadius="10dp" />
 
-                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:hint="Theme (ex: Barbie - Birthday)"
-                    app:hintTextColor="@color/pink"
-                    app:boxStrokeColor="@color/darkpink"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp">
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="9dp"
+                        android:layout_marginTop="15dp"
+                        android:src="@drawable/addtocart" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/theme"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:textColor="@color/grey"
-                        android:textSize="16sp"
-                        android:inputType="textMultiLine"
-                        android:gravity="start"
-                        android:minLines="3"
-                        android:maxLines="6"
-                        android:scrollbars="vertical" />
-                </com.google.android.material.textfield.TextInputLayout>
+                </FrameLayout>
+
+                <Button
+                    android:id="@+id/btnAddItem"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_weight="6"
+                    android:backgroundTint="@color/pink"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="Order Now"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:cornerRadius="10dp" />
 
             </LinearLayout>
 
 
-
-        </LinearLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Notes:"
-            app:hintTextColor="@color/pink"
-            app:boxStrokeColor="@color/darkpink"
-            app:boxCornerRadiusTopStart="10dp"
-            app:boxCornerRadiusTopEnd="10dp"
-            app:boxCornerRadiusBottomStart="10dp"
-            app:boxCornerRadiusBottomEnd="10dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/notes"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@color/grey"
-                android:textSize="16sp"
-                android:inputType="textMultiLine"
-                android:gravity="start"
-                android:minLines="3"
-                android:maxLines="6"
-                android:scrollbars="vertical" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:gravity="center">
-
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-
-                <Button
-                    android:id="@+id/btnClearAll"
-                    android:layout_width="50dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
-                    android:textSize="16dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:backgroundTint="@color/darkpink"
-                    android:textColor="@color/white"
-                    android:drawableStart="@drawable/delete"
-                    app:cornerRadius="10dp" />
-
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="9dp"
-                    android:layout_marginTop="15dp"
-                    android:src="@drawable/addtocart" />
-
-            </FrameLayout>
-            <Button
-                android:id="@+id/btnAddItem"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="6"
-                android:text="Order Now"
-                android:textSize="16sp"
+                android:textColor="@color/semiblack"
+                android:text="Pricing List:"
                 android:fontFamily="@font/montserrat_bold"
-                android:backgroundTint="@color/pink"
-                android:textColor="@color/white"
-                app:cornerRadius="10dp" />
+                android:textSize="16sp"
+                android:layout_marginTop="20dp"/>
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_cake"/>
         </LinearLayout>
-
-
-    </LinearLayout>
-
-
+    </ScrollView>
+</LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

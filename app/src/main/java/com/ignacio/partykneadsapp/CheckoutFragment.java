@@ -247,6 +247,9 @@ public class CheckoutFragment extends Fragment {
         orderData.put("referenceId", orderRefId);
         orderData.put("status", "placed");
 
+        // Add the timestamp for the order (this is for sorting later)
+        orderData.put("timestamp", System.currentTimeMillis()); // Store the timestamp at the order level
+
         // Get the current user's email
         if (cUser != null) {
             orderData.put("userEmail", cUser.getEmail());
@@ -328,6 +331,8 @@ public class CheckoutFragment extends Fragment {
                     Log.w("CheckoutFragment", "Error fetching active location details", e);
                 });
     }
+
+
 
     private void sendOrderNotification(String cakeImageUrl) {
         // Admin's email address

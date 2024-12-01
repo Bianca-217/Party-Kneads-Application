@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,7 +35,7 @@ import java.util.Map;
 
 public class NewAddressFragment extends DialogFragment {
 
-    private ConstraintLayout cl;
+    private ScrollView cl;
     FragmentNewAddressBinding binding;
 
     @Override

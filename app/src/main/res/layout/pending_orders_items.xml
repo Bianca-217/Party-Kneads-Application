@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:backgroundTint="@color/footerpink"
     android:layout_marginBottom="20dp"
-    android:layout_marginVertical="25dp"
     android:layout_height="wrap_content">
 
     <FrameLayout
@@ -43,7 +42,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="09754011041"
-            android:inputType="number"
             android:fontFamily="@font/montserrat_semibold"
             android:textSize="14sp"
             android:textColor="@color/semiblack"/>

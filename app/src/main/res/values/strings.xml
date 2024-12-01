@@ -961,6 +961,23 @@
         <item>Gender Reveal</item>
     </string-array>
 
+    <string-array name="Cake_Types">
+        <item>Butter Cream</item>
+        <item>Whipped Cream</item>
+        <item>Fondant</item>
+    </string-array>
+
+    <string-array name="Cake_Sizes">
+        <item>Bento Cake</item>
+        <item>6-inch</item>
+        <item>8-inch</item>
+        <item>9-inch</item>
+        <item>10-inch</item>
+        <item>2-Tier (6\" x 8\")</item>
+        <item>2-Tier (8\" x 10\")</item>
+        <item>3-Tier (6\" x 8\" x 10\")</item>
+    </string-array>
+
     <string-array name="Numbers">
         <item>Number - 0</item>
         <item>Number - 1</item>

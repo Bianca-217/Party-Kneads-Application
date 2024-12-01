@@ -18,6 +18,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.PendingOrdersAdapter;
+import com.ignacio.partykneadsapp.databinding.FragmentPendingSellerSideBinding;
 import com.ignacio.partykneadsapp.databinding.FragmentSellerOrderBinding;
 import com.ignacio.partykneadsapp.model.PendingOrdersModel;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class PendingSellerSideFragment extends Fragment {
 
-    private FragmentSellerOrderBinding binding;
+    private FragmentPendingSellerSideBinding binding;
     private PendingOrdersAdapter adapter;
     private List<PendingOrdersModel> ordersList;
     private FirebaseFirestore db;
@@ -36,7 +37,7 @@ public class PendingSellerSideFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentSellerOrderBinding.inflate(getLayoutInflater());
+        binding = FragmentPendingSellerSideBinding.inflate(getLayoutInflater());
         return binding.getRoot();
     }
 
@@ -53,13 +54,13 @@ public class PendingSellerSideFragment extends Fragment {
         adapter = new PendingOrdersAdapter(getContext(), ordersList);
 
         // Set up RecyclerView
-        binding.pendingOrders.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.pendingOrders.setAdapter(adapter);
+        binding.pendingRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.pendingRecyclerview.setAdapter(adapter);
 
-        binding.btnPending.setOnClickListener(view1 -> {
-            fetchOrdersFromFirestore(); // Fetch orders with placed status
-            adapter.toggleMode("Accept"); // Toggle mode for adapter (if applicable)
-        });
+//        binding.btnPending.setOnClickListener(view1 -> {
+//            fetchOrdersFromFirestore(); // Fetch orders with placed status
+//            adapter.toggleMode("Accept"); // Toggle mode for adapter (if applicable)
+//        });
 
         // Initial fetch of orders (defaults to placed orders)
         fetchOrdersFromFirestore();

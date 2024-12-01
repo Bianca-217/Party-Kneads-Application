@@ -137,6 +137,9 @@
         <action
             android:id="@+id/action_homePageFragment_to_shopFragment"
             app:destination="@id/shopFragment" />
+        <action
+            android:id="@+id/action_homePageFragment_to_customizeOrderFragment"
+            app:destination="@id/customizeOrderFragment" />
 
     </fragment>
 
@@ -568,5 +571,17 @@
         <action
             android:id="@+id/action_voucherFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/customizeOrderFragment"
+        android:name="com.ignacio.partykneadsapp.CustomizeOrderFragment"
+        android:label="fragment_customize_order"
+        tools:layout="@layout/fragment_customize_order" >
+        <action
+            android:id="@+id/action_customizeOrderFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_customizeOrderFragment_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
     </fragment>
 </navigation>

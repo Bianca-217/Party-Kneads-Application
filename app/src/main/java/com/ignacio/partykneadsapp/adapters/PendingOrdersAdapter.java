@@ -123,6 +123,7 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
         }
     }
 
+
     private void showCancelDialog(PendingOrdersModel order, int position) {
         // Create the AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -134,10 +135,7 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
         // Create the AlertDialog
         AlertDialog cancelDialog = builder.create();
 
-        // Make the background fully transparent
-        if (cancelDialog.getWindow() != null) {
-            cancelDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+
 
         // Set dialog width and apply margins programmatically
         Window window = cancelDialog.getWindow();
@@ -147,6 +145,11 @@ public class PendingOrdersAdapter extends RecyclerView.Adapter<PendingOrdersAdap
             layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - 40 * context.getResources().getDisplayMetrics().density); // 20dp margin on each side
             layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(layoutParams);
+        }
+
+        // Make the background fully transparent
+        if (cancelDialog.getWindow() != null) {
+            cancelDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
         // Initialize the RadioGroup

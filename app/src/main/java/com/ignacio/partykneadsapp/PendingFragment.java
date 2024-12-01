@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.ignacio.partykneadsapp.adapters.PendingItemAdapter;
 import com.ignacio.partykneadsapp.adapters.ToShipAdapter;
@@ -56,27 +57,35 @@ public class PendingFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
+                        // Get admin UID
                         String adminUid = queryDocumentSnapshots.getDocuments().get(0).getId();
 
+                        // Query placed orders, sorted by timestamp in descending order
                         db.collection("Users").document(adminUid)
                                 .collection("Orders")
                                 .whereEqualTo("userEmail", currentUserEmail)
-                                .whereEqualTo("status", "placed") // Fetch only "placed" orders
+                                .whereEqualTo("status", "placed")
                                 .get()
                                 .addOnSuccessListener(orderSnapshots -> {
-                                    orderList.clear();
+                                    orderList.clear(); // Clear the list before adding new data
                                     for (QueryDocumentSnapshot doc : orderSnapshots) {
                                         String status = doc.getString("status");
                                         String referenceId = doc.getId();
                                         fetchFirstItemFromOrder(doc, referenceId, status);
                                     }
-                                    toShipAdapter.notifyDataSetChanged(); // Update the adapter with new data
+                                    toShipAdapter.notifyDataSetChanged(); // Notify the adapter about data changes
                                 })
-                                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+                                .addOnFailureListener(e -> Log.e("Firestore Error", "Failed to fetch orders: " + e.getMessage()));
+                    } else {
+                        Log.w("Firestore Warning", "No admin UID found for the provided email.");
                     }
                 })
-                .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
+                .addOnFailureListener(e -> Log.e("Firestore Error", "Failed to fetch admin UID: " + e.getMessage()));
     }
+
+
+
+
 
     private void fetchFirstItemFromOrder(QueryDocumentSnapshot doc, String referenceId, String status) {
         List<Map<String, Object>> items = (List<Map<String, Object>>) doc.get("items");

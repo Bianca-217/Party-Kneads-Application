@@ -137,7 +137,11 @@ public class ShopFragment extends Fragment {
 
         // Initialize adapter and layout manager for categories
         categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {
-            fetchProducts(category); // Fetch products for the selected category
+            if ("Customize".equals(category)) {
+                openCustomizeOrderFragment(); // Open CustomizeOrderFragment
+            } else {
+                fetchProducts(category); // Fetch products for other categories
+            }// Fetch products for the selected category
         });
 
         categories.setAdapter(categoriesAdapter);
@@ -149,6 +153,10 @@ public class ShopFragment extends Fragment {
         fetchProducts("All Items");
     }
 
+    private void openCustomizeOrderFragment() {
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_homePageFragment_to_customizeOrderFragment);
+    }
 
     // Function to search products based on the keyword
     private void searchProducts(String keyword) {

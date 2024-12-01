@@ -1,11 +1,14 @@
 package com.ignacio.partykneadsapp;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -17,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,9 +53,26 @@ public class Cake_Description extends Fragment {
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
     private ListenerRegistration productListener;
+    private ConstraintLayout cl;
 
     private int quantity = 1; // Initial quantity
     private CakeSizeModel selectedCakeSize; // Currently selected cake size
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        cl = view.findViewById(R.id.clayout);
+        cl.setOnClickListener(v -> hideKeyboard(v));
+    }
+
+    private void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,8 +92,6 @@ public class Cake_Description extends Fragment {
         productName = view.findViewById(R.id.productName);
         productPrice = view.findViewById(R.id.productPrice);
         productDescription = view.findViewById(R.id.productDescription);
-        ratePercent = view.findViewById(R.id.ratePercent);
-        numReviews = view.findViewById(R.id.numReviews);
         btnBack = view.findViewById(R.id.btnBack);
         btnLike = view.findViewById(R.id.btnLike); // Initialize btnLike
         // Initialize quantity controls
@@ -374,8 +393,6 @@ public class Cake_Description extends Fragment {
                     Glide.with(Cake_Description.this).load(imageUrl).into(productImage); // Load image with Glide
                     productName.setText(name);
                     productDescription.setText(description);
-                    ratePercent.setText(rate);
-                    numReviews.setText(numReviewsStr);
                     productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
                 }
             }

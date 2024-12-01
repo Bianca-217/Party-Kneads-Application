@@ -1,5 +1,7 @@
 package com.ignacio.partykneadsapp;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -19,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -52,7 +56,7 @@ import java.util.List;
 
 
 public class BannerDescription extends Fragment {
-    private TextView productName, productPrice, productDescription, ratePercent, numReviews;
+    private TextView productName, productPrice, productDescription;
     private ImageView productImage, btnBack;
     private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
@@ -60,6 +64,7 @@ public class BannerDescription extends Fragment {
     private ListenerRegistration productListener;
     private String color;
     private int quantity = 1; // Initial quantity
+    private ConstraintLayout cl;
 
     FragmentBannerDescriptionBinding binding;
     private List<CategoriesModel> categoriesModelList;
@@ -76,6 +81,9 @@ public class BannerDescription extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        cl = view.findViewById(R.id.clayout);
+        cl.setOnClickListener(v -> hideKeyboard(v));
+
         firestore = FirebaseFirestore.getInstance();
 
         // Get the passed arguments
@@ -89,8 +97,6 @@ public class BannerDescription extends Fragment {
         productName = view.findViewById(R.id.productName);
         productPrice = view.findViewById(R.id.productPrice);
         productDescription = view.findViewById(R.id.productDescription);
-        ratePercent = view.findViewById(R.id.ratePercent);
-        numReviews = view.findViewById(R.id.numReviews);
         btnBack = view.findViewById(R.id.btnBack);
         // Initialize quantity controls
         btnAddtoCart = view.findViewById(R.id.btnAddtoCart); // Initialize Add to Cart button
@@ -135,6 +141,14 @@ public class BannerDescription extends Fragment {
             navController.navigate(R.id.action_bannerDescription_to_homePageFragment, args1);
         });
     }
+
+    private void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 
     private void showOccasionBuyDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -524,8 +538,6 @@ public class BannerDescription extends Fragment {
                     Glide.with(BannerDescription.this).load(imageUrl).into(productImage); // Load image with Glide
                     productName.setText(name);
                     productDescription.setText(description);
-                    ratePercent.setText(rate);
-                    numReviews.setText(numReviewsStr);
                     productPrice.setText("₱" +  price);
                     productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
                 }
