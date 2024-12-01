@@ -52,7 +52,7 @@ import java.util.List;
 public class PartyHatsDescription extends Fragment {
     private TextView productName, productPrice, productDescription, ratePercent, numReviews;
     private ImageView productImage, btnBack;
-    private TextView quantityTextView;
+    private TextView quantityTextView, stockValue;
     private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
@@ -70,7 +70,6 @@ public class PartyHatsDescription extends Fragment {
         return binding.getRoot();
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -84,6 +83,7 @@ public class PartyHatsDescription extends Fragment {
         }
 
         // Initialize views
+        stockValue = view.findViewById(R.id.stockValue);
         productImage = view.findViewById(R.id.productImage);
         productName = view.findViewById(R.id.productName);
         productPrice = view.findViewById(R.id.productPrice);
@@ -99,9 +99,17 @@ public class PartyHatsDescription extends Fragment {
         btnAddtoCart.setOnClickListener(v -> showAddToCartDialog("", 1));
 
         // Set button click listener for "Buy Now"
-        btnBuyNow.setOnClickListener(v -> handleBuyNow("", 1));
+        btnBuyNow.setOnClickListener(v -> {
+            String stock = stockValue.getText().toString(); // Get the stock value from the TextView
 
-
+            if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+                // Show "Out of Stock" dialog
+                showNoStockDialog();
+            } else {
+                // Proceed to checkout if stock is available
+                handleBuyNow("", 1); // Proceed with checkout process
+            }
+        });
         if (productShopModel != null) {
             loadProductDetails(productShopModel.getId());
         }
@@ -127,11 +135,23 @@ public class PartyHatsDescription extends Fragment {
         });
     }
 
-    // Define the method for adding to the cart with selected letter and quantity
-    private void addToCartFunctionality(String selectedLetter, int quantityLetter) {
-        // Example logic for adding the item to the cart
-        showAddToCartDialog(selectedLetter, quantityLetter);
-        // Implement your actual add-to-cart logic here
+    private void showNoStockDialog() {
+        // Create the dialog for "Out of Stock"
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.nostock_dialog); // Inflate your "Out of Stock" dialog layout
+        dialog.setCancelable(true);
+
+        // Make the dialog background transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // Set button click listener for the dialog
+        Button btnClose = dialog.findViewById(R.id.btnClose); // Assuming there's a "Close" button in the dialog
+        btnClose.setOnClickListener(v -> dialog.dismiss()); // Dismiss the dialog when clicked
+
+        // Show the dialog
+        dialog.show();
     }
 
     private void setupCartoonTheme() {
@@ -215,7 +235,6 @@ public class PartyHatsDescription extends Fragment {
         partyHatsTheme.setHasFixedSize(true);
         partyHatsTheme.setNestedScrollingEnabled(false);
     }
-
 
     private void showAddToCartDialog(String selectedLetter, int quantityLetter) {
         // Create a dialog
@@ -333,37 +352,69 @@ public class PartyHatsDescription extends Fragment {
                 });
     }
 
-
-
     private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {
-        // Create a CartItemModel for the selected cake and quantity
-        int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
-        int totalPrice = price * quantityNumLetter;
+        String stock = stockValue.getText().toString(); // Get current stock from UI
 
-        // Create a CartItemModel for this selection
-        CartItemModel cartItem = new CartItemModel(
-                productShopModel.getId(),
-                productShopModel.getName(),
-                color + selectedNumLetter,
-                quantityNumLetter,
-                "₱" + totalPrice, // Include price with quantity
-                productShopModel.getimageUrl() // Product Image URL
-        );
+        // Check if stock is available
+        if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+            // Show the out of stock dialog if no stock is available
+            showNoStockDialog();
+        } else {
+            // Decrease stock by 1
+            int newStock = Integer.parseInt(stock) - 1;
 
-        // Bundle the cart item to pass to the CheckoutFragment
-        List<CartItemModel> selectedItems = new ArrayList<>();
-        selectedItems.add(cartItem);
+            // Update the stock in Firestore
+            updateStockInFirestore(newStock);
 
-        // Log the details of the cart item
-        Log.d("CartItem", "Item: " + cartItem.getProductName() + ", Quantity: " + cartItem.getQuantity() + ", Total Price: " + cartItem.getTotalPrice());
+            // Proceed with the purchase process
+            int price = Integer.parseInt(productPrice.getText().toString().replace("₱", ""));
+            int totalPrice = price * quantityNumLetter;
 
-        // Create a Bundle to pass the selected items to CheckoutFragment
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("selectedItems", (ArrayList<? extends Parcelable>) selectedItems);
+            // Create the cart item and proceed to checkout
+            CartItemModel cartItem = new CartItemModel(
+                    productShopModel.getId(),
+                    productShopModel.getName(),
+                    color + selectedNumLetter,
+                    quantityNumLetter,
+                    "₱" + totalPrice, // Include price with quantity
+                    productShopModel.getimageUrl() // Product Image URL
+            );
 
-        // Navigate to CheckoutFragment and pass the selected items
-        NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_partyHatsDescription_to_checkoutFragment, bundle);
+            // Bundle the cart item to pass to the CheckoutFragment
+            List<CartItemModel> selectedItems = new ArrayList<>();
+            selectedItems.add(cartItem);
+
+            // Log the details of the cart item
+            Log.d("CartItem", "Item: " + cartItem.getProductName() + ", Quantity: " + cartItem.getQuantity() + ", Total Price: " + cartItem.getTotalPrice());
+
+            // Create a Bundle to pass the selected items to CheckoutFragment
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("selectedItems", (ArrayList<? extends Parcelable>) selectedItems);
+
+            // Navigate to CheckoutFragment and pass the selected items
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_partyHatsDescription_to_checkoutFragment, bundle);
+        }
+    }
+
+    private void updateStockInFirestore(int newStock) {
+        // Get the product ID from the productShopModel
+        String productId = productShopModel.getId();
+
+        // Get the reference to the Firestore product document
+        DocumentReference productRef = firestore.collection("products").document(productId);
+
+        // Update the stock value in Firestore
+        productRef.update("stock", newStock)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Stock", "Stock updated successfully: " + newStock);
+                    // Optionally update the UI with the new stock value
+                    stockValue.setText(String.valueOf(newStock));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Stock", "Error updating stock: ", e);
+                    Toast.makeText(getActivity(), "Failed to update stock", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void loadProductDetails(String productId) {
@@ -378,22 +429,32 @@ public class PartyHatsDescription extends Fragment {
                 }
 
                 if (documentSnapshot != null && documentSnapshot.exists()) {
-                    // Fetch and display product details
-                    String imageUrl = documentSnapshot.getString("imageUrl"); // Fetch the imageUrl
+                    // Fetch product details from Firestore
+                    String imageUrl = documentSnapshot.getString("imageUrl");
                     String name = documentSnapshot.getString("name");
                     String description = documentSnapshot.getString("description");
                     String rate = documentSnapshot.getString("rate");
                     String numReviewsStr = documentSnapshot.getString("numreviews");
                     String price = documentSnapshot.getString("price");
 
+                    // Fetch the stock value from Firestore
+                    String stock = documentSnapshot.getString("stock"); // Assuming "stock" is the field name in Firestore
+
                     // Populate the views with data
-                    Glide.with(PartyHatsDescription.this).load(imageUrl).into(productImage); // Load image with Glide
+                    Glide.with(PartyHatsDescription.this).load(imageUrl).into(productImage);
                     productName.setText(name);
                     productDescription.setText(description);
                     ratePercent.setText(rate);
                     numReviews.setText(numReviewsStr);
-                    productPrice.setText("₱" +  price);
-                    productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
+                    productPrice.setText("₱" + price);
+                    productShopModel.setimageUrl(imageUrl);
+
+                    // Set the stock value to stockValue TextView
+                    if (stock != null) {
+                        stockValue.setText(stock); // Set the stock value (assuming "stock" is a string number)
+                    } else {
+                        stockValue.setText("Out of Stock");
+                    }
                 }
             }
         });

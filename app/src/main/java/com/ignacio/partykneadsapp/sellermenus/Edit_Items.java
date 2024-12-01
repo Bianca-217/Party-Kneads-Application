@@ -198,6 +198,7 @@ public class Edit_Items extends Fragment {
         String updatedDescription = binding.description.getText().toString().trim();
         String updatedPrice = binding.productPrice.getText().toString().trim();
         String updatedCategory = binding.categgories.getText().toString().trim();
+        String updatedStock = binding.stockInput.getText().toString().trim();  // Retrieve stock input
 
         // Validate inputs
         boolean isValid = true;
@@ -230,6 +231,14 @@ public class Edit_Items extends Fragment {
             binding.categgories.setError(null); // Clear error if valid
         }
 
+        // Validate stock input
+        if (updatedStock.isEmpty()) {
+            binding.stockInput.setError("Stock is required!");
+            isValid = false;
+        } else {
+            binding.stockInput.setError(null); // Clear error if valid
+        }
+
         if (!isValid) {
             // If any field is invalid, stop further processing
             Toast.makeText(getContext(), "Please fill in all required fields!", Toast.LENGTH_SHORT).show();
@@ -240,22 +249,22 @@ public class Edit_Items extends Fragment {
         progressDialog.setVisibility(View.VISIBLE);
         getView().setAlpha(0.5f); // Dim the background when saving
 
+        // Proceed with uploading image or updating details
         if (selectedImageUri != null) {
-            uploadImageToFirebase(selectedImageUri, updatedName, updatedDescription, updatedPrice, updatedCategory);
+            uploadImageToFirebase(selectedImageUri, updatedName, updatedDescription, updatedPrice, updatedCategory, updatedStock);
         } else {
-            updateProductDetails(imageUrl, updatedName, updatedDescription, updatedPrice, updatedCategory);
+            updateProductDetails(imageUrl, updatedName, updatedDescription, updatedPrice, updatedCategory, updatedStock);
         }
     }
 
-
-    private void uploadImageToFirebase(Uri imageUri, String name, String description, String price, String category) {
+    private void uploadImageToFirebase(Uri imageUri, String name, String description, String price, String category, String stock) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference()
                 .child("product_images").child(System.currentTimeMillis() + ".jpg");
 
         storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot ->
                 storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String newImageUrl = uri.toString();
-                    updateProductDetails(newImageUrl, name, description, price, category);
+                    updateProductDetails(newImageUrl, name, description, price, category, stock);
                 })
         ).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Error uploading image", Toast.LENGTH_SHORT).show();
@@ -263,13 +272,15 @@ public class Edit_Items extends Fragment {
         });
     }
 
-    private void updateProductDetails(String imageUrl, String name, String description, String price, String category) {
+    private void updateProductDetails(String imageUrl, String name, String description, String price, String category, String stock) {
         if (productId != null) {
             Map<String, Object> updatedProduct = new HashMap<>();
             updatedProduct.put("name", name);
             updatedProduct.put("description", description);
             updatedProduct.put("price", price);
             updatedProduct.put("categories", category);
+            updatedProduct.put("stock", stock);  // Add stock field to the update
+
             if (imageUrl != null) {
                 updatedProduct.put("imageUrl", imageUrl);
             }
@@ -278,7 +289,6 @@ public class Edit_Items extends Fragment {
                     .update(updatedProduct)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(getContext(), "Product updated successfully", Toast.LENGTH_SHORT).show();
-                        // Hide progress dialog and remove background dim
                         progressDialog.setVisibility(View.GONE);
                         getView().setAlpha(1f);  // Remove the dim effect
 
@@ -287,6 +297,7 @@ public class Edit_Items extends Fragment {
                         binding.description.setText(description);
                         binding.productPrice.setText(price);
                         binding.categgories.setText(category);
+                        binding.stockInput.setText(stock);  // Update stock input
                         if (imageUrl != null && !imageUrl.isEmpty()) {
                             Glide.with(getContext()).load(imageUrl).into(binding.itemImg);
                         }
@@ -297,11 +308,9 @@ public class Edit_Items extends Fragment {
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(getContext(), "Failed to update product", Toast.LENGTH_SHORT).show();
-                        // Hide progress dialog and remove background dim
                         progressDialog.setVisibility(View.GONE);
                         getView().setAlpha(1f);  // Remove the dim effect
                     });
         }
     }
 }
-
