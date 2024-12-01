@@ -1,5 +1,6 @@
 package com.ignacio.partykneadsapp.adapters;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -261,40 +262,44 @@ public class PendingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                         // Retrieve the 'items' field from the order document
                                         List<Map<String, Object>> items = (List<Map<String, Object>>) orderSnapshot.get("items");
 
-                                        // Initialize the dialog
-                                        Dialog dialog = new Dialog(context);
-                                        dialog.setContentView(R.layout.view_order_details);
+                                        // Initialize the AlertDialog builder
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        View dialogView = LayoutInflater.from(context).inflate(R.layout.view_order_details, null);
+                                        builder.setView(dialogView);
+
+                                        // Create the dialog
+                                        AlertDialog dialog = builder.create();
 
                                         // Set the dialog background to transparent
                                         if (dialog.getWindow() != null) {
                                             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                        }
 
-                                        // Set margin of 20dp horizontally and center the dialog
-                                        Window window = dialog.getWindow();
-                                        if (window != null) {
-                                            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-                                            layoutParams.copyFrom(window.getAttributes());
+                                            // Set margin of 20dp horizontally and center the dialog
+                                            Window window = dialog.getWindow();
+                                            if (window != null) {
+                                                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                                                layoutParams.copyFrom(window.getAttributes());
 
-                                            // Convert dp to pixels
-                                            int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
+                                                // Convert dp to pixels
+                                                int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
 
-                                            // Set width to match parent with 20dp margin on each side
-                                            layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
-                                            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // Height to wrap content
+                                                // Set width to match parent with 20dp margin on each side
+                                                layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
+                                                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // Height to wrap content
 
-                                            // Set the gravity to center the dialog
-                                            layoutParams.gravity = Gravity.CENTER;
+                                                // Set the gravity to center the dialog
+                                                layoutParams.gravity = Gravity.CENTER;
 
-                                            // Apply the layout parameters
-                                            window.setAttributes(layoutParams);
+                                                // Apply the layout parameters
+                                                window.setAttributes(layoutParams);
+                                            }
                                         }
 
                                         // Get references to the TextViews in the dialog
-                                        TextView orderIdTextView = dialog.findViewById(R.id.OrderID);
-                                        TextView itemTotalTextView = dialog.findViewById(R.id.itemTotal);
-                                        TextView totalCosttTextView = dialog.findViewById(R.id.totalCost);
-                                        RecyclerView productsRecyclerView = dialog.findViewById(R.id.recyclerViewCart);
+                                        TextView orderIdTextView = dialogView.findViewById(R.id.OrderID);
+                                        TextView itemTotalTextView = dialogView.findViewById(R.id.itemTotal);
+                                        TextView totalCosttTextView = dialogView.findViewById(R.id.totalCost);
+                                        RecyclerView productsRecyclerView = dialogView.findViewById(R.id.recyclerViewCart);
 
                                         productsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -367,4 +372,5 @@ public class PendingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

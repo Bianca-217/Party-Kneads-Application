@@ -8,13 +8,14 @@ public class DeliverOrderModel {
     private String productName;
     private String cakeSize;
     private int quantity;
+    private String orderId;
     private String totalPrice;
     private String imageURL;
 
     // Constructor
     public DeliverOrderModel(String userName, String contactNum, String location,
                              String productName, String cakeSize, int quantity,
-                             String totalPrice, String imageURL) {
+                             String totalPrice, String imageURL, String orderId) {
         this.userName = userName;
         this.contactNum = contactNum;
         this.location = location;
@@ -23,6 +24,7 @@ public class DeliverOrderModel {
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.imageURL = imageURL;
+        this.orderId = orderId;
     }
 
     // Getter and Setter methods
@@ -57,6 +59,8 @@ public class DeliverOrderModel {
     public void setProductName(String productName) {
         this.productName = productName;
     }
+
+    public String getOrderId() { return orderId; }
 
     public String getCakeSize() {
         return cakeSize;

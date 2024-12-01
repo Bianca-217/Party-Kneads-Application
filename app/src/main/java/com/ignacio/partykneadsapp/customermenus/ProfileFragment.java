@@ -78,6 +78,12 @@ public class ProfileFragment extends Fragment {
             navController.navigate(R.id.action_profileFragment_to_manageProfileFragment);
         });
 
+        binding.btnPolicy.setOnClickListener(v ->{
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_profileFragment_to_policyFragment);
+        });
+
         binding.btnAbout.setOnClickListener(v ->{
 
             NavController navController = Navigation.findNavController(v);
@@ -88,6 +94,12 @@ public class ProfileFragment extends Fragment {
 
             NavController navController = Navigation.findNavController(v);
             navController.navigate(R.id.action_profileFragment_to_supportFragment);
+        });
+
+        binding.btnHistory.setOnClickListener(v ->{
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_profileFragment_to_orderHistoryFragment);
         });
 
 

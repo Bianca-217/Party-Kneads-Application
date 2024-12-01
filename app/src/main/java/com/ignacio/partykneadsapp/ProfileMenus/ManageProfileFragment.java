@@ -2,6 +2,8 @@ package com.ignacio.partykneadsapp.ProfileMenus;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -106,6 +108,59 @@ public class ManageProfileFragment extends Fragment {
                 updateUserInfo(userId, updatedFirstName, updatedLastName);
             }
         });
+
+        // Delete Account button listener
+        binding.btnDeleteAccount.setOnClickListener(v -> showDeleteAccountDialog());
+    }
+
+    private void showDeleteAccountDialog() {
+        // Inflate the dialog view
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.delete_account_dialog, null);
+
+        // Create the dialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Set the background of the dialog to transparent using Window's attributes
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        // Find and set up the buttons
+        dialogView.findViewById(R.id.btnYes).setOnClickListener(v -> {
+            dialog.dismiss(); // Dismiss the dialog
+            deleteUserAccount(); // Proceed to delete the account
+        });
+
+        dialogView.findViewById(R.id.btnNo).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void deleteUserAccount() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        // Delete the user document from Firestore
+        firestore.collection("Users").document(userId).delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Delete the user from Firebase Authentication
+                        auth.getCurrentUser().delete().addOnCompleteListener(authTask -> {
+                            if (authTask.isSuccessful()) {
+                                Toast.makeText(getActivity(), "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                                // Redirect to the login or home screen
+                                NavController navController = Navigation.findNavController(requireView());
+                                navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
+                            } else {
+                                Toast.makeText(getActivity(), "Failed to delete account from authentication", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getActivity(), "Failed to delete account from Firestore", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
         private void hideKeyboard(View view) {

@@ -406,32 +406,42 @@ public class BannerDescription extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
-        // Reference to FirebaseAuth
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+        String stock = stockValue.getText().toString(); // Get current stock from UI
 
-        // Automatically add item to the cart when the dialog is shown
-        if (userId != null) {
-            saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
+        // Check if stock is available
+        if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+            // Show the out of stock dialog if no stock is available
+            showNoStockDialog();
         } else {
-            Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
+
+            // Reference to FirebaseAuth
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+
+            // Automatically add item to the cart when the dialog is shown
+            if (userId != null) {
+                saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
+            } else {
+                Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
+            }
+
+            Button btnCart = dialog.findViewById(R.id.btnCart);
+            btnCart.setOnClickListener(v -> {
+                dialog.dismiss(); // Close the dialog
+                goToCart(); // Navigate to the cart fragment
+            });
+
+            // Use findViewById to get the TextView and set an OnClickListener
+            TextView btnContinue = dialog.findViewById(R.id.btnContinue); // Keep it as TextView
+            btnContinue.setOnClickListener(v -> {
+                dialog.dismiss(); // Close the dialog
+                goToShop(); // Navigate back to the shop fragment
+            });
+
+            // Show the dialog
+            dialog.show();
         }
 
-        Button btnCart = dialog.findViewById(R.id.btnCart);
-        btnCart.setOnClickListener(v -> {
-            dialog.dismiss(); // Close the dialog
-            goToCart(); // Navigate to the cart fragment
-        });
-
-        // Use findViewById to get the TextView and set an OnClickListener
-        TextView btnContinue = dialog.findViewById(R.id.btnContinue); // Keep it as TextView
-        btnContinue.setOnClickListener(v -> {
-            dialog.dismiss(); // Close the dialog
-            goToShop(); // Navigate back to the shop fragment
-        });
-
-        // Show the dialog
-        dialog.show();
     }
 
     private void saveCartItem(String userId, String selectedLetter, int quantityLetter) {
@@ -446,69 +456,78 @@ public class BannerDescription extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Check if the product with the same color and letter already exists in the cart
-        db.collection("Users")
-                .document(userId)
-                .collection("cartItems")
-                .whereEqualTo("productName", productName)
-                .whereEqualTo("cakeSize", uniqueKey)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        // Item exists, update the quantity and totalPrice
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String docId = document.getId();
-                            int existingQuantity = document.getLong("quantity").intValue();
-                            String existingTotalPriceStr = document.getString("totalPrice");
+        String stock = stockValue.getText().toString(); // Get current stock from UI
 
-                            // Calculate the new quantity and total price
-                            int newQuantity = existingQuantity + quantityLetter;
-                            int existingTotalPrice = Integer.parseInt(existingTotalPriceStr.replaceAll("[^\\d]", ""));
-                            int newTotalPrice = existingTotalPrice + (unitPrice * quantityLetter);
+        // Check if stock is available
+        if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+            // Show the out of stock dialog if no stock is available
+            showNoStockDialog();
+        } else {
 
-                            // Update the existing cart item
+            // Check if the product with the same color and letter already exists in the cart
+            db.collection("Users")
+                    .document(userId)
+                    .collection("cartItems")
+                    .whereEqualTo("productName", productName)
+                    .whereEqualTo("cakeSize", uniqueKey)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            // Item exists, update the quantity and totalPrice
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String docId = document.getId();
+                                int existingQuantity = document.getLong("quantity").intValue();
+                                String existingTotalPriceStr = document.getString("totalPrice");
+
+                                // Calculate the new quantity and total price
+                                int newQuantity = existingQuantity + quantityLetter;
+                                int existingTotalPrice = Integer.parseInt(existingTotalPriceStr.replaceAll("[^\\d]", ""));
+                                int newTotalPrice = existingTotalPrice + (unitPrice * quantityLetter);
+
+                                // Update the existing cart item
+                                db.collection("Users")
+                                        .document(userId)
+                                        .collection("cartItems")
+                                        .document(docId)
+                                        .update("quantity", newQuantity, "totalPrice", "₱" + newTotalPrice)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Successfully updated the cart item
+                                            Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(getActivity(), "Failed to update cart item.", Toast.LENGTH_SHORT).show();
+                                            Log.e("CartItem", "Error updating cart item: ", e);
+                                        });
+                            }
+                        } else {
+                            // Item doesn't exist, create a new cart item
+                            AddToCartModel cartItem = new AddToCartModel(
+                                    productShopModel.getId(),
+                                    productName,
+                                    uniqueKey,
+                                    quantityLetter,
+                                    "₱" + totalPrice,
+                                    imageUrl,
+                                    timestamp
+                            );
+
+                            // Add the new item to the cart
                             db.collection("Users")
                                     .document(userId)
                                     .collection("cartItems")
-                                    .document(docId)
-                                    .update("quantity", newQuantity, "totalPrice", "₱" + newTotalPrice)
-                                    .addOnSuccessListener(aVoid -> {
-                                        // Successfully updated the cart item
-                                        Toast.makeText(getActivity(), "Cart item updated", Toast.LENGTH_SHORT).show();
+                                    .add(cartItem)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(getActivity(), "Item added to cart", Toast.LENGTH_SHORT).show();
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(getActivity(), "Failed to update cart item.", Toast.LENGTH_SHORT).show();
-                                        Log.e("CartItem", "Error updating cart item: ", e);
+                                        Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
                                     });
                         }
-                    } else {
-                        // Item doesn't exist, create a new cart item
-                        AddToCartModel cartItem = new AddToCartModel(
-                                productShopModel.getId(),
-                                productName,
-                                uniqueKey,
-                                quantityLetter,
-                                "₱" + totalPrice,
-                                imageUrl,
-                                timestamp
-                        );
-
-                        // Add the new item to the cart
-                        db.collection("Users")
-                                .document(userId)
-                                .collection("cartItems")
-                                .add(cartItem)
-                                .addOnSuccessListener(documentReference -> {
-                                    Toast.makeText(getActivity(), "Item added to cart", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getActivity(), "Failed to add item to cart.", Toast.LENGTH_SHORT).show();
-                                });
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("CartItem", "Error fetching cart items: ", e);
-                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("CartItem", "Error fetching cart items: ", e);
+                    });
+        }
     }
 
     private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {

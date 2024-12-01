@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/loginbgg"
+    tools:context=".ProfileMenus.PolicyFragment">
+
+    <!-- Horizontal ProgressBar -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:visibility="gone"
+        app:trackColor="@color/footerpink"
+        app:indicatorColor="@color/pink"
+        android:indeterminate="true" />
+
+    <FrameLayout
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="20dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/back_bg" />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/back" />
+
+    </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/termsLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Policy Privacy - Party Kneads"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:layout_marginHorizontal="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/darkpink"
+        android:textSize="24sp"/>
+
+
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/logincont"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="40dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/privacyPolicyContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_marginTop="10dp"
+                android:textAlignment="textStart"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/semiblack"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

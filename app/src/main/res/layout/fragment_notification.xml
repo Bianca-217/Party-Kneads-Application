@@ -7,15 +7,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginTop="50dp"
+    android:background="@drawable/plainwhitebg"
     android:paddingHorizontal="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginVertical="20dp"
+        android:layout_marginTop="80dp"
         android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
         app:layout_constraintTop_toTopOf="@+id/whitecont"
         tools:layout_editor_absoluteX="0dp">
 

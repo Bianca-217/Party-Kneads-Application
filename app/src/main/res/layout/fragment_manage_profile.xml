@@ -184,4 +184,22 @@
             app:cornerRadius="10dp" />
     </LinearLayout>
 
+
+    <Button
+        android:id="@+id/btnDeleteAccount"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="10dp"
+        app:cornerRadius="10dp"
+        android:backgroundTint="@color/darkpink"
+        android:drawableLeft="@drawable/baseline_delete_forever_24"
+        android:text="Delete Account"
+        android:textColor="@color/semiwhite"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="16sp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAlignment="textStart"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

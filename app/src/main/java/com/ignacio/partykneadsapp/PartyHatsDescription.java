@@ -101,9 +101,8 @@ public class PartyHatsDescription extends Fragment {
         btnAddtoCart = view.findViewById(R.id.btnAddtoCart); // Initialize Add to Cart button
         btnBuyNow = view.findViewById(R.id.btnBuyNow); // Initialize Buy Now button
 
-        // Set button click listener for "Add to Cart"
+        // Set button click listener for "Add to Cart
         btnAddtoCart.setOnClickListener(v -> showAddToCartDialog("", 1));
-
         // Set button click listener for "Buy Now"
         btnBuyNow.setOnClickListener(v -> {
             String stock = stockValue.getText().toString(); // Get the stock value from the TextView
@@ -260,32 +259,42 @@ public class PartyHatsDescription extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
-        // Reference to FirebaseAuth
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+        String stock = stockValue.getText().toString(); // Get current stock from UI
 
-        // Automatically add item to the cart when the dialog is shown
-        if (userId != null) {
-            saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
+        // Check if stock is available
+        if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+            // Show the out of stock dialog if no stock is available
+            showNoStockDialog();
         } else {
-            Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
+
+
+            // Reference to FirebaseAuth
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+
+            // Automatically add item to the cart when the dialog is shown
+            if (userId != null) {
+                saveCartItem(userId, selectedLetter, quantityLetter); // Method to add to cart
+            } else {
+                Toast.makeText(getActivity(), "Please log in to add items to the cart.", Toast.LENGTH_SHORT).show();
+            }
+
+            Button btnCart = dialog.findViewById(R.id.btnCart);
+            btnCart.setOnClickListener(v -> {
+                dialog.dismiss(); // Close the dialog
+                goToCart(); // Navigate to the cart fragment
+            });
+
+            // Use findViewById to get the TextView and set an OnClickListener
+            TextView btnContinue = dialog.findViewById(R.id.btnContinue); // Keep it as TextView
+            btnContinue.setOnClickListener(v -> {
+                dialog.dismiss(); // Close the dialog
+                goToShop(); // Navigate back to the shop fragment
+            });
+
+            // Show the dialog
+            dialog.show();
         }
-
-        Button btnCart = dialog.findViewById(R.id.btnCart);
-        btnCart.setOnClickListener(v -> {
-            dialog.dismiss(); // Close the dialog
-            goToCart(); // Navigate to the cart fragment
-        });
-
-        // Use findViewById to get the TextView and set an OnClickListener
-        TextView btnContinue = dialog.findViewById(R.id.btnContinue); // Keep it as TextView
-        btnContinue.setOnClickListener(v -> {
-            dialog.dismiss(); // Close the dialog
-            goToShop(); // Navigate back to the shop fragment
-        });
-
-        // Show the dialog
-        dialog.show();
     }
 
     private void saveCartItem(String userId, String selectedLetter, int quantityLetter) {
@@ -299,6 +308,13 @@ public class PartyHatsDescription extends Fragment {
         String uniqueKey = color + selectedLetter; // Create a unique key for color and letter combination
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String stock = stockValue.getText().toString(); // Get current stock from UI
+
+        // Check if stock is available
+        if ("0".equals(stock) || "Out of Stock".equals(stock)) {
+            // Show the out of stock dialog if no stock is available
+            showNoStockDialog();
+        } else {
 
         // Check if the product with the same color and letter already exists in the cart
         db.collection("Users")
@@ -363,6 +379,8 @@ public class PartyHatsDescription extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e("CartItem", "Error fetching cart items: ", e);
                 });
+        }
+
     }
 
     private void handleBuyNow(String selectedNumLetter, int quantityNumLetter) {
@@ -451,27 +469,36 @@ public class PartyHatsDescription extends Fragment {
                     String price = documentSnapshot.getString("price");
 
                     // Fetch the stock value from Firestore
-                    String stock = documentSnapshot.getString("stock"); // Assuming "stock" is the field name in Firestore
+                    Object stockObject = documentSnapshot.get("stock"); // Retrieve the stock as Object
+
+                    // Handle different stock types (e.g., Long, Integer, etc.)
+                    String stock = "Out of Stock"; // Default message
+                    if (stockObject != null) {
+                        if (stockObject instanceof Long) {
+                            stock = String.valueOf(stockObject); // If it's a Long, convert to String
+                        } else if (stockObject instanceof Integer) {
+                            stock = String.valueOf(stockObject); // If it's an Integer, convert to String
+                        }
+                        // Add other type checks if needed, depending on how you store stock in Firestore
+                    }
 
                     // Populate the views with data
                     Glide.with(PartyHatsDescription.this).load(imageUrl).into(productImage);
                     productName.setText(name);
                     productDescription.setText(description);
-                    productPrice.setText("₱" +  price);
+                    productPrice.setText("₱" + price);
                     productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
                     productPrice.setText("₱" + price);
                     productShopModel.setimageUrl(imageUrl);
 
                     // Set the stock value to stockValue TextView
-                    if (stock != null) {
-                        stockValue.setText(stock); // Set the stock value (assuming "stock" is a string number)
-                    } else {
-                        stockValue.setText("Out of Stock");
-                    }
+                    stockValue.setText(stock); // Display the stock value or "Out of Stock"
                 }
             }
         });
     }
+
+
 
     private void goToCart() {
         NavController navController = Navigation.findNavController(requireView());

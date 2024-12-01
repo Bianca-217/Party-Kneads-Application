@@ -1,11 +1,17 @@
 package com.ignacio.partykneadsapp.adapters;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,31 +96,55 @@ public class TransactionCompletedAdapter extends RecyclerView.Adapter<Transactio
                         // Get the user document
                         DocumentSnapshot userDocument = querySnapshot.getDocuments().get(0);
 
-                        // Access the Orders collection and the specific order by referenceID
+                        // Access the Orders collection and the specific order by referenceId
                         db.collection("Users")
                                 .document(userDocument.getId())
                                 .collection("Orders")
-                                .document(referenceId) // Use referenceID for the specific order
+                                .document(referenceId)
                                 .get()
-                                .addOnSuccessListener(orderDoc -> {
-                                    if (orderDoc.exists()) {
-                                        // Fetch the 'items' field from the order document
-                                        List<Map<String, Object>> items = (List<Map<String, Object>>) orderDoc.get("items");
+                                .addOnSuccessListener(orderSnapshot -> {
+                                    if (orderSnapshot.exists()) {
+                                        // Retrieve the 'items' field from the order document
+                                        List<Map<String, Object>> items = (List<Map<String, Object>>) orderSnapshot.get("items");
 
-                                        // Initialize the dialog
-                                        Dialog dialog = new Dialog(context);
-                                        dialog.setContentView(R.layout.view_order_details);
+                                        // Initialize the AlertDialog builder
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        View dialogView = LayoutInflater.from(context).inflate(R.layout.view_order_details, null);
+                                        builder.setView(dialogView);
 
-                                        // Make dialog background transparent
+                                        // Create the dialog
+                                        AlertDialog dialog = builder.create();
+
+                                        // Set the dialog background to transparent
                                         if (dialog.getWindow() != null) {
-                                            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                            // Set margin of 20dp horizontally and center the dialog
+                                            Window window = dialog.getWindow();
+                                            if (window != null) {
+                                                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                                                layoutParams.copyFrom(window.getAttributes());
+
+                                                // Convert dp to pixels
+                                                int margin = (int) (20 * context.getResources().getDisplayMetrics().density);
+
+                                                // Set width to match parent with 20dp margin on each side
+                                                layoutParams.width = (int) (context.getResources().getDisplayMetrics().widthPixels - margin * 2); // 20dp margin on each side
+                                                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // Height to wrap content
+
+                                                // Set the gravity to center the dialog
+                                                layoutParams.gravity = Gravity.CENTER;
+
+                                                // Apply the layout parameters
+                                                window.setAttributes(layoutParams);
+                                            }
                                         }
 
                                         // Get references to the TextViews in the dialog
-                                        TextView orderIdTextView = dialog.findViewById(R.id.OrderID);
-                                        TextView itemTotalTextView = dialog.findViewById(R.id.itemTotal);
-                                        TextView totalCostTextView = dialog.findViewById(R.id.totalCost);
-                                        RecyclerView productsRecyclerView = dialog.findViewById(R.id.recyclerViewCart);
+                                        TextView orderIdTextView = dialogView.findViewById(R.id.OrderID);
+                                        TextView itemTotalTextView = dialogView.findViewById(R.id.itemTotal);
+                                        TextView totalCosttTextView = dialogView.findViewById(R.id.totalCost);
+                                        RecyclerView productsRecyclerView = dialogView.findViewById(R.id.recyclerViewCart);
 
                                         productsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -163,22 +193,28 @@ public class TransactionCompletedAdapter extends RecyclerView.Adapter<Transactio
 
                                             // Set the total price to the itemTotal TextView
                                             itemTotalTextView.setText("₱" + String.format("%.2f", totalPrice)); // Format to 2 decimal places
-                                            totalCostTextView.setText(itemTotalTextView.getText());
+                                            totalCosttTextView.setText(itemTotalTextView.getText());
                                         }
 
                                         // Show the dialog after all data is set
                                         dialog.show();
+                                    } else {
+                                        Log.d("OrderDetailsDialog", "Order document not found.");
+                                        Toast.makeText(context, "Order not found.", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("OrderDetailsDialog", "Error fetching order: ", e);
+                                    Log.e("Firestore Error", e.getMessage());
                                     Toast.makeText(context, "Failed to fetch order details.", Toast.LENGTH_SHORT).show();
                                 });
+                    } else {
+                        Log.d("OrderDetailsDialog", "User document not found.");
+                        Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("OrderDetailsDialog", "Error fetching user: ", e);
-                    Toast.makeText(context, "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
+                    Log.e("Firestore Error", e.getMessage());
+                    Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
                 });
     }
 }

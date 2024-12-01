@@ -115,10 +115,11 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.confirmreceived_dialog);
 
-        // Find the confirm button
-        Button btnReceive = dialog.findViewById(R.id.btnReceive);
+        // Set the background of the dialog to transparent
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        // Set up the confirmation button
+        // Set up the confirmation button (btnReceive)
+        Button btnReceive = dialog.findViewById(R.id.btnReceive);
         btnReceive.setOnClickListener(v -> {
             // Update the order status in the data source (Firestore)
             updateOrderStatus(referenceId);
@@ -138,9 +139,17 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
             dialog.dismiss();
         });
 
+        // Set up the "No" button (btnNo) to dismiss the dialog
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(v -> {
+            // Dismiss the dialog when "No" is clicked
+            dialog.dismiss();
+        });
+
         // Show the dialog
         dialog.show();
     }
+
 
     private void createNotification(String referenceId, int position, ToShipModel shipModel) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

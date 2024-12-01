@@ -47,6 +47,9 @@
         <action
             android:id="@+id/action_loginFragment_to_forgotPassword"
             app:destination="@id/forgotPassword" />
+        <action
+            android:id="@+id/action_loginFragment_to_manageProfileFragment"
+            app:destination="@id/manageProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/termsFragment2"
@@ -231,6 +234,12 @@
         <action
             android:id="@+id/action_profileFragment_to_supportFragment2"
             app:destination="@id/supportFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_policyFragment"
+            app:destination="@id/policyFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_orderHistoryFragment"
+            app:destination="@id/orderHistoryFragment" />
 
     </fragment>
     <fragment
@@ -359,6 +368,9 @@
         <action
             android:id="@+id/action_orderFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_orderFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <fragment
@@ -369,6 +381,9 @@
         <action
             android:id="@+id/action_orderHistoryFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_orderHistoryFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <fragment
@@ -487,6 +502,9 @@
         <action
             android:id="@+id/action_manageProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_manageProfileFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment"
@@ -583,5 +601,14 @@
         <action
             android:id="@+id/action_customizeOrderFragment_to_checkoutFragment"
             app:destination="@id/checkoutFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/policyFragment"
+        android:name="com.ignacio.partykneadsapp.ProfileMenus.PolicyFragment"
+        android:label="fragment_policy"
+        tools:layout="@layout/fragment_policy" >
+        <action
+            android:id="@+id/action_policyFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 </navigation>

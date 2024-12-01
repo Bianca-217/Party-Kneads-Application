@@ -147,20 +147,6 @@
                 android:drawableRight="@drawable/nextt"
                 android:textColor="@color/semiblack" />
 
-            <Button
-                android:id="@+id/btnVouchers"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:backgroundTint="@color/semiwhite"
-                app:cornerRadius="10dp"
-                android:layout_marginBottom="5dp"
-                android:text="Vouchers"
-                android:textAlignment="textStart"
-                android:fontFamily="@font/montserrat_medium"
-                android:drawableLeft="@drawable/outline_discount_24"
-                android:drawableRight="@drawable/nextt"
-                android:textColor="@color/semiblack"
-                 />
 
             <Button
                 android:id="@+id/btnHistory"
@@ -190,6 +176,22 @@
                 android:drawableLeft="@drawable/support_pink"
                 android:drawableRight="@drawable/nextt"
                 android:textColor="@color/semiblack" />
+
+            <Button
+                android:id="@+id/btnPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:backgroundTint="@color/semiwhite"
+                app:cornerRadius="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="Privacy Policy"
+                android:textAlignment="textStart"
+                android:fontFamily="@font/montserrat_medium"
+                android:drawableLeft="@drawable/policy_privacy"
+                android:drawableRight="@drawable/nextt"
+                android:textColor="@color/semiblack"
+                />
+
 
             <Button
                 android:id="@+id/btnTerms"

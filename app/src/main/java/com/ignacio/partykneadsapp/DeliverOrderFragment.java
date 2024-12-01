@@ -106,7 +106,7 @@ public class DeliverOrderFragment extends Fragment {
 
         // Create DeliverOrderModel instance and add to list
         DeliverOrderModel order = new DeliverOrderModel(userName, contactNum, location,
-                productName, cakeSize, (int) quantity, String.valueOf(cleanTotalPrice), imageUrl);
+                productName, cakeSize, (int) quantity, String.valueOf(cleanTotalPrice), imageUrl, refID);
         ordersList.add(order); // Add to orders list
     }
 
