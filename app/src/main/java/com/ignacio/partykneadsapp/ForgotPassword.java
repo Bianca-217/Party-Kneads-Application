@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.ignacio.partykneadsapp.databinding.FragmentForgotPasswordBinding;
-
 public class ForgotPassword extends Fragment {
 
     FragmentForgotPasswordBinding binding;
@@ -77,8 +76,10 @@ public class ForgotPassword extends Fragment {
                         Toast.makeText(getActivity(), "Password reset email sent!", Toast.LENGTH_SHORT).show();
 
                         // Navigate back to the login screen after successfully sending the email
-                        NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_forgotPassword_to_loginFragment);
+                        if (isAdded() && getView() != null) {
+                            NavController navController = Navigation.findNavController(requireView());
+                            navController.navigate(R.id.action_forgotPassword_to_loginFragment);
+                        }
                     } else {
                         // Show error message if something goes wrong
                         Toast.makeText(getActivity(), "Error sending password reset email: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();

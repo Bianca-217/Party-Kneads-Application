@@ -205,18 +205,32 @@ public class ProfileFragment extends Fragment {
 
 
     private void setupButtons() {
+        // Handle logout button click
         binding.btnLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_profileFragment_to_loginFragment);
         });
 
+        // Handle back button click
         binding.btnBack.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            if (Objects.equals(currentUser.getEmail(), "sweetkatrinabiancaignacio@gmail.com")) {
-                navController.navigate(R.id.action_profileFragment_to_seller_HomePageFragment);
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+            if (currentUser != null) {
+                // Only proceed if the user is logged in
+                NavController navController = Navigation.findNavController(requireView());
+
+                // Check if the current user email matches a specific value
+                if (Objects.equals(currentUser.getEmail(), "sweetkatrinabiancaignacio@gmail.com")) {
+                    navController.navigate(R.id.action_profileFragment_to_seller_HomePageFragment);
+                } else {
+                    navController.navigate(R.id.action_profileFragment_to_homePageFragment);
+                }
             } else {
-                navController.navigate(R.id.action_profileFragment_to_homePageFragment);
+                // Handle the case when the user is not logged in
+                Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
+                NavController navController = Navigation.findNavController(requireView());
+                navController.navigate(R.id.action_profileFragment_to_loginFragment);  // Navigate to login screen
             }
         });
     }
