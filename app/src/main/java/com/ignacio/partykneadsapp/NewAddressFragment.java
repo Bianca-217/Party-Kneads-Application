@@ -84,7 +84,7 @@ public class NewAddressFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        cl = view.findViewById(R.id.clayout);
+        ConstraintLayout cl = view.findViewById(R.id.clayout);
         cl.setOnClickListener(v -> hideKeyboard(v));
 
         binding.btnClearAll.setOnClickListener(v -> clearInputFields());
