@@ -35,6 +35,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         void onItemSelected();
     }
 
+    // Callback interface for fetching stock
+    public interface OnStockFetchedListener {
+        void onStockFetched(int stock);
+    }
+
+    // Callback interface for fetching product category
+    public interface OnCategoryFetchedListener {
+        void onCategoryFetched(String category);
+    }
+
     public CartAdapter(List<CartItemModel> cartItems, OnItemSelectedListener listener) {
         this.cartItems = cartItems;
         this.onItemSelectedListener = listener;
@@ -212,15 +222,96 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             cartItemRef.update(cartItemData);
         }
 
+        private void fetchProductStock(String productId, OnStockFetchedListener listener) {
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+            firestore.collection("products")
+                    .document(productId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Get the stock value
+                            Long stockValue = documentSnapshot.getLong("stock");
+                            String category = documentSnapshot.getString("categories"); // Fetch the category of the product
+
+                            // Check if the product belongs to an exempt category
+                            boolean isExemptCategory = isExemptCategory(category);
+
+                            // If the category is exempt, set stock to Integer.MAX_VALUE (or another value to bypass stock check)
+                            if (isExemptCategory) {
+                                listener.onStockFetched(Integer.MAX_VALUE); // No quantity limitation
+                            } else {
+                                // If stock is null, set it to 0 (or handle as needed)
+                                int stock = (stockValue != null) ? stockValue.intValue() : 0;
+                                listener.onStockFetched(stock);
+                            }
+                        } else {
+                            // If the product doesn't exist in the Firestore document, default to 0 stock
+                            listener.onStockFetched(0);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("CartAdapter", "Error fetching stock for productId: " + productId, e);
+                        listener.onStockFetched(0); // Return 0 stock in case of failure
+                    });
+        }
 
         private void updateQuantityAndPrice(CartItemModel item, int newQuantity) {
+            // Fetch product category first before checking stock
+            fetchProductCategory(item.getProductId(), category -> {
+                // Check if the item belongs to the exempt categories
+                if (isExemptCategory(category)) {
+                    // Item belongs to an exempt category, no stock limitation applied
+                    applyQuantityChange(item, newQuantity);
+                } else {
+                    // Fetch stock and apply stock limit logic for non-exempt items
+                    fetchProductStock(item.getProductId(), stock -> {
+                        if (newQuantity > stock) {
+                            // Show a message if quantity exceeds stock
+                            Toast.makeText(itemView.getContext(), "Cannot exceed available stock (" + stock + ")", Toast.LENGTH_SHORT).show();
+                            return; // Prevent updating if the new quantity exceeds available stock
+                        }
+
+                        // Calculate unit price dynamically
+                        double unitPrice = item.getTotalPriceAsDouble() / item.getQuantity(); // Derive unit price
+
+                        // Calculate new total price based on the new quantity
+                        double newTotalPrice = unitPrice * newQuantity;
+
+                        // Format total price based on whether it has decimal places or not
+                        String formattedPrice;
+                        if (newTotalPrice == (long) newTotalPrice) {
+                            formattedPrice = "₱" + (long) newTotalPrice; // Whole number
+                        } else {
+                            formattedPrice = "₱" + String.format("%.2f", newTotalPrice); // Decimal format
+                        }
+
+                        // Update the cart item
+                        item.setQuantity(newQuantity);
+                        item.setTotalPrice(formattedPrice);
+
+                        // Update views
+                        quantity.setText(String.valueOf(newQuantity));
+                        totalPrice.setText(formattedPrice);
+
+                        // Update Firestore
+                        updateCartItemInFirestore(item);
+
+                        // Notify listener to update the total price in the cart
+                        onItemSelectedListener.onItemSelected();
+                    });
+                }
+            });
+        }
+
+        private void applyQuantityChange(CartItemModel item, int newQuantity) {
             // Calculate unit price dynamically
-            double unitPrice = item.getTotalPriceAsDouble() / item.getQuantity(); // Derive unit price
+            double unitPrice = item.getTotalPriceAsDouble() / item.getQuantity(); // Derive unit price from the current total price
 
             // Calculate new total price based on the new quantity
             double newTotalPrice = unitPrice * newQuantity;
 
-            // Format total price based on whether it has decimal places or not
+            // Format the total price based on whether it has decimal places or not
             String formattedPrice;
             if (newTotalPrice == (long) newTotalPrice) {
                 formattedPrice = "₱" + (long) newTotalPrice; // Whole number
@@ -232,15 +323,49 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             item.setQuantity(newQuantity);
             item.setTotalPrice(formattedPrice);
 
-            // Update views
+            // Update the quantity and total price displayed in the view
             quantity.setText(String.valueOf(newQuantity));
             totalPrice.setText(formattedPrice);
 
-            // Update Firestore
+            // Update Firestore with the new quantity and total price
             updateCartItemInFirestore(item);
 
-            // Notify listener
+            // Notify listener to update the total price in the cart
             onItemSelectedListener.onItemSelected();
+        }
+
+
+        // Helper method to check if the product belongs to one of the exempt categories
+        private boolean isExemptCategory(String category) {
+            // Convert category to lowercase for case-insensitive comparison
+            category = category.toLowerCase();
+
+            // Check if the category is one of the exempt categories
+            return category.equals("dessert - donuts") ||
+                    category.equals("dessert - cookies") ||
+                    category.equals("dessert - cupcakes") ||
+                    category.equals("cakes");
+        }
+
+        // Fetch product category from Firestore based on productId
+        private void fetchProductCategory(String productId, OnCategoryFetchedListener listener) {
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+            firestore.collection("products")
+                    .document(productId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String category = documentSnapshot.getString("categories"); // Assuming "category" is the field name
+                            listener.onCategoryFetched(category != null ? category : ""); // Handle null category if not found
+                        } else {
+                            listener.onCategoryFetched(""); // Default to empty if product not found
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("CartAdapter", "Error fetching category for productId: " + productId, e);
+                        listener.onCategoryFetched(""); // Default to empty if failed
+                    });
         }
     }
 }
