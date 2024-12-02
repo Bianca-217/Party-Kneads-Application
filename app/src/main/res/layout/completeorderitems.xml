@@ -121,21 +121,10 @@
                 android:textAlignment="textStart"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
+                android:layout_marginBottom="20dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="" />
 
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/pink"
-                    app:cornerRadius="20dp"
-                    android:layout_weight="1"
-                    android:layout_gravity="right"
-                    android:layout_marginBottom="20dp"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Buy Again"
-                    android:textColor="@color/semiwhite" />
 
             </LinearLayout>
 
