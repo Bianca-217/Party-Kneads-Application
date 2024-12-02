@@ -72,6 +72,12 @@ public class SellerHome extends Fragment {
             navController.navigate(R.id.action_seller_HomePageFragment_to_myProductFragment);
         });
 
+        // Navigate to MyProductFragment
+        binding.btnInventory.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView2);
+            navController.navigate(R.id.action_seller_HomePageFragment_to_inventoryFragment);
+        });
+
         // Fetch total number of products from Firestore
         fetchTotalProductCount();
     }

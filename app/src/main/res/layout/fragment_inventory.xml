@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/plainwhitebg"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".sellermenus.InventoryFragment">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="80dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/back_bg" />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/back" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/addtextview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_weight="0"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:text="INVENTORY"
+            android:textAlignment="center"
+            android:textColor="@color/darkpink"
+            android:textSize="26sp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darkpink" />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/footerpink"
+        app:boxStrokeColor="@color/darkpink"
+        app:hintTextColor="@color/darkpink"
+        app:boxBackgroundColor="@color/footerpink"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <AutoCompleteTextView
+            android:id="@+id/categories"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/semiblack"
+            android:inputType="none"
+            android:layout_weight="1"
+            android:backgroundTint="@color/semiwhite"
+            app:hintTextColor="@color/pink"
+            android:popupBackground="@color/semiwhite"
+            android:textColorHint="@color/darkpink"
+            android:hint="Select Categories" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp">
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp">
+
+            <!-- Header Row for the table -->
+            <TableRow android:background="@color/pink">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:text="Product Name"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textColor="@color/semiwhite"
+                    android:padding="10sp"
+                    android:layout_weight="6"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:text="Stocks"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textColor="@color/semiwhite"
+                    android:padding="10sp"
+                    android:layout_weight="4"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:text="Sold"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textColor="@color/semiwhite"
+                    android:padding="10sp"
+                    android:layout_weight="3"
+                    android:gravity="center" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+</LinearLayout>

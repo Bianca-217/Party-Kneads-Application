@@ -272,4 +272,21 @@
                 />
         </FrameLayout>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnInventory"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:backgroundTint="@color/white"
+        app:cornerRadius="10dp"
+        android:layout_marginBottom="20dp"
+        android:text="Inventory"
+        android:layout_marginHorizontal="20dp"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        android:textAlignment="textStart"
+        android:drawableRight="@drawable/nextt"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/pink" />
+
 </LinearLayout>

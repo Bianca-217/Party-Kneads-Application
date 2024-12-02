@@ -13,6 +13,7 @@
     <string name="address">Blk 34 Lot 29 NHA Site 1 Brgy. Dayap, Calauan, Laguna</string>
     <string name="success">Your order has been placed successfully! Get ready for an amazing party!</string>
     <string name="forgotpass"><u>Forgot Password?</u></string>
+    <string name="delete_account">We\'re truly sorry to see you go. Deleting your account will permanently remove all your data, including <b>orders, personal details, and any other information you\'ve provided.</b> Are you sure you want to proceed?</string>
 
     <string name="cancellation_reasons">Please select a cancellation reason. Please take note that this will cancel all items in the order and the action cannot be undone.</string>
 
@@ -941,8 +942,6 @@
         <item>Party Hats - Pompoms</item>
         <item>Banners - Card</item>
         <item>Banners - Cursive</item>
-        <item>Toppers</item>
-        <item>Backdrop</item>
         <item>Customize</item>
 
     </string-array>
