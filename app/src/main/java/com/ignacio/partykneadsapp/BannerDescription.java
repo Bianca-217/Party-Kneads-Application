@@ -120,10 +120,7 @@ public class BannerDescription extends Fragment {
                 // Show "Out of Stock" dialog if no stock is available
                 showNoStockDialog();
             } else {
-                // Proceed to checkout if stock is available
-                handleBuyNow("", 1); // Proceed with checkout process
-
-                // Check if the product belongs to a certain category
+                // Instead of proceeding directly, show the occasion buy dialog
                 if (productShopModel.getCategory().equals("Banners - Card") || productShopModel.getCategory().equals("Banners - Cursive")) {
                     // Show the occasion buy dialog
                     showOccasionBuyDialog();
@@ -138,7 +135,7 @@ public class BannerDescription extends Fragment {
         if (productShopModel.getCategory().equals("Banners - Cursive")) {
             color = "Gold";
             setupCursiveColors();
-        } else if(productShopModel.getCategory().equals("Banners - Card")) {
+        } else if (productShopModel.getCategory().equals("Banners - Card")) {
             color = "Blue";
             setupCardColors();
         }
@@ -152,6 +149,7 @@ public class BannerDescription extends Fragment {
             navController.navigate(R.id.action_bannerDescription_to_homePageFragment, args1);
         });
     }
+
 
     private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
@@ -196,7 +194,7 @@ public class BannerDescription extends Fragment {
         // Set up the AutoCompleteTextView
         AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.occasion_dropdown);
 
-        // Create an ArrayAdapter using the letters from strings.xml
+        // Create an ArrayAdapter using the occasions from strings.xml
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.Occasions, android.R.layout.simple_dropdown_item_1line);
 
@@ -209,57 +207,80 @@ public class BannerDescription extends Fragment {
         TextView plusButton = dialogView.findViewById(R.id.plus);
 
         // Set up initial quantity
-        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        final int[] quantity = {1}; // Use an array to modify the value within inner classes
         quantityTextView.setText(String.valueOf(quantity[0]));
 
+        // Assuming stock is fetched from a TextView (can be from Firestore or other data source)
+        String stock = stockValue.getText().toString(); // stockValue is a reference to the stock data
+
+        // Parse the stock value (this can come from Firestore or another data source)
+        int availableStock = 0;
+        try {
+            availableStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            // Handle invalid stock value
+            Toast.makeText(getContext(), "Invalid stock value", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if the stock is invalid
+        }
+
+        // If stock is 0 or out of stock, show a message and return
+        if (availableStock <= 0) {
+            Toast.makeText(getContext(), "Out of Stock", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Handle the minus button click
-        minusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (quantity[0] > 1) {
-                    quantity[0]--;
-                    quantityTextView.setText(String.valueOf(quantity[0]));
-                } else {
-                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
-                }
+        minusButton.setOnClickListener(v -> {
+            if (quantity[0] > 1) {
+                quantity[0]--;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            } else {
+                Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Handle the plus button click
-        plusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        int finalAvailableStock1 = availableStock;
+        plusButton.setOnClickListener(v -> {
+            if (quantity[0] < finalAvailableStock1) { // Limit quantity to available stock
                 quantity[0]++;
                 quantityTextView.setText(String.valueOf(quantity[0]));
+            } else {
+                Toast.makeText(getContext(), "Cannot exceed available stock", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Inside this dialog, find the confirmation button (addToCartBtn)
-        Button confirmbuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
-        confirmbuyBtnToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the selected letter from the AutoCompleteTextView
-                String selectedLetter = autoCompleteTextView.getText().toString();
-
-                // Check if the selected letter is empty
-                if (selectedLetter.isEmpty()) {
-                    // Show a warning message if no letter is selected
-                    autoCompleteTextView.setError("Please select an occasion");
-                    autoCompleteTextView.requestFocus();
-                    return; // Stop further execution until a letter is selected
-                }
-
-                // Your logic for confirming adding to cart with the selected letter and quantity
-                handleBuyNow(selectedLetter, quantity[0]);
-
-                // Dismiss the dialog after confirmation
-                dialog.dismiss();
+        // Inside this dialog, find the confirmation button (buyBtn)
+        Button confirmBuyBtnToCartBtn = dialogView.findViewById(R.id.buyBtn);
+        int finalAvailableStock = availableStock;
+        confirmBuyBtnToCartBtn.setOnClickListener(v -> {
+            // Check if the selected quantity exceeds available stock
+            if (quantity[0] > finalAvailableStock) {
+                Toast.makeText(getContext(), "Cannot add more than available stock", Toast.LENGTH_SHORT).show();
+                return; // Stop further execution if quantity exceeds available stock
             }
+
+            // Get the selected occasion from the AutoCompleteTextView
+            String selectedOccasion = autoCompleteTextView.getText().toString();
+
+            // Check if the selected occasion is empty
+            if (selectedOccasion.isEmpty()) {
+                // Show a warning message if no occasion is selected
+                autoCompleteTextView.setError("Please select an occasion");
+                autoCompleteTextView.requestFocus();
+                return; // Stop further execution until an occasion is selected
+            }
+
+            // Your logic for confirming the buy now with the selected occasion and quantity
+            handleBuyNow(selectedOccasion, quantity[0]);
+
+            // Dismiss the dialog after confirmation
+            dialog.dismiss();
         });
 
         dialog.show(); // Display the dialog
     }
+
 
     private void showOccasionAddDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -277,7 +298,7 @@ public class BannerDescription extends Fragment {
         // Set up the AutoCompleteTextView
         AutoCompleteTextView autoCompleteTextView = dialogView.findViewById(R.id.occasion_dropdown);
 
-        // Create an ArrayAdapter using the letters from strings.xml
+        // Create an ArrayAdapter using the occasions from strings.xml
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.Occasions, android.R.layout.simple_dropdown_item_1line);
 
@@ -290,56 +311,80 @@ public class BannerDescription extends Fragment {
         TextView plusButton = dialogView.findViewById(R.id.plus);
 
         // Set up initial quantity
-        int[] quantity = {1}; // Use an array to modify the value within inner classes
+        final int[] quantity = {1}; // Use an array to modify the value within inner classes
         quantityTextView.setText(String.valueOf(quantity[0]));
 
+        // Assuming stock is fetched from a TextView (can be from Firestore or other data source)
+        String stock = stockValue.getText().toString(); // stockValue is a reference to the stock data
+
+        // Parse the stock value (this can come from Firestore or another data source)
+        int availableStock = 0;
+        try {
+            availableStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            // Handle invalid stock value
+            Toast.makeText(getContext(), "Invalid stock value", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if the stock is invalid
+        }
+
+        // If stock is 0 or out of stock, show a message and return
+        if (availableStock <= 0) {
+            Toast.makeText(getContext(), "Out of Stock", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Handle the minus button click
-        minusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (quantity[0] > 1) {
-                    quantity[0]--;
-                    quantityTextView.setText(String.valueOf(quantity[0]));
-                } else {
-                    Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
-                }
+        minusButton.setOnClickListener(v -> {
+            if (quantity[0] > 1) {
+                quantity[0]--;
+                quantityTextView.setText(String.valueOf(quantity[0]));
+            } else {
+                Toast.makeText(getContext(), "Minimum quantity is 1", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Handle the plus button click
-        plusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        int finalAvailableStock1 = availableStock;
+        plusButton.setOnClickListener(v -> {
+            if (quantity[0] < finalAvailableStock1) { // Limit quantity to available stock
                 quantity[0]++;
                 quantityTextView.setText(String.valueOf(quantity[0]));
+            } else {
+                Toast.makeText(getContext(), "Cannot exceed available stock", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Inside this dialog, find the confirmation button (addToCartBtn)
         Button confirmAddToCartBtn = dialogView.findViewById(R.id.addToCartBtn);
-        confirmAddToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the selected letter from the AutoCompleteTextView
-                String selectedLetter = autoCompleteTextView.getText().toString();
-
-                // Check if the selected letter is empty
-                if (selectedLetter.isEmpty()) {
-                    // Show a warning message if no letter is selected
-                    autoCompleteTextView.setError("Please select an occasion");
-                    autoCompleteTextView.requestFocus();
-                    return; // Stop further execution until a letter is selected
-                }
-                // Your logic for confirming adding to cart with the selected letter and quantity
-                addToCartFunctionality(selectedLetter, quantity[0]);
-
-                // Dismiss the dialog after confirmation
-                dialog.dismiss();
+        int finalAvailableStock = availableStock;
+        confirmAddToCartBtn.setOnClickListener(v -> {
+            // Check if the selected quantity exceeds available stock
+            if (quantity[0] > finalAvailableStock) {
+                Toast.makeText(getContext(), "Cannot add more than available stock", Toast.LENGTH_SHORT).show();
+                return; // Stop further execution if quantity exceeds available stock
             }
+
+            // Get the selected occasion from the AutoCompleteTextView
+            String selectedOccasion = autoCompleteTextView.getText().toString();
+
+            // Check if the selected occasion is empty
+            if (selectedOccasion.isEmpty()) {
+                // Show a warning message if no occasion is selected
+                autoCompleteTextView.setError("Please select an occasion");
+                autoCompleteTextView.requestFocus();
+                return; // Stop further execution until an occasion is selected
+            }
+
+            // Your logic for confirming adding to cart with the selected occasion and quantity
+            addToCartFunctionality(selectedOccasion, quantity[0]);
+
+            // Dismiss the dialog after confirmation
+            dialog.dismiss();
         });
 
         dialog.show(); // Display the dialog
     }
+
 
     // Define the method for adding to the cart with selected letter and quantity
     private void addToCartFunctionality(String selectedLetter, int quantityLetter) {
