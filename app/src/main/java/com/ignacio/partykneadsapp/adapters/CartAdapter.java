@@ -230,29 +230,32 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            // Get the stock value
-                            Long stockValue = documentSnapshot.getLong("stock");
-                            String category = documentSnapshot.getString("categories"); // Fetch the category of the product
+                            Object stockValue = documentSnapshot.get("stock");
+                            int stock = 0;
 
-                            // Check if the product belongs to an exempt category
-                            boolean isExemptCategory = isExemptCategory(category);
+                            if (stockValue instanceof Number) {
+                                stock = ((Number) stockValue).intValue();
+                            } else if (stockValue instanceof String) {
+                                try {
+                                    stock = Integer.parseInt((String) stockValue);
+                                } catch (NumberFormatException e) {
+                                    Log.e("CartAdapter", "Error parsing stock value as Integer: " + stockValue, e);
+                                }
+                            }
 
-                            // If the category is exempt, set stock to Integer.MAX_VALUE (or another value to bypass stock check)
-                            if (isExemptCategory) {
-                                listener.onStockFetched(Integer.MAX_VALUE); // No quantity limitation
+                            String category = documentSnapshot.getString("categories");
+                            if (isExemptCategory(category)) {
+                                listener.onStockFetched(Integer.MAX_VALUE); // No stock limitation
                             } else {
-                                // If stock is null, set it to 0 (or handle as needed)
-                                int stock = (stockValue != null) ? stockValue.intValue() : 0;
-                                listener.onStockFetched(stock);
+                                listener.onStockFetched(stock); // Use fetched stock
                             }
                         } else {
-                            // If the product doesn't exist in the Firestore document, default to 0 stock
-                            listener.onStockFetched(0);
+                            listener.onStockFetched(0); // Default stock if product not found
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("CartAdapter", "Error fetching stock for productId: " + productId, e);
-                        listener.onStockFetched(0); // Return 0 stock in case of failure
+                        listener.onStockFetched(0); // Default to 0 stock in case of failure
                     });
         }
 
