@@ -20,7 +20,7 @@
         <SearchView
             android:id="@+id/ShopsearchView"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:layout_marginHorizontal="10dp"
             android:background="@drawable/bg_search"
@@ -39,7 +39,7 @@
             <Button
                 android:id="@+id/btnCart"
                 android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_marginBottom="5dp"
                 android:backgroundTint="@color/pink"
                 android:layout_gravity="bottom"
@@ -49,9 +49,9 @@
             <ImageView
                 android:id="@+id/cart"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_height="25dp"
                 android:layout_marginStart="38dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="9dp"
                 android:src="@drawable/cart_white"
                 android:layout_marginEnd="10dp"
                 />

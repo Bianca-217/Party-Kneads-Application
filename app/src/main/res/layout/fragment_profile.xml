@@ -17,6 +17,16 @@
         android:visibility="gone"
         android:progressDrawable="@drawable/progress_bar_linear" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="30dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -64,8 +74,8 @@
             android:textSize="28sp" />
 
     <FrameLayout
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         android:layout_gravity="center">
     <TextView
         android:layout_width="match_parent"
@@ -74,8 +84,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userProfile"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@drawable/img_placeholder" />
@@ -109,7 +119,7 @@
         android:layout_height="wrap_content"
         android:text=""
         android:fontFamily="@font/montserrat_bold"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_marginTop="20dp"
         android:textAlignment="center"
         android:textColor="@color/semiblack"/>
@@ -120,7 +130,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:fontFamily="@font/montserrat_bold"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textAlignment="center"
             android:textColor="@color/grey"/>
 
@@ -238,4 +248,6 @@
 
         </LinearLayout>
     </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

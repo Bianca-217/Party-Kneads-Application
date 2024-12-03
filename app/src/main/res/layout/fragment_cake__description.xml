@@ -2,19 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/pinkbg"
     android:orientation="vertical"
-    android:id="@+id/clayout"
     tools:context=".Cake_Description">
 
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="60dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,39 +24,38 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
-
             android:layout_width="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/back_bg" />
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/back_bg" />
 
             <ImageView
                 android:layout_width="25dp"
                 android:layout_height="35dp"
-                android:layout_marginRight="2dp"
                 android:layout_gravity="center"
+                android:layout_marginRight="2dp"
                 android:src="@drawable/back" />
 
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/btnHeart"
-            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end">
+            android:layout_gravity="top|right">
 
             <Button
                 android:id="@+id/btnLike"
                 android:layout_width="40dp"
                 android:layout_height="45dp"
-                android:layout_gravity="start"
+                android:layout_gravity="center"
                 android:backgroundTint="@color/semiwhite" />
 
             <ImageView
@@ -65,34 +65,45 @@
                 android:src="@drawable/heart_pink" />
         </FrameLayout>
 
-        <ImageView
-            android:id="@+id/productImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_gravity="center|bottom"
-            android:layout_marginTop="70dp"
-            android:src="@drawable/strawberry" />
 
     </FrameLayout>
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/productImage"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/strawberry"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:background="@drawable/whitecont"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="600dp"
-            android:layout_gravity="bottom"
-            android:src="@drawable/whitecont" />
 
         <LinearLayout
+            android:id="@+id/linearLayout9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
+            android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout10">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -105,29 +116,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="0dp"
-                    android:paddingHorizontal="15dp"
-                    android:textSize="24sp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="-" />
+                    android:paddingHorizontal="15dp"
+                    android:text="-"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/quantity"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/white"
                     android:layout_gravity="center"
+                    android:background="@color/white"
                     android:fontFamily="@font/montserrat_bold"
                     android:paddingHorizontal="15dp"
                     android:text="1"
                     android:textSize="20sp" />
+
                 <TextView
                     android:id="@+id/plus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:paddingHorizontal="15dp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="+" />
+                    android:paddingHorizontal="15dp"
+                    android:text="+"
+                    android:textSize="24sp" />
 
             </LinearLayout>
 
@@ -135,25 +147,32 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayout10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
             android:layout_marginHorizontal="20dp"
-            android:orientation="vertical">
+            android:layout_marginBottom="30dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="362dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-            <TextView
-                android:id="@+id/productName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="24sp"
-                android:textColor="@color/semiblack"
-                android:fontFamily="@font/montserrat_extrabold"
-                android:text="Vanilla Bean Cake"/>
+
+                <TextView
+                    android:id="@+id/productName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:text="Vanilla Bean Cake"
+                    android:textColor="@color/semiblack"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/productPrice"
@@ -164,113 +183,110 @@
                     android:gravity="center|end"
                     android:text="₱250.00"
                     android:textColor="@color/darkpink"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
             </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Cake Sizes:"
-            android:fontFamily="@font/montserrat_bold"
-            android:textSize="18sp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Cake Sizes:"
+                android:textSize="16sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cakeSizes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                tools:listitem="@layout/cake_sizes"
-                tools:itemCount="1" />
+                tools:itemCount="1"
+                tools:listitem="@layout/cake_sizes" />
 
             <TextView
                 android:id="@+id/productDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
-                android:fontFamily="@font/montserrat_semibold"
+                android:fontFamily="@font/montserrat_medium"
                 android:text="@string/Description"
+                android:textColor="@color/semiblack"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="0dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Notes: (ex. less sugar)"
                 android:textColor="@color/semiblack"
                 android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notes: (ex. less sugar)"
-                    android:layout_margin="0dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:textColor="@color/semiblack"
-                    android:textSize="18sp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:hint="Notes: "
-                    app:hintTextColor="@color/pink"
-                    app:boxStrokeColor="@color/darkpink"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/notes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:textColor="@color/grey"
-                        android:textSize="16sp"
-                        android:inputType="textMultiLine"
-                        android:gravity="start"
-                        android:minLines="3"
-                        android:maxLines="6"
-                        android:scrollbars="vertical" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:orientation="horizontal">
+                android:layout_marginTop="10dp"
+                android:hint="Notes: "
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxStrokeColor="@color/darkpink"
+                app:hintTextColor="@color/pink">
 
-                <!-- Add to Cart Button with Icon -->
-                <Button
-                    android:id="@+id/btnAddtoCart"
-                    android:layout_width="0dp"
-                    android:layout_height="55dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/pink"
-                    android:text="Add to cart"
-                    android:textSize="16sp"
-                    android:drawableLeft="@drawable/addtocart"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:textColor="@android:color/white"
-                    android:layout_marginEnd="10dp"/>
-
-                <!-- Buy Now Button with Icon -->
-                <Button
-                    android:id="@+id/btnBuyNow"
-                    android:layout_width="0dp"
-                    android:layout_height="55dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/darkpink"
-                    android:text="Buy Now"
-                    android:textSize="16sp"
-                    android:drawableLeft="@drawable/buynowcart"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:textColor="@android:color/white"
-                    android:layout_marginStart="10dp"/>
-
-            </LinearLayout>
-
-
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:gravity="start"
+                    android:inputType="textMultiLine"
+                    android:maxLines="6"
+                    android:minLines="3"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/grey"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="30dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/btnAddtoCart"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/pink"
+                android:drawableLeft="@drawable/addtocart"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Add to cart"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
 
 
+            <Button
+                android:id="@+id/btnBuyNow"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/darkpink"
+                android:drawableLeft="@drawable/buynowcart"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Buy Now"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
 
-    </FrameLayout>
-
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

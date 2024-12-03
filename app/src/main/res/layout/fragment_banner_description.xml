@@ -64,34 +64,41 @@
                 android:src="@drawable/heart_pink" />
         </FrameLayout>
 
-        <ImageView
-            android:id="@+id/productImage"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_gravity="center|bottom"
-            android:layout_marginTop="70dp"
-            android:src="@drawable/plain_banner" />
+
 
     </FrameLayout>
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/productImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/plain_banner"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:src="@drawable/whitecont" />
+        android:background="@drawable/whitecont"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
 
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_marginHorizontal="20dp"
             android:orientation="vertical">
@@ -172,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="20dp"
-                android:fontFamily="@font/montserrat_semibold"
+                android:fontFamily="@font/montserrat_medium"
                 android:text="@string/Description"
                 android:textColor="@color/semiblack"
                 android:textSize="16sp" />
@@ -196,7 +203,6 @@
                 app:boxCornerRadiusTopStart="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusBottomStart="10dp"
-                android:layout_marginBottom="40dp"
                 app:boxCornerRadiusBottomEnd="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -217,9 +223,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
 
-                <!-- Add to Cart Button with Icon -->
+
                 <Button
                     android:id="@+id/btnAddtoCart"
                     android:layout_width="0dp"
@@ -227,13 +234,12 @@
                     android:layout_weight="1"
                     android:backgroundTint="@color/pink"
                     android:text="Add to cart"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:drawableLeft="@drawable/addtocart"
                     android:fontFamily="@font/montserrat_semibold"
-                    android:textColor="@android:color/white"
-                    android:layout_marginEnd="10dp"/>
+                    android:textColor="@android:color/white" />
 
-                <!-- Buy Now Button with Icon -->
+
                 <Button
                     android:id="@+id/btnBuyNow"
                     android:layout_width="0dp"
@@ -241,11 +247,11 @@
                     android:layout_weight="1"
                     android:backgroundTint="@color/darkpink"
                     android:text="Buy Now"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:drawableLeft="@drawable/buynowcart"
                     android:fontFamily="@font/montserrat_semibold"
                     android:textColor="@android:color/white"
-                    android:layout_marginStart="10dp"/>
+                    android:layout_marginStart="8dp"/>
 
             </LinearLayout>
 
@@ -255,6 +261,6 @@
 
 
 
-    </FrameLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

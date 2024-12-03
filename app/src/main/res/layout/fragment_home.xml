@@ -69,7 +69,7 @@
                         android:fontFamily="@font/montserrat_extrabold"
                         android:text=""
                         android:textColor="@color/darkpink"
-                        android:textSize="24sp" />
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
@@ -87,7 +87,7 @@
                         android:layout_width="20dp"
                         android:layout_height="25dp"
                         android:layout_gravity="center"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="9dp"
                         android:layout_marginEnd="10dp"
                         android:src="@drawable/loc" />
 
@@ -99,7 +99,7 @@
                         android:gravity="center_vertical"
                         android:text=""
                         android:textColor="@color/semiblack"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
 
@@ -115,7 +115,7 @@
                 <Button
                     android:id="@+id/btnCart"
                     android:layout_width="150dp"
-                    android:layout_height="50dp"
+                    android:layout_height="45dp"
                     android:layout_marginBottom="5dp"
                     android:backgroundTint="@color/pink"
                     android:layout_gravity="bottom"
@@ -124,10 +124,10 @@
                 <!-- Cart Icon on top of the button -->
                 <ImageView
                     android:id="@+id/cart"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_marginStart="38dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="9dp"
                     android:src="@drawable/cart_white"
                     android:layout_marginEnd="10dp"
                     />
@@ -164,7 +164,7 @@
                     <SearchView
                         android:id="@+id/searchView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:background="@drawable/bg_search"
                         android:queryHint="Search for products..."
                         android:iconifiedByDefault="false"/>
@@ -182,7 +182,6 @@
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_marginTop="20dp"
                     android:layout_marginHorizontal="20dp" />
 
                 <!-- Dot Indicator -->
@@ -214,7 +213,7 @@
                         android:text="Popular Products"
                         android:layout_marginBottom="10dp"
                         android:textColor="@color/semiblack"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 

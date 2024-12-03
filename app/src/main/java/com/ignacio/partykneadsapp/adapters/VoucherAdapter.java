@@ -67,7 +67,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
         holder.btnClaim.setOnClickListener(v -> {
             // Show confirmation dialog
             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
             builder.setTitle("Claim Voucher")
 
                     .setMessage("Are you sure you want to claim this voucher?")

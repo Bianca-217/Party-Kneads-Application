@@ -28,7 +28,7 @@
             android:gravity="center"
             android:text="Verification Code"
             android:textColor="@color/semiblack"
-            android:textSize="30sp"
+            android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -40,11 +40,11 @@
             android:id="@+id/textView10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_bold"
+            android:fontFamily="@font/montserrat_semibold"
             android:text="Use the 6-digit code sent to your email \address to verify your account."
             android:textAlignment="center"
             android:textColor="@color/grey"
-            android:textSize="17sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvEmail"
@@ -55,7 +55,7 @@
             android:gravity="center"
             android:text="sweetkatrinabiancaignacio"
             android:textColor="@color/semiblack"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,8 +71,8 @@
 
             <EditText
                 android:id="@+id/otp1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -82,13 +82,13 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
 
             <EditText
                 android:id="@+id/otp2"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -98,12 +98,12 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/otp3"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -113,12 +113,12 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/otp4"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -128,12 +128,12 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/otp5"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -143,12 +143,12 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/otp6"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginHorizontal="5dp"
                 android:background="@drawable/otpbg"
                 android:fontFamily="@font/montserrat_bold"
@@ -158,20 +158,20 @@
                 android:maxLines="1"
                 android:textAlignment="center"
                 android:textColor="@color/darkpink"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnsubmitOTP"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_marginBottom="15dp"
             android:backgroundTint="@color/pink"
             android:fontFamily="@font/montserrat_bold"
             android:onClick="otpSubmit"
             android:text="Submit"
             android:textColor="@color/semiwhite"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:cornerRadius="15dp" />
 
 
@@ -188,7 +188,7 @@
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Didn't Receive the code?"
                 android:textColor="@color/semiblack"
-                android:textSize="16dp"
+                android:textSize="14sp"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/otp4" />
@@ -200,7 +200,7 @@
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Resend"
                 android:textColor="@color/darkpink"
-                android:textSize="16dp"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.151"
                 app:layout_constraintStart_toEndOf="@+id/tvcode"

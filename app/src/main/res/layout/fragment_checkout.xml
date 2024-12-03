@@ -61,6 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginBottom="20dp"
             android:paddingHorizontal="20dp">
 
             <LinearLayout
@@ -89,7 +90,7 @@
                     android:text="CHECKOUT"
                     android:textAlignment="center"
                     android:textColor="@color/darkpink"
-                    android:textSize="28sp" />
+                    android:textSize="24sp" />
 
                 <Button
                     android:layout_width="0dp"
@@ -112,7 +113,8 @@
                 android:id="@+id/showVouchers"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginVertical="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
                 android:backgroundTint="@color/semiwhite"
                 android:drawableLeft="@drawable/discount"
                 android:drawableRight="@drawable/nextt"
@@ -135,7 +137,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
                 android:orientation="horizontal">
 
@@ -271,6 +273,7 @@
                     android:backgroundTint="@color/pink"
                     android:fontFamily="@font/montserrat_bold"
                     android:textAlignment="center"
+                    android:paddingBottom="20dp"
                     android:textColor="@color/semiwhite"
                     android:textSize="16sp"
                     app:cornerRadius="10dp" />

@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginLeft="10dp">
 
@@ -33,6 +33,7 @@
             android:id="@+id/cakeImage"
             android:layout_width="100dp"
             android:layout_height="130dp"
+            android:layout_marginRight="10dp"
             android:src="@drawable/strawberry"/>
 
         <LinearLayout
@@ -91,7 +92,7 @@
                 android:id="@+id/totalPrice"
                 android:layout_width="180dp"
                 android:layout_height="match_parent"
-                android:gravity="bottom|end"
+                android:gravity="start"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
                 android:fontFamily="@font/montserrat_bold"

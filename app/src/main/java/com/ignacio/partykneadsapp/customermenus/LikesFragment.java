@@ -118,7 +118,6 @@ public class LikesFragment extends Fragment {
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
         categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
 
         // Initialize adapter and layout manager for categories
         categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {

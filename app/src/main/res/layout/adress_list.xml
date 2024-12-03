@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Bianca Ignacio"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:fontFamily="@font/montserrat_bold"
                 />
 
@@ -42,7 +42,7 @@
             android:text="09754011041"
             android:inputType="number"
             android:fontFamily="@font/montserrat_semibold"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:layout_marginBottom="10dp"
             android:textColor="@color/semiblack"/>
 
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_medium"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="@color/grey"
             android:text="@string/address" />
     </LinearLayout>

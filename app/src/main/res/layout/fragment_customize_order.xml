@@ -84,7 +84,7 @@
                     android:text="CUSTOMIZE ORDER"
                     android:textAlignment="center"
                     android:textColor="@color/darkpink"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
 
                 <Button
                     android:layout_width="0dp"
@@ -115,7 +115,7 @@
                     <Button
                         android:id="@+id/btnUpload"
                         android:layout_width="150dp"
-                        android:layout_height="50dp"
+                        android:layout_height="45dp"
                         android:layout_marginTop="15dp"
                         android:backgroundTint="@color/pink"
                         android:fontFamily="@font/montserrat_bold"
@@ -150,6 +150,7 @@
                             android:backgroundTint="@color/semiwhite"
                             android:fontFamily="@font/montserrat_medium"
                             android:hint="Cake Types"
+                            android:textSize="14sp"
                             android:inputType="none"
                             android:popupBackground="@color/semiwhite"
                             android:textColor="@color/semiblack"
@@ -180,6 +181,7 @@
                             android:fontFamily="@font/montserrat_medium"
                             android:hint="Cake Sizes"
                             android:inputType="none"
+                            android:textSize="14sp"
                             android:popupBackground="@color/semiwhite"
                             android:textColor="@color/semiblack"
                             android:textColorHint="@color/darkpink"
@@ -210,7 +212,7 @@
                             android:minLines="3"
                             android:scrollbars="vertical"
                             android:textColor="@color/grey"
-                            android:textSize="16sp" />
+                            android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
@@ -266,7 +268,7 @@
                     android:minLines="3"
                     android:scrollbars="vertical"
                     android:textColor="@color/grey"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -287,7 +289,7 @@
                     <Button
                         android:id="@+id/btnAddToCart"
                         android:layout_width="50dp"
-                        android:layout_height="60dp"
+                        android:layout_height="50dp"
                         android:layout_marginEnd="10dp"
                         android:layout_weight="1"
                         android:backgroundTint="@color/darkpink"
@@ -300,9 +302,9 @@
 
                     <ImageView
                         android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_height="25dp"
                         android:layout_marginLeft="9dp"
-                        android:layout_marginTop="15dp"
+                        android:layout_marginTop="12dp"
                         android:src="@drawable/addtocart" />
 
                 </FrameLayout>
@@ -310,7 +312,7 @@
                 <Button
                     android:id="@+id/btnAddItem"
                     android:layout_width="0dp"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_weight="6"
                     android:backgroundTint="@color/pink"
                     android:fontFamily="@font/montserrat_bold"

@@ -78,7 +78,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_semibold"
                 android:textColor="@color/semiblack"
-                android:textSize="18sp"/>
+                android:textSize="16sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -98,7 +98,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -108,7 +108,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -118,7 +118,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -128,7 +128,7 @@
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -138,7 +138,7 @@
                 android:textAlignment="center"
                 android:fontFamily="@font/montserrat_semibold"
                 android:textColor="@color/darkpink"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -147,7 +147,7 @@
                 android:textAlignment="center"
                 android:fontFamily="@font/montserrat_semibold"
                 android:textColor="@color/semiblack"
-                android:textSize="16sp"/>
+                android:textSize="14sp"/>
 
 
 

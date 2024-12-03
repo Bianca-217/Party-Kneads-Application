@@ -12,52 +12,43 @@
         android:id="@+id/imageView3"
         android:layout_width="match_parent"
         android:layout_height="405dp"
+        android:layout_marginTop="80dp"
         android:src="@drawable/onboarding2"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.666"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.233" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="284dp"
-        android:layout_marginBottom="-20dp"
+        android:layout_height="290dp"
+        android:layout_marginBottom="-70dp"
         android:background="@drawable/rectanglecont"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:layout_constraintVertical_bias="0.92" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="190dp"
         android:layout_height="35dp"
         android:src="@drawable/dot3"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:layout_constraintVertical_bias="0.079" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="164dp"
-        android:layout_height="165dp"
-
+        android:layout_width="140dp"
+        android:layout_height="140dp"
         android:src="@drawable/dripfooter"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
-        app:layout_constraintTop_toTopOf="@+id/textView3"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="@+id/textView3" />
 
     <TextView
         android:id="@+id/textView4"
@@ -67,10 +58,11 @@
         android:text="Safe Delivery, Guaranteed!"
         android:textAlignment="center"
         android:textColor="@color/darkpink"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView3"
         app:layout_constraintVertical_bias="0.185" />
 
@@ -83,11 +75,11 @@
         android:text="We guarantee your cakes and party supplies will arrive fresh, safe, and right on time!"
         android:textAlignment="center"
         android:textColor="@color/semiblack"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/textView3"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4"
         app:layout_constraintVertical_bias="0.125" />
 
@@ -95,11 +87,11 @@
         android:id="@+id/btnNext"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="350dp"
         android:layout_gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView3">
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:layout_width="50dp"

@@ -51,14 +51,14 @@
         android:orientation="horizontal"
         android:layout_marginTop="30dp"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginLeft="10dp">
+        android:layout_marginStart="10dp">
 
 
 
         <ImageView
             android:id="@+id/cakeImage"
             android:layout_width="100dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_height="130dp"
             android:layout_gravity="center"
             android:src="@drawable/strawberry"/>
@@ -71,7 +71,7 @@
 
             <TextView
                 android:id="@+id/productName"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:text="Vanilla Bean Cake"
                 android:layout_marginTop="10dp"

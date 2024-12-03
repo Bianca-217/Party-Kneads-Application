@@ -58,7 +58,7 @@
             android:text="Create your Account"
             android:textAlignment="center"
             android:textColor="@color/semiblack"
-            android:textSize="26sp"
+            android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.512"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +71,7 @@
             android:fontFamily="@font/montserrat_semibold"
             android:text="Please fill in your login details."
             android:textColor="@color/semiblack"
-            android:textSize="18dp"
+            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -80,7 +80,7 @@
             android:id="@+id/txtinputLayoutEmailCA"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             android:layout_marginVertical="2dp"
             android:hint="*Email"
             android:textColorHint="@color/pink"
@@ -96,9 +96,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmailCA"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
+                android:layout_height="50dp"
                 android:fontFamily="@font/montserrat_semibold"
                 android:singleLine="true"
+                android:textSize="14sp"
                 android:textColor="@color/semiblack" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -129,10 +130,11 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassCA"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
+                android:layout_height="50dp"
                 android:fontFamily="@font/montserrat_semibold"
                 android:inputType="textPassword"
                 android:singleLine="true"
+                android:textSize="14sp"
                 android:textColor="@color/semiblack" />
 
             <!-- Helper Text Views for Password Criteria -->
@@ -141,6 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
+                android:textSize="12sp"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="Minimum of 8 characters"
                 android:textColor="#808080" />
@@ -150,6 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
+                android:textSize="12sp"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="At least one uppercase letter"
                 android:textColor="#808080" />
@@ -159,6 +163,7 @@
                 android:layout_width="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_height="wrap_content"
+                android:textSize="12sp"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="At least one number"
                 android:textColor="#808080" />
@@ -168,6 +173,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
+                android:textSize="12sp"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="At least one special character"
                 android:textColor="#808080" />
@@ -177,13 +183,13 @@
         <Button
             android:id="@+id/btnCont"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/pink"
             android:fontFamily="@font/montserrat_bold"
             android:text="Continue"
             android:textColor="@color/semiwhite"
-            android:textSize="18dp"
+            android:textSize="16sp"
             app:cornerRadius="10dp" />
     </LinearLayout>
 
