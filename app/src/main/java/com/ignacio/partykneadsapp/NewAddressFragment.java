@@ -149,36 +149,50 @@ public class NewAddressFragment extends DialogFragment {
             // Concatenate full address
             String fullAddress = houseNum + ", " + barangay + ", " + city + ", Laguna, " + postalCode;
 
-            // Prepare the data map to be stored in Firestore
-            Map<String, Object> addressData = new HashMap<>();
-            addressData.put("userName", userName);  // Add userName
-            addressData.put("phoneNumber", phoneNumber);
-            addressData.put("city", city);
-            addressData.put("barangay", barangay);
-            addressData.put("postalCode", postalCode);
-            addressData.put("houseNum", houseNum);
-            addressData.put("location", fullAddress); // Full address from concatenation
-            addressData.put("status", "Not Active"); // Set the status as "Inactive"
-
-            // Add data to the `Locations` subcollection of the current user
+            // Fetch locations to determine if this is the first one
             db.collection("Users")
                     .document(userId)
                     .collection("Locations")
-                    .add(addressData)
-                    .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(getContext(), "Address saved successfully!", Toast.LENGTH_SHORT).show();
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        // Check if this is the first location
+                        String status = querySnapshot.isEmpty() ? "Active" : "Not Active";
 
-                        getParentFragmentManager().setFragmentResult("newAddressKey", new Bundle());
-                        dismiss();
+                        // Prepare the data map to be stored in Firestore
+                        Map<String, Object> addressData = new HashMap<>();
+                        addressData.put("userName", userName);  // Add userName
+                        addressData.put("phoneNumber", phoneNumber);
+                        addressData.put("city", city);
+                        addressData.put("barangay", barangay);
+                        addressData.put("postalCode", postalCode);
+                        addressData.put("houseNum", houseNum);
+                        addressData.put("location", fullAddress); // Full address from concatenation
+                        addressData.put("status", status); // Set status dynamically based on condition
+
+                        // Add data to the `Locations` subcollection of the current user
+                        db.collection("Users")
+                                .document(userId)
+                                .collection("Locations")
+                                .add(addressData)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(getContext(), "Address saved successfully!", Toast.LENGTH_SHORT).show();
+
+                                    getParentFragmentManager().setFragmentResult("newAddressKey", new Bundle());
+                                    dismiss();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Failed to save address: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to save address: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Failed to check existing locations: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         } else {
             // Handle the case where no user is logged in
             Toast.makeText(getContext(), "No user logged in. Please sign in.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
     private void clearFields() {
@@ -342,8 +356,15 @@ public class NewAddressFragment extends DialogFragment {
             binding.contactNum.setError("Phone Number is required");
             isValid = false;
         } else {
+            String phoneNumber = binding.contactNum.getText().toString().trim();
             try {
-                Long.parseLong(binding.contactNum.getText().toString().trim());
+                Long.parseLong(phoneNumber); // Check if it's numeric
+
+                // Validate that it starts with "09" and has a length of 11
+                if (!phoneNumber.startsWith("09") || phoneNumber.length() != 11) {
+                    binding.contactNum.setError("Phone Number must start with '09' and be 11 digits long");
+                    isValid = false;
+                }
             } catch (NumberFormatException e) {
                 binding.contactNum.setError("Phone Number must be numeric");
                 isValid = false;

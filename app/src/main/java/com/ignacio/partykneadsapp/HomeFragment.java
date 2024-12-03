@@ -137,8 +137,6 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
         setupDotsIndicator(); // Setup dots after initializing adapter
 
-        // Initialize category, popular, and order history
-        setupCategories();
         setupPopularProducts();
 
         // Enable infinite looping behavior
@@ -498,23 +496,6 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
-
-    private void setupCategories() {
-        categories = binding.categories;
-        categoriesModelList = new ArrayList<>();
-        categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.party_hats, "Party Hats"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
-        categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
-
-        categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {});
-        categories.setAdapter(categoriesAdapter);
-        categories.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
-        categories.setHasFixedSize(true);
-        categories.setNestedScrollingEnabled(false);
     }
 
     // Set up popular products

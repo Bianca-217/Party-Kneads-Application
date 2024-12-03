@@ -185,36 +185,71 @@ public class EditAddressFragment extends DialogFragment {
                 String location = getArguments().getString("location");
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                // Check the count of locations
                 db.collection("Users").document(userId).collection("Locations")
-                        .whereEqualTo("location", location)
                         .get()
                         .addOnSuccessListener(querySnapshot -> {
-                            if (!querySnapshot.isEmpty()) {
-                                String docId = querySnapshot.getDocuments().get(0).getId();
-                                db.collection("Users").document(userId).collection("Locations")
-                                        .document(docId)
-                                        .delete()
-                                        .addOnSuccessListener(aVoid -> {
-                                            Toast.makeText(getContext(), "Address deleted successfully!", Toast.LENGTH_SHORT).show();
-
-                                            // Notify AddressFragment about the deletion
-                                            getParentFragmentManager().setFragmentResult("deleteAddressKey", new Bundle());
-
-                                            // Dismiss the dialog
-                                            dismiss();
-                                            dialog.dismiss();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("EditAddress", "Failed to delete address", e);
-                                            Toast.makeText(getContext(), "Failed to delete address", Toast.LENGTH_SHORT).show();
-                                        });
-                            } else {
-                                Toast.makeText(getContext(), "Address not found.", Toast.LENGTH_SHORT).show();
+                            if (querySnapshot.size() <= 1) {
+                                Toast.makeText(getContext(), "Cannot delete the last address.", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                                return;
                             }
+
+                            // Check the status of the location to be deleted
+                            db.collection("Users").document(userId).collection("Locations")
+                                    .whereEqualTo("location", location)
+                                    .get()
+                                    .addOnSuccessListener(innerQuerySnapshot -> {
+                                        if (!innerQuerySnapshot.isEmpty()) {
+                                            String docId = innerQuerySnapshot.getDocuments().get(0).getId();
+                                            String status = innerQuerySnapshot.getDocuments().get(0).getString("status");
+
+                                            if ("Active".equalsIgnoreCase(status)) {
+                                                // Find another location and set its status to Active
+                                                db.collection("Users").document(userId).collection("Locations")
+                                                        .whereEqualTo("status", "Not Active")
+                                                        .limit(1) // Get only one document
+                                                        .get()
+                                                        .addOnSuccessListener(activeQuerySnapshot -> {
+                                                            if (!activeQuerySnapshot.isEmpty()) {
+                                                                String newActiveDocId = activeQuerySnapshot.getDocuments().get(0).getId();
+                                                                db.collection("Users").document(userId).collection("Locations")
+                                                                        .document(newActiveDocId)
+                                                                        .update("status", "Active")
+                                                                        .addOnSuccessListener(aVoid -> {
+                                                                            // Proceed with deletion after updating the status
+                                                                            deleteLocation(db, userId, docId, dialog);
+                                                                        })
+                                                                        .addOnFailureListener(e -> {
+                                                                            Log.e("EditAddress", "Failed to update new active location", e);
+                                                                            Toast.makeText(getContext(), "Failed to update new active location.", Toast.LENGTH_SHORT).show();
+                                                                        });
+                                                            } else {
+                                                                Toast.makeText(getContext(), "No other locations to set as Active.", Toast.LENGTH_SHORT).show();
+                                                                dialog.dismiss();
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e("EditAddress", "Failed to fetch Not Active locations", e);
+                                                            Toast.makeText(getContext(), "Failed to fetch Not Active locations.", Toast.LENGTH_SHORT).show();
+                                                        });
+                                            } else {
+                                                // Directly delete if the location is not Active
+                                                deleteLocation(db, userId, docId, dialog);
+                                            }
+                                        } else {
+                                            Toast.makeText(getContext(), "Address not found.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("EditAddress", "Failed to fetch address for deletion", e);
+                                        Toast.makeText(getContext(), "Failed to fetch address for deletion.", Toast.LENGTH_SHORT).show();
+                                    });
                         })
                         .addOnFailureListener(e -> {
-                            Log.e("EditAddress", "Failed to fetch address for deletion", e);
-                            Toast.makeText(getContext(), "Failed to fetch address for deletion", Toast.LENGTH_SHORT).show();
+                            Log.e("EditAddress", "Failed to fetch locations", e);
+                            Toast.makeText(getContext(), "Failed to check locations count.", Toast.LENGTH_SHORT).show();
                         });
             });
 
@@ -224,6 +259,9 @@ public class EditAddressFragment extends DialogFragment {
             // Show the dialog
             dialog.show();
         });
+
+
+
 
 
 
@@ -259,6 +297,29 @@ public class EditAddressFragment extends DialogFragment {
 
         setupAutoCompleteTextView();
 }
+
+    // Method to handle location deletion
+    private void deleteLocation(FirebaseFirestore db, String userId, String docId, AlertDialog dialog) {
+        db.collection("Users").document(userId).collection("Locations")
+                .document(docId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Address deleted successfully!", Toast.LENGTH_SHORT).show();
+
+                    // Notify AddressFragment about the deletion
+                    getParentFragmentManager().setFragmentResult("deleteAddressKey", new Bundle());
+
+                    // Dismiss the dialog
+                    dismiss();
+                    dialog.dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("EditAddress", "Failed to delete address", e);
+                    Toast.makeText(getContext(), "Failed to delete address.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
 
         private void setupAutoCompleteTextView() {
         String[] cities = getResources().getStringArray(R.array.City);

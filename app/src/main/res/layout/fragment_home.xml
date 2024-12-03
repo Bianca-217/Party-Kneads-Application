@@ -177,16 +177,6 @@
 
                 </LinearLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/categories"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="5dp"
-                    tools:itemCount="1"
-                    android:layout_marginBottom="20dp"
-                    tools:listitem="@layout/categories" />
-
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"
