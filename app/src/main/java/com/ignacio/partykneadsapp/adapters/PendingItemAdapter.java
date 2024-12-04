@@ -326,7 +326,11 @@ public class PendingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                                                 // Add item to the list if the required fields are not null
                                                 if (productName != null && price != null) {
-                                                    productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, price));
+                                                    String productId = "someProductId";  // Make sure you have the productId here (either pass it from elsewhere or fetch it)
+
+                                                    // Create new OrderItemModel with productId
+                                                    productList.add(new OrderItemModel(productId, productName, cakeSize, imageUrl, (int) quantity, price, referenceId));
+
 
                                                     // Sum the totalPrice (assuming the price is stored with the "₱" symbol)
                                                     try {

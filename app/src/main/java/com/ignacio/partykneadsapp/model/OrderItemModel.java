@@ -1,27 +1,39 @@
 package com.ignacio.partykneadsapp.model;
 
+
 public class OrderItemModel {
+    private String productId;   // Field for productId
     private String productName;
     private String cakeSize;
     private String imageUrl;
     private int quantity;
     private String price;
-    private String referenceID;
+    private String referenceID; // Field for referenceID
 
     // Default constructor required for Firestore
     public OrderItemModel() {
     }
 
     // Constructor with all fields
-    public OrderItemModel(String productName, String cakeSize, String imageUrl, int quantity, String price) {
+    public OrderItemModel(String productId, String productName, String cakeSize, String imageUrl, int quantity, String price, String referenceID) {
+        this.productId = productId; // Initialize productId
         this.productName = productName;
         this.cakeSize = cakeSize;
         this.imageUrl = imageUrl;
         this.quantity = quantity;
         this.price = price;
+        this.referenceID = referenceID; // Initialize referenceID
     }
 
     // Getters and Setters
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
     public String getProductName() {
         return productName;
     }
@@ -60,6 +72,10 @@ public class OrderItemModel {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getReferenceID() {
+        return referenceID;
     }
 
     public void setReferenceID(String referenceID) {

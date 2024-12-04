@@ -78,24 +78,37 @@ public class SellerTransactions extends Fragment {
                                             // Only take the first item from the list of items in the order
                                             Map<String, Object> firstItem = items.get(0); // Get the first item
 
+                                            // Extract necessary fields from the first item
                                             String productName = (String) firstItem.get("productName");
                                             String cakeSize = (String) firstItem.get("cakeSize");
-                                            long quantity = (long) firstItem.get("quantity");
+                                            long quantity = firstItem.get("quantity") != null ? (long) firstItem.get("quantity") : 0; // Handle null value safely
                                             String totalPrice = (String) firstItem.get("totalPrice");
                                             String imageUrl = (String) firstItem.get("imageUrl");
 
+                                            // Ensure totalPrice is valid (e.g., a proper string with a currency symbol, etc.)
+                                            if (totalPrice == null) {
+                                                totalPrice = "₱0.00"; // Set a default value if it's null
+                                            }
+
                                             // Create a new OrderItemModel for the first item
+                                            // Pass empty values for productId and referenceID as required by the existing constructor
                                             OrderItemModel orderItem = new OrderItemModel(
-                                                    productName, cakeSize, imageUrl, (int) quantity, totalPrice
+                                                    "",  // productId (empty string as it's not used)
+                                                    productName,
+                                                    cakeSize,
+                                                    imageUrl,
+                                                    (int) quantity,
+                                                    totalPrice,
+                                                    ""  // referenceID (empty string as it's not used)
                                             );
 
-                                            String referenceID = doc.getId();  // Get the reference ID
+                                            // Get the reference ID (the document ID)
+                                            String referenceID = doc.getId();  // Firestore document ID
 
                                             // Wrap the OrderItemModel and referenceID into OrderItemWithReference
                                             orderListWithRefID.add(new OrderItemWithReference(orderItem, referenceID));
                                         }
                                     }
-
                                     // Notify the adapter to update the RecyclerView
                                     adapter.notifyDataSetChanged();
                                 })
@@ -110,4 +123,5 @@ public class SellerTransactions extends Fragment {
                     Log.e("SellerTransactions", "Error fetching user: ", e);
                 });
     }
+
 }

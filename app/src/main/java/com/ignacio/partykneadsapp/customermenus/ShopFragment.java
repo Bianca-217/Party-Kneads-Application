@@ -184,9 +184,12 @@ public class ShopFragment extends Fragment {
                                 String description = document.getString("description");
                                 String rate = document.getString("rate");
                                 String numreviews = document.getString("numreviews");
-                                String category = document.getString("categories");
+                                String category = document.getString("category");
 
-                                filteredList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                                // Handle 'sold' field with default value if not present
+                                long sold = document.contains("sold") ? document.getLong("sold") : 0;
+
+                                filteredList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                             }
                         }
                         productShopAdapter.updateData(filteredList);  // Update the adapter with the filtered list
@@ -195,6 +198,7 @@ public class ShopFragment extends Fragment {
                     }
                 });
     }
+
 
     private void fetchProducts(String categoryFilter) {
         if ("All Items".equals(categoryFilter)) {
@@ -224,7 +228,11 @@ public class ShopFragment extends Fragment {
                             String numreviews = document.getString("numreviews");
                             String category = document.getString("categories");
 
-                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            // Assuming 'sold' is a field in Firestore document
+                            long sold = document.contains("sold") ? document.getLong("sold") : 0;
+
+                            // Add the product to the list
+                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                         }
 
                         productShopAdapter.updateData(productsList);
@@ -233,7 +241,6 @@ public class ShopFragment extends Fragment {
                     }
                 });
     }
-
 
     private void loadAllProducts() {
         productsRef
@@ -251,7 +258,11 @@ public class ShopFragment extends Fragment {
                             String numreviews = document.getString("numreviews");
                             String category = document.getString("categories");
 
-                            allProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            // Get the 'sold' value, defaulting to 0 if not found
+                            long sold = document.contains("sold") ? document.getLong("sold") : 0;
+
+                            // Add the product to the list with the 'sold' value
+                            allProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                         }
                         productShopAdapter.updateData(allProductsList);  // Update the adapter with all products
                     } else {

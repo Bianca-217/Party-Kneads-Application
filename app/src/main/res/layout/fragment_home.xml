@@ -219,15 +219,12 @@
 
                 <!-- RecyclerView for Popular Products -->
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/popular"
+                    android:id="@+id/ShoprecyclerView"
                     android:layout_width="match_parent"
+                    android:paddingHorizontal="7dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginHorizontal="10dp"
-                    tools:itemCount="1"
-                    android:orientation="vertical"
-                    app:spanCount="2"
-                    tools:listitem="@layout/popular_item" />
+                    tools:itemCount="8"
+                    tools:listitem="@layout/products_shop" />
 
             </LinearLayout>
         </ScrollView>

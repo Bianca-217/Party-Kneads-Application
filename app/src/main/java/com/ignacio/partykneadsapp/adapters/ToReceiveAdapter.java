@@ -42,6 +42,8 @@ import java.util.Map;
 public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.OrderViewHolder> {
     private List<ToShipModel> orderList;
     private Context context;
+    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
 
     // Constructor to initialize the order list and context
     public ToReceiveAdapter(List<ToShipModel> orderList, Context context) {
@@ -121,22 +123,33 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         // Set up the confirmation button (btnReceive)
         Button btnReceive = dialog.findViewById(R.id.btnReceive);
         btnReceive.setOnClickListener(v -> {
-            // Update the order status in the data source (Firestore)
-            updateOrderStatus(referenceId);
+            // Get the productId from the order
+            String productId = getProductIdFromOrder(referenceId, position); // This function fetches the productId from the order's REF field
 
-            // Create notification for in-app and Firestore update
-            createNotification(referenceId, position, new ToShipModel());
+            if (productId != null) {
+                // Update the order status in Firestore
+                updateOrderStatus(referenceId);
 
-            // Update the order status in the RecyclerView list
-            orderList.get(position).setStatus("Complete Order");
-            notifyItemChanged(position);  // Refresh the item to show the updated status
-            updateOrderStatusLocally(position, "Complete Order");
+                // Create notification for in-app and Firestore update
+                createNotification(referenceId, position, new ToShipModel());
 
-            // Show confirmation message
-            Toast.makeText(context, "Order marked as complete!", Toast.LENGTH_SHORT).show();
+                // Update the order status in the RecyclerView list
+                orderList.get(position).setStatus("Complete Order");
+                notifyItemChanged(position);  // Refresh the item to show the updated status
+                updateOrderStatusLocally(position, "Complete Order");
 
-            // Dismiss the dialog
-            dialog.dismiss();
+                // Show confirmation message
+                Toast.makeText(context, "Order marked as complete!", Toast.LENGTH_SHORT).show();
+
+                // Update the product's sold field
+                updateProductSoldField(productId);
+
+                // Dismiss the dialog
+                dialog.dismiss();
+            } else {
+                Log.e("FirestoreError", "Product ID is null, cannot update sold count");
+                Toast.makeText(context, "Error: Product ID is null", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Set up the "No" button (btnNo) to dismiss the dialog
@@ -150,6 +163,50 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         dialog.show();
     }
 
+    // In ToReceiveAdapter
+    public String getProductIdFromOrder(String referenceId, int position) {
+        ToShipModel order = orderList.get(position);  // Get the order at the given position
+        if (order.getItems() != null && !order.getItems().isEmpty()) {
+            OrderItemModel item = order.getItems().get(0);  // Get the first item (or any item you need)
+            return item.getProductId();  // Return the productId
+        }
+        return null;
+    }
+
+
+    private void updateProductSoldField(String productId) {
+        if (productId != null) {
+            // Create a map to store the updated 'sold' field value
+            Map<String, Object> updatedProduct = new HashMap<>();
+
+            // Fetch the current value of the 'sold' field and increment it
+            firestore.collection("products").document(productId)
+                    .get()
+                    .addOnSuccessListener(productSnapshot -> {
+                        int currentSoldCount = 0;
+                        if (productSnapshot.exists() && productSnapshot.contains("sold")) {
+                            // If the 'sold' field exists, get the current count
+                            currentSoldCount = productSnapshot.getLong("sold").intValue();
+                        }
+
+                        // Increment the 'sold' count by 1
+                        updatedProduct.put("sold", currentSoldCount + 1);
+
+                        // Update the 'sold' field in the product document
+                        firestore.collection("products").document(productId)
+                                .update(updatedProduct)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, "Product sold count updated", Toast.LENGTH_SHORT).show(); // Use context here
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(context, "Failed to update sold count", Toast.LENGTH_SHORT).show(); // Use context here
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("FirestoreError", "Error fetching product: " + e.getMessage());
+                    });
+        }
+    }
 
     private void createNotification(String referenceId, int position, ToShipModel shipModel) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -363,7 +420,11 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
                                                 // Add item to the list if the required fields are not null
                                                 if (productName != null && price != null) {
-                                                    productList.add(new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, price));
+                                                    String productId = "someProductId";  // Make sure you have the productId here (either pass it from elsewhere or fetch it)
+
+                                                    // Create new OrderItemModel with productId
+                                                    productList.add(new OrderItemModel(productId, productName, cakeSize, imageUrl, (int) quantity, price, referenceId));
+
 
                                                     // Sum the totalPrice (assuming the price is stored with the "₱" symbol)
                                                     try {

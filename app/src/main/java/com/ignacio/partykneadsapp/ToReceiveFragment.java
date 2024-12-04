@@ -87,6 +87,7 @@ public class ToReceiveFragment extends Fragment {
             long quantity = firstItem.get("quantity") != null ? (long) firstItem.get("quantity") : 0;
             String totalPrice = (String) firstItem.get("totalPrice");
             String imageUrl = (String) firstItem.get("imageUrl");
+            String productId = (String) firstItem.get("productId"); // Assuming 'productId' is part of the order item
 
             // Determine the display status based on the order status
             String displayStatus;
@@ -106,7 +107,7 @@ public class ToReceiveFragment extends Fragment {
             }
 
             // Create the OrderItemModel for the item
-            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice);
+            OrderItemModel item = new OrderItemModel(productId, productName, cakeSize, imageUrl, (int) quantity, totalPrice, referenceId);
 
             // Create a ToShipModel with the item and other order details
             List<OrderItemModel> itemList = new ArrayList<>();

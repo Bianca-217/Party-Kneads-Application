@@ -105,10 +105,14 @@ public class CompletedFragment extends Fragment {
             String displayStatus = "Your order has been delivered.";  // For "Complete Order"
 
             // Use the parsed price (converted back to a string for consistency, if needed)
-            String formattedPrice = String.format("₱%.2f", parsedPrice); // Display with currency symbol
+            String formattedPrice = String.format("₱%.2f", parsedPrice);
+
+            // You need to provide productId and referenceID to the constructor.
+            String productId = "defaultProductId";  // Replace with actual productId if available
+            String orderReferenceId = referenceId; // Use referenceId as the referenceID
 
             // Create the OrderItemModel for the item
-            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, formattedPrice);
+            OrderItemModel item = new OrderItemModel(productId, productName, cakeSize, imageUrl, (int) quantity, formattedPrice, orderReferenceId);
 
             // Create a ToShipModel with the item and other order details
             List<OrderItemModel> itemList = new ArrayList<>();
@@ -121,4 +125,5 @@ public class CompletedFragment extends Fragment {
             orderList.add(order);
         }
     }
+
 }
