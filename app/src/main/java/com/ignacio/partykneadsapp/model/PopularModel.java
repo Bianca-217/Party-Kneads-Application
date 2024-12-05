@@ -1,7 +1,9 @@
 package com.ignacio.partykneadsapp.model;
 
 
-public class PopularModel {
+import java.io.Serializable;
+
+public class PopularModel implements Serializable {
     private String name;
     private String sold;
     private String price;

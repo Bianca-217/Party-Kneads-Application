@@ -132,29 +132,33 @@ public class ChangePasswordDialogFragment extends DialogFragment {
         String currentPassword = binding.currentPass.getText().toString();
         String newPassword = binding.NewPass.getText().toString();
         String confirmPassword = binding.confirmPass.getText().toString();
-
-        if (newPassword.equals(confirmPassword)) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                // Re-authenticate the user
-                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
-                user.reauthenticate(credential)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                // Password is correct, proceed with password change
-                                updatePassword(newPassword, user);
-                            } else {
-                                // Show error if current password is incorrect
-                                Toast.makeText(getContext(), "Current password is incorrect", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+        if(!confirmPassword.isEmpty()) {
+            if (newPassword.equals(confirmPassword)) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    // Re-authenticate the user
+                    AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
+                    user.reauthenticate(credential)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // Password is correct, proceed with password change
+                                    updatePassword(newPassword, user);
+                                } else {
+                                    // Show error if current password is incorrect
+                                    Toast.makeText(getContext(), "Current password is incorrect", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+                // Passwords do not match
+                binding.helperNotMatch.setVisibility(View.VISIBLE);
             }
-        } else {
-            // Passwords do not match
-            binding.helperNotMatch.setVisibility(View.VISIBLE);
+        }else {
+            Toast.makeText(getContext(), "Please enter a password", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     private void updatePassword(String newPassword, FirebaseUser user) {

@@ -51,6 +51,7 @@ import com.ignacio.partykneadsapp.adapters.CarouselAdapter;
 import com.ignacio.partykneadsapp.adapters.CategoriesAdapter;
 import com.ignacio.partykneadsapp.adapters.OrderHistoryAdapter;
 import com.ignacio.partykneadsapp.adapters.PopularAdapter;
+import com.ignacio.partykneadsapp.adapters.ProductShopAdapter;
 import com.ignacio.partykneadsapp.adapters.SearchProductAdapter;
 import com.ignacio.partykneadsapp.databinding.FragmentHomeBinding;
 import com.ignacio.partykneadsapp.model.CategoriesModel;
@@ -77,30 +78,23 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
     private TextView txtUser;
     private Button btnLogout;
     private FirebaseUser user;
-    private RecyclerView categories;
-    private RecyclerView popular;
-    private RecyclerView orderHistory;
 
-    private List<CategoriesModel> categoriesModelList;
-    private CategoriesAdapter categoriesAdapter;
-    private List<PopularModel> popularProductList;
-    private PopularAdapter popularAdapter;
-    private List<OrderHistoryModel> orderHistoryList;
-    private OrderHistoryAdapter orderHistoryAdapter;
-
-    private int dotsCount;
     private ImageView[] dots;
     private LinearLayout cl;
     private ViewPager2 viewPager;
     private CarouselAdapter carouselAdapter; // Declare CarouselAdapter here
 
-    // Location-related variables
     private FusedLocationProviderClient fusedLocationClient;
     private TextView locationTextView;
 
     private SearchProductAdapter productAdapter;
     private List<SearchProduct> productList;
     private SearchView searchView;
+
+    private ProductShopAdapter productShopAdapter;
+    private List<ProductShopModel> shopproductList = new ArrayList<>();
+    private RecyclerView shopRecyclerView; // Correctly name your RecyclerView
+    private CollectionReference productsRef;
     private RecyclerView recyclerView;
 
     @Override
@@ -108,6 +102,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
+        productsRef = firestore.collection("products");
     }
 
     @Override
@@ -137,7 +132,20 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
         setupDotsIndicator(); // Setup dots after initializing adapter
 
-        setupPopularProducts();
+        // Initialize Shop RecyclerView
+        shopRecyclerView = binding.ShoprecyclerView;
+        shopRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // If `productList` is already a class-level variable, don't re-declare it
+        if (productList == null) {
+            productList = new ArrayList<>();
+        }
+
+        productShopAdapter = new ProductShopAdapter(getContext(), shopproductList);
+        shopRecyclerView.setAdapter(productShopAdapter);
+
+        // Load the most sold product
+        loadMostSoldProduct();
 
         // Enable infinite looping behavior
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -158,6 +166,59 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         });
 
         return binding.getRoot();
+    }
+
+    private void loadMostSoldProduct() {
+        if (productsRef == null) {
+            Log.e("HomeFragment", "productsRef is null. Ensure Firestore is initialized.");
+            return;
+        }
+
+        // Fetch all products from the "products" collection
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("products")
+                .get()
+                .addOnSuccessListener(productSnapshots -> {
+                    ProductShopModel mostSoldProduct = null;
+                    int highestSoldCount = 0;
+
+                    for (QueryDocumentSnapshot productSnapshot : productSnapshots) {
+                        String id = productSnapshot.getId();
+                        String imageUrl = productSnapshot.getString("imageUrl");
+                        String name = productSnapshot.getString("name");
+                        String price = productSnapshot.getString("price");
+                        String description = productSnapshot.getString("description");
+                        String rate = productSnapshot.getString("rate");
+                        String numreviews = productSnapshot.getString("numreviews");
+                        String category = productSnapshot.getString("categories");
+
+                        // Get the sold count for this product
+                        Long soldCountObject = productSnapshot.getLong("sold");
+
+                        // If soldCount is null, default it to 0
+                        long soldCount = (soldCountObject != null) ? soldCountObject : 0;
+
+                        // Check if this product has the highest sold count
+                        if (soldCount > highestSoldCount) {
+                            highestSoldCount = (int) soldCount;
+
+                            // Update the most sold product, including the 'sold' field
+                            mostSoldProduct = new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, soldCount);
+                        }
+                    }
+
+                    // If there is a most sold product, update the RecyclerView
+                    if (mostSoldProduct != null) {
+                        List<ProductShopModel> mostSoldProductList = new ArrayList<>();
+                        mostSoldProductList.add(mostSoldProduct);
+                        productShopAdapter.updateData(mostSoldProductList);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FirestoreError", "Error fetching products: " + e.getMessage()));
+    }
+
+    public int getItemCount() {
+        return (shopproductList != null) ? shopproductList.size() : 0;
     }
 
     @Override
@@ -198,7 +259,7 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         recyclerView = binding.SearchrecyclerView;  // Reference RecyclerView from binding
         if (recyclerView != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-            productList = new ArrayList<>();
+            productList = new ArrayList<>(); // Ensure productList is initialized
             productAdapter = new SearchProductAdapter(productList);
             recyclerView.setAdapter(productAdapter);
         } else {
@@ -223,6 +284,8 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
             }
         });
     }
+
+
 
     private void searchProducts(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -496,84 +559,6 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
-
-    // Set up popular products
-    private void setupPopularProducts() {
-        popular = binding.popular;
-        popularProductList = new ArrayList<>();
-        PopularAdapter popularAdapter = new PopularAdapter(getActivity(), popularProductList);
-        popular.setAdapter(popularAdapter);
-        popular.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
-        popular.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        popular.setNestedScrollingEnabled(false);
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Fetch orders from Firestore
-        db.collection("Users")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    HashMap<String, Integer> productCountMap = new HashMap<>();
-                    HashMap<String, String> productImageMap = new HashMap<>(); // Store image URLs for each product
-                    HashMap<String, String> productPriceMap = new HashMap<>(); // Store prices for each product
-
-                    for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
-                        CollectionReference ordersRef = userSnapshot.getReference().collection("Orders");
-                        ordersRef.get().addOnSuccessListener(orderSnapshots -> {
-                            for (QueryDocumentSnapshot orderSnapshot : orderSnapshots) {
-                                List<Map<String, Object>> items = (List<Map<String, Object>>) orderSnapshot.get("items");
-                                if (items != null) {
-                                    for (Map<String, Object> item : items) {
-                                        String productName = (String) item.get("productName");
-                                        String imageUrl = (String) item.get("imageUrl"); // Fetch image URL
-                                        if (productName != null) {
-                                            productCountMap.put(productName, productCountMap.getOrDefault(productName, 0) + 1);
-                                            productImageMap.put(productName, imageUrl); // Save the image URL for the product
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Fetch product prices from the "products" collection
-                            db.collection("products").get().addOnSuccessListener(productSnapshots -> {
-                                for (QueryDocumentSnapshot productSnapshot : productSnapshots) {
-                                    String name = productSnapshot.getString("name");
-                                    String price = productSnapshot.getString("price");
-                                    if (name != null && price != null) {
-                                        productPriceMap.put(name, price); // Save the price for each product
-                                    }
-                                }
-
-                                // Populate the list
-                                popularProductList.clear();
-                                for (Map.Entry<String, Integer> entry : productCountMap.entrySet()) {
-                                    String productName = entry.getKey();
-                                    int quantitySold = entry.getValue();
-                                    String imageUrl = productImageMap.get(productName); // Get the image URL
-                                    String price = productPriceMap.getOrDefault(productName, "₱0.00"); // Get the price
-
-                                    popularProductList.add(new PopularModel(
-                                            productName,
-                                            quantitySold + " sold",
-                                            "₱" + price, // Use the price from Firestore
-                                            imageUrl // Image URL from Firestore
-                                    ));
-                                }
-
-                                // Sort the list by quantity sold
-                                Collections.sort(popularProductList, (product1, product2) -> {
-                                    int quantity1 = Integer.parseInt(product1.getSold().split(" ")[0]);
-                                    int quantity2 = Integer.parseInt(product2.getSold().split(" ")[0]);
-                                    return Integer.compare(quantity2, quantity1);
-                                });
-
-                                popularAdapter.notifyDataSetChanged();
-                            });
-                        });
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FirestoreError", "Error fetching products: " + e.getMessage()));
     }
 
     private String capitalizeFirstLetter(String str) {

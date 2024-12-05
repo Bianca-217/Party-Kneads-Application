@@ -264,14 +264,22 @@ public class OrderFragment extends Fragment {
                     break;
             }
 
-            OrderItemModel item = new OrderItemModel(productName, cakeSize, imageUrl, (int) quantity, totalPrice);
+            // Assuming the productId and referenceID are not available here, use placeholders
+            String productId = "defaultProductId"; // You can set a default or fetch it from the Firestore document
+            String orderReferenceId = referenceId; // Use the provided referenceId as the referenceID
+
+            // Create the OrderItemModel with the correct constructor
+            OrderItemModel item = new OrderItemModel(productId, productName, cakeSize, imageUrl, (int) quantity, totalPrice, orderReferenceId);
+
             List<OrderItemModel> itemList = new ArrayList<>();
             itemList.add(item);
 
+            // Create the ToShipModel and add it to the list
             ToShipModel order = new ToShipModel(referenceId, displayStatus, totalPrice, productName, cakeSize, imageUrl, (int) quantity, itemList);
             orderList.add(order);
         }
     }
+
 }
 
 

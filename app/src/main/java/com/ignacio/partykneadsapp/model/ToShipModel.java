@@ -12,6 +12,7 @@ public class ToShipModel {
     private int quantity;
     private List<OrderItemModel> items; // Nested list of individual items
     private String cancellationReason;
+    private String productId;
 
     // Default constructor required for Firestore
     public ToShipModel() {
@@ -28,7 +29,13 @@ public class ToShipModel {
         this.imageUrl = imageUrl;
         this.quantity = quantity;
         this.items = items;
+        this.productId = productId;
     }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
 
     // Getters and Setters
     public String getReferenceId() {
@@ -101,5 +108,14 @@ public class ToShipModel {
 
     public void setCancellationReason(String cancellationReason) {
         this.cancellationReason = cancellationReason;
+    }
+
+    // Method to get productId from the first item in the list (assuming all items have the same productId)
+    public String getProductId() {
+        if (items != null && !items.isEmpty()) {
+            OrderItemModel firstItem = items.get(0); // Assuming productId is in each OrderItemModel
+            return firstItem.getProductId(); // Modify this based on the actual field in OrderItemModel
+        }
+        return null;
     }
 }

@@ -20,6 +20,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.ChangePasswordDialogFragment;
@@ -140,30 +142,78 @@ public class ManageProfileFragment extends Fragment {
 
     private void deleteUserAccount() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         String userId = auth.getCurrentUser().getUid();
 
-        // Delete the user document from Firestore
-        firestore.collection("Users").document(userId).delete()
+        // List of known collections
+        String[] collections = {"Locations", "cartItems", "Likes", "Notifications", "Vouchers"};
+
+        try {
+            // Fetch and delete each collection if it exists
+            for (String collectionName : collections) {
+                deleteCollection(firestore.collection("Users").document(userId).collection(collectionName));
+            }
+
+            // Delete the user's Firestore document after all collections are deleted
+            firestore.collection("Users").document(userId).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        try {
+                            // After Firestore deletion, proceed to delete the user's Firebase Authentication account
+                            auth.getCurrentUser().delete()
+                                    .addOnSuccessListener(authVoid -> {
+                                        // On successful deletion, show a success message
+                                        Toast.makeText(getActivity(), "Account deleted successfully", Toast.LENGTH_SHORT).show();
+
+                                        // Navigate to the login or home screen
+                                        NavController navController = Navigation.findNavController(requireView());
+                                        navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
+                                    })
+                                    .addOnFailureListener(authError -> {
+                                        // Handle any failure in deleting the user from Firebase Authentication
+                                        Toast.makeText(getActivity(), "Failed to delete authentication account: " + authError.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } catch (Exception e) {
+                            // Handle any errors that occur during the Firebase Authentication deletion
+                            Toast.makeText(getActivity(), "Unexpected error during authentication deletion", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                    })
+                    .addOnFailureListener(firestoreError -> {
+                        // Handle any failure in deleting the Firestore data
+                        Toast.makeText(getActivity(), "Failed to delete Firestore data: " + firestoreError.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } catch (Exception e) {
+            // Catch any unexpected errors and display a toast message
+            Toast.makeText(getActivity(), "An unexpected error occurred while deleting the account", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    // Helper method to delete all documents in a collection
+    private void deleteCollection(CollectionReference collectionRef) {
+        collectionRef.get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Delete the user from Firebase Authentication
-                        auth.getCurrentUser().delete().addOnCompleteListener(authTask -> {
-                            if (authTask.isSuccessful()) {
-                                Toast.makeText(getActivity(), "Account deleted successfully", Toast.LENGTH_SHORT).show();
-                                // Redirect to the login or home screen
-                                NavController navController = Navigation.findNavController(requireView());
-                                navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
-                            } else {
-                                Toast.makeText(getActivity(), "Failed to delete account from authentication", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        // Loop through the documents in the collection and delete them
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            doc.getReference().delete()
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getActivity(), "Error deleting document in collection: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
                     } else {
-                        Toast.makeText(getActivity(), "Failed to delete account from Firestore", Toast.LENGTH_SHORT).show();
+                        // Handle failure (i.e., collection not found or no documents to delete)
+                        Toast.makeText(getActivity(), "Error fetching collection: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getActivity(), "Error accessing collection: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-        private void hideKeyboard(View view) {
+
+
+    private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);

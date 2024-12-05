@@ -155,7 +155,7 @@ public class LikesFragment extends Fragment {
                         List<ProductShopModel> filteredList = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String productName = document.getString("name");
-                            if (productName != null && productName.toUpperCase().contains(normalizedKeyword)) {
+                            if (productName != null && productName.toUpperCase().contains(normalizedKeyword.toUpperCase())) {
                                 String id = document.getId();
                                 String imageUrl = document.getString("imageUrl");
                                 String name = document.getString("name");
@@ -165,14 +165,28 @@ public class LikesFragment extends Fragment {
                                 String numreviews = document.getString("numreviews");
                                 String category = document.getString("categories");
 
-                                filteredList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                                // Convert the sold value to a long (0 if null or invalid)
+                                String soldString = document.getString("sold");
+                                long sold = 0;
+                                if (soldString != null) {
+                                    try {
+                                        sold = Long.parseLong(soldString);
+                                    } catch (NumberFormatException e) {
+                                        // Handle parsing error if the value is not a valid number
+                                        Log.e("ProductShopModel", "Error parsing sold value: " + soldString, e);
+                                    }
+                                }
+
+                                // Add the product to the list with the 'sold' value
+                                filteredList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                             }
                         }
-                        productShopAdapter.updateData(filteredList); // Update adapter with all liked products
+
+                        // Update the adapter with the filtered list
+                        productShopAdapter.updateData(filteredList);
                     } else {
                         Log.d("Firestore", "Error loading liked products: ", task.getException());
                     }
-
                 });
     }
 
@@ -193,8 +207,8 @@ public class LikesFragment extends Fragment {
         db.collection("Users")
                 .document(uid)  // Navigate to the current user's document
                 .collection("Likes")  // Fetch liked products from the "Likes" collection
-                .whereGreaterThanOrEqualTo("category", startAt)
-                .whereLessThan("category", endAt)
+                .whereGreaterThanOrEqualTo("category", startAt)  // Start range based on 'startAt'
+                .whereLessThan("category", endAt)  // End range based on 'endAt'
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -209,9 +223,14 @@ public class LikesFragment extends Fragment {
                             String numreviews = document.getString("numreviews");
                             String category = document.getString("category");
 
-                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            // Fetch 'sold' as long, default to 0 if it's missing
+                            long sold = document.contains("sold") ? document.getLong("sold") : 0;
+
+                            // Add the product with the sold count
+                            productsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                         }
-                        productShopAdapter.updateData(productsList);  // Update adapter with filtered liked products
+                        // Update the adapter with the filtered liked products
+                        productShopAdapter.updateData(productsList);
                     } else {
                         Log.d("Firestore", "Error fetching liked products: ", task.getException());
                     }
@@ -236,9 +255,13 @@ public class LikesFragment extends Fragment {
                             String numreviews = document.getString("numreviews");
                             String category = document.getString("category");
 
-                            allLikedProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            // Get 'sold' as long, default to 0 if not available
+                            long sold = document.contains("sold") ? document.getLong("sold") : 0;
+
+                            // Add the product to the list
+                            allLikedProductsList.add(new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, sold));
                         }
-                        productShopAdapter.updateData(allLikedProductsList); // Update adapter with all liked products
+                        productShopAdapter.updateData(allLikedProductsList);  // Update adapter with all liked products
                     } else {
                         Log.d("Firestore", "Error loading liked products: ", task.getException());
                     }

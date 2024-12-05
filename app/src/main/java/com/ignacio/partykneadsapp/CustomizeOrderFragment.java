@@ -163,6 +163,12 @@ public class CustomizeOrderFragment extends Fragment {
         String theme = binding.theme.getText().toString();
         String note = binding.notes.getText().toString();
         int quantity = 1; // Default quantity
+
+        String imageUrl1 = ""; // Ensure `imageUrl` is correctly set after upload
+        if (selectedImageUri != null) {
+            imageUrl1 = selectedImageUri.toString();
+        }
+
         String productSize = selectedCakeType + " " + selectedCakeSize;
 
         int totalPrice = Integer.parseInt(binding.itemPrice.getText().toString().replace("₱", "").replace(".00", ""));
@@ -170,6 +176,11 @@ public class CustomizeOrderFragment extends Fragment {
 
         // Get the current user's UID
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (theme.isEmpty() || selectedCakeSize.isEmpty() || imageUrl1.isEmpty()) {
+            Toast.makeText(getContext(), "Please fill in all details before proceeding to checkout.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Upload image to Firebase Storage
         if (selectedImageUri != null) {

@@ -43,12 +43,16 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         ProductShopModel currentProduct = productList.get(position);
 
         // Bind data to the views
         holder.productName.setText(currentProduct.getName());
         holder.itemPrice.setText("₱ " + currentProduct.getPrice());
+
+        // Set sold count in the TextView
+        long soldCount = currentProduct.getSold();  // Assuming `getSold()` method exists in `ProductShopModel`
+        holder.itemSold.setText(soldCount + " sold");
 
         // Load product image using Glide
         Glide.with(holder.itemView.getContext())
@@ -140,10 +144,10 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
             } else if ("Balloons - Classic".equals(category) || "Balloons - Latex".equals(category) || "Balloons - LED".equals(category) || "Balloons - Number".equals(category) || "Balloons - Letter".equals(category)) {
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_balloonClassicDescription, bundle);
-            } else if ("Party Hats - Cartoon".equals(category) || ("Party Hats - Pompoms".equals(category)) || ("Party Hats - Balloon Headress".equals(category))){
+            } else if ("Party Hats - Cartoon".equals(category) || ("Party Hats - Pompoms".equals(category)) || ("Party Hats - Balloon Headress".equals(category))) {
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_partyHatsDescription, bundle);
-            } else if ("Banners - Card".equals(category) || ("Banners - Cursive".equals(category))){
+            } else if ("Banners - Card".equals(category) || ("Banners - Cursive".equals(category))) {
                 NavController navController = Navigation.findNavController(view);
                 navController.navigate(R.id.action_homePageFragment_to_bannerDescription, bundle);
             }
@@ -157,7 +161,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView productImage;
-        TextView productName, itemPrice;
+        TextView productName, itemPrice, itemSold;
         ImageView btnLike;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -166,6 +170,7 @@ public class ProductShopAdapter extends RecyclerView.Adapter<ProductShopAdapter.
             productName = itemView.findViewById(R.id.productName);
             itemPrice = itemView.findViewById(R.id.itemPrice);
             btnLike = itemView.findViewById(R.id.btnLike); // Initialize Like button
+            itemSold = itemView.findViewById(R.id.itemSold); // Initialize sold TextView
         }
     }
 
