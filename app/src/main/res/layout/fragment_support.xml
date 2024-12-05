@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         android:text="Need Help? Contact Our Support"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:textAlignment="center"
         android:layout_marginHorizontal="20dp"
         android:fontFamily="@font/montserrat_bold"
@@ -59,7 +60,8 @@
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:clipToPadding="true"
+        android:paddingVertical="20dp"
         android:background="@drawable/logincont"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="40dp">
@@ -67,7 +69,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:paddingHorizontal="20dp"
             android:orientation="vertical">
 
 
@@ -76,7 +78,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/supportIntro"
-                android:layout_marginTop="10dp"
                 android:textAlignment="textStart"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@color/semiblack"
