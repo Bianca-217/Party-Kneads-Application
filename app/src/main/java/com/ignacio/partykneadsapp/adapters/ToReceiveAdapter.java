@@ -87,12 +87,14 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
         // Handle item click to open dialog
         holder.itemView.setOnClickListener(v -> showOrderDetailsDialog(order.getReferenceId()));
+
     }
 
     @Override
     public int getItemCount() {
         return orderList.size();
     }
+
 
     // ViewHolder class
     static class OrderViewHolder extends RecyclerView.ViewHolder {
@@ -112,6 +114,7 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
         }
     }
 
+
     private void showConfirmReceivedDialog(String referenceId, int position) {
         // Create a dialog
         Dialog dialog = new Dialog(context);
@@ -129,7 +132,7 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
             if (productId != null) {
                 // Update the order status in Firestore
                 updateOrderStatus(referenceId);
-
+                String quantity = String.valueOf(orderList.get(position).getQuantity());
                 // Create notification for in-app and Firestore update
                 createNotification(referenceId, position, new ToShipModel());
 
@@ -140,9 +143,8 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
                 // Show confirmation message
                 Toast.makeText(context, "Order marked as complete!", Toast.LENGTH_SHORT).show();
-
                 // Update the product's sold field
-                updateProductSoldField(productId);
+                updateProductSoldField(productId, quantity);
 
                 // Dismiss the dialog
                 dialog.dismiss();
@@ -174,10 +176,11 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
     }
 
 
-    private void updateProductSoldField(String productId) {
+    private void updateProductSoldField(String productId, String quant) {
         if (productId != null) {
             // Create a map to store the updated 'sold' field value
             Map<String, Object> updatedProduct = new HashMap<>();
+            long quantNum = Long.parseLong(quant);
 
             // Fetch the current value of the 'sold' field and increment it
             firestore.collection("products").document(productId)
@@ -190,7 +193,7 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                         }
 
                         // Increment the 'sold' count by 1
-                        updatedProduct.put("sold", currentSoldCount + 1);
+                        updatedProduct.put("sold", currentSoldCount + quantNum);
 
                         // Update the 'sold' field in the product document
                         firestore.collection("products").document(productId)

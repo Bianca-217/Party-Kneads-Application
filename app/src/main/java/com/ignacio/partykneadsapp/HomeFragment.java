@@ -45,6 +45,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ignacio.partykneadsapp.adapters.CarouselAdapter;
@@ -135,7 +136,8 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
 
         // Initialize Shop RecyclerView
         shopRecyclerView = binding.ShoprecyclerView;
-        shopRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        shopRecyclerView.setLayoutManager(gridLayoutManager);
 
         // If `productList` is already a class-level variable, don't re-declare it
         if (productList == null) {
@@ -175,13 +177,15 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
             return;
         }
 
-        // Fetch all products from the "products" collection
+        // Fetch products with sold count greater than 5 and limit to 6 items
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("products")
+                .whereGreaterThan("sold", 5) // Only get products with sold count > 5
+                .orderBy("sold", Query.Direction.DESCENDING) // Sort by sold count in descending order
+                .limit(10) // Limit to top 6 products
                 .get()
                 .addOnSuccessListener(productSnapshots -> {
-                    ProductShopModel mostSoldProduct = null;
-                    int highestSoldCount = 0;
+                    List<ProductShopModel> mostSoldProducts = new ArrayList<>();
 
                     for (QueryDocumentSnapshot productSnapshot : productSnapshots) {
                         String id = productSnapshot.getId();
@@ -199,24 +203,19 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
                         // If soldCount is null, default it to 0
                         long soldCount = (soldCountObject != null) ? soldCountObject : 0;
 
-                        // Check if this product has the highest sold count
-                        if (soldCount > highestSoldCount) {
-                            highestSoldCount = (int) soldCount;
-
-                            // Update the most sold product, including the 'sold' field
-                            mostSoldProduct = new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, soldCount);
-                        }
+                        // Add the product to the list
+                        ProductShopModel product = new ProductShopModel(id, imageUrl, name, price, description, rate, numreviews, category, soldCount);
+                        mostSoldProducts.add(product);
                     }
 
-                    // If there is a most sold product, update the RecyclerView
-                    if (mostSoldProduct != null) {
-                        List<ProductShopModel> mostSoldProductList = new ArrayList<>();
-                        mostSoldProductList.add(mostSoldProduct);
-                        productShopAdapter.updateData(mostSoldProductList);
+                    // If there are top sold products, update the RecyclerView
+                    if (!mostSoldProducts.isEmpty()) {
+                        productShopAdapter.updateData(mostSoldProducts);
                     }
                 })
                 .addOnFailureListener(e -> Log.e("FirestoreError", "Error fetching products: " + e.getMessage()));
     }
+
 
     public int getItemCount() {
         return (shopproductList != null) ? shopproductList.size() : 0;
