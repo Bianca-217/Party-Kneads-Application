@@ -8,12 +8,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".OrderHistory">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="80dp">
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="80dp">
+        android:layout_marginStart="20dp">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -29,6 +33,19 @@
 
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/btnRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:fontFamily="@font/montserrat_semibold"
+        android:textColor="@color/darkpink"
+        android:textSize="16sp"
+        android:gravity="end"
+        android:paddingEnd="20dp"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
     <LinearLayout
         android:id="@+id/addtextview"
         android:layout_width="match_parent"

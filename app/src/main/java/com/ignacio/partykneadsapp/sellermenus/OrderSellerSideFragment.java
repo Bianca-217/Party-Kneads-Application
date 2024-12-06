@@ -4,11 +4,14 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.ignacio.partykneadsapp.R;
@@ -22,6 +25,8 @@ import com.ignacio.partykneadsapp.CancelledOrderFragment;
 public class OrderSellerSideFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private TextView btnRefresh;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,7 +51,20 @@ public class OrderSellerSideFragment extends Fragment {
         // Link ViewPager to the adapter and TabLayout
         viewPager.setAdapter(fragmentViewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+        btnRefresh = view.findViewById(R.id.btnRefresh);
+
+        btnRefresh.setOnClickListener(v -> reloadFragment());
 
         return view;
     }
+    private void reloadFragment() {
+        // Reload the orderSellerSideFragment within the seller's homepage
+        Fragment orderSellerSideFragment = new OrderSellerSideFragment(); // Create a new instance
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_contseller, orderSellerSideFragment) // Replace the frame layout's content
+                .commit();
+    }
+
 }

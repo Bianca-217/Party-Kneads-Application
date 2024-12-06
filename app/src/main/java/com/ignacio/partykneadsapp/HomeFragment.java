@@ -53,6 +53,7 @@ import com.ignacio.partykneadsapp.adapters.OrderHistoryAdapter;
 import com.ignacio.partykneadsapp.adapters.PopularAdapter;
 import com.ignacio.partykneadsapp.adapters.ProductShopAdapter;
 import com.ignacio.partykneadsapp.adapters.SearchProductAdapter;
+import com.ignacio.partykneadsapp.customermenus.ShopFragment;
 import com.ignacio.partykneadsapp.databinding.FragmentHomeBinding;
 import com.ignacio.partykneadsapp.model.CategoriesModel;
 import com.ignacio.partykneadsapp.model.OrderHistoryModel;
@@ -270,19 +271,23 @@ public class HomeFragment extends Fragment implements NavigationBarView.OnItemSe
         searchView = view.findViewById(R.id.searchView);
         searchView.setQueryHint("Search products...");
 
-        // Listen for changes in the SearchView input
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false; // No need to handle submit for Firestore query
-            }
+// Navigate to ShopFragment when SearchView is clicked
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) { // Check if the SearchView is focused
+                Bundle args = new Bundle();
+                args.putBoolean("focusSearchView", true); // Pass flag to focus the SearchView
+                Fragment shopFragment = new ShopFragment();
+                shopFragment.setArguments(args); // Set arguments for the fragment
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                searchProducts(newText); // Call the function to search products
-                return true;
+                requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_cont, shopFragment)
+                        .commit();
             }
         });
+
+
     }
 
 

@@ -13,18 +13,18 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.ignacio.partykneadsapp.adapters.FragmentViewPagerAdapter;
 
-
 public class OrderHistory extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private ImageView btn;
+    private ImageView btnBack;
+    private TextView btnRefresh;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -49,18 +49,28 @@ public class OrderHistory extends Fragment {
         // Link ViewPager to the adapter and TabLayout
         viewPager.setAdapter(fragmentViewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        btn = view.findViewById(R.id.btnBack);
 
-        btn.setOnClickListener(v -> {
-            setupBackButton();
-        });
+        // Initialize buttons
+        btnBack = view.findViewById(R.id.btnBack);
+        btnRefresh = view.findViewById(R.id.btnRefresh);
+
+        // Set click listeners
+        btnBack.setOnClickListener(v -> setupBackButton());
+        btnRefresh.setOnClickListener(v -> reloadFragment());
+
         return view;
     }
 
     private void setupBackButton() {
-            Bundle args1 = new Bundle();
-            args1.putBoolean("loadShop", true);
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_orderHistoryFragment_to_homePageFragment, args1);
+        Bundle args1 = new Bundle();
+        args1.putBoolean("loadShop", true);
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_orderHistoryFragment_to_homePageFragment, args1);
+    }
+
+    private void reloadFragment() {
+        // Reload the current fragment to update its content
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.orderHistoryFragment); // Navigate to itself
     }
 }

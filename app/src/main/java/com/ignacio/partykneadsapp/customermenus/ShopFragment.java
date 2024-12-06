@@ -2,6 +2,7 @@ package com.ignacio.partykneadsapp.customermenus;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -81,7 +82,16 @@ public class ShopFragment extends Fragment {
         // Setup SearchView
         shopsearchView = binding.ShopsearchView;  // Assuming your layout has a SearchView with this ID
         shopsearchView.setQueryHint("Search for products...");
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.getBoolean("focusSearchView", false)) {
+            shopsearchView.requestFocus(); // Programmatically focus the SearchView
 
+            // Show keyboard
+            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(shopsearchView, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }
         shopsearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

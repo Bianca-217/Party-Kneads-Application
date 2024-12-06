@@ -8,11 +8,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".sellermenus.OrderSellerSideFragment">
 
+    <TextView
+        android:id="@+id/btnRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:layout_marginTop="70dp"
+        android:fontFamily="@font/montserrat_semibold"
+        android:textColor="@color/darkpink"
+        android:textSize="16sp"
+        android:paddingEnd="20dp"
+        android:gravity="end"
+        android:layout_gravity="center"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
         android:orientation="vertical">
 
     <LinearLayout
