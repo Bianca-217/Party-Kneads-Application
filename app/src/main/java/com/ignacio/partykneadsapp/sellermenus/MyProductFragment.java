@@ -77,7 +77,7 @@ public class MyProductFragment extends Fragment {
         setupCategories();
 
         // Fetch products
-        fetchProducts("Cakes");
+        fetchProducts("All Items");
 
         binding.btnBack.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
@@ -103,6 +103,7 @@ public class MyProductFragment extends Fragment {
         categoriesModelList = new ArrayList<>();
 
         // Add categories to the list (Images should exist in drawable folder)
+        categoriesModelList.add(new CategoriesModel(R.drawable.all, "All Items"));
         categoriesModelList.add(new CategoriesModel(R.drawable.cake, "Cakes"));
         categoriesModelList.add(new CategoriesModel(R.drawable.desserts, "Dessert"));
         categoriesModelList.add(new CategoriesModel(R.drawable.balloons, "Balloons"));
@@ -110,10 +111,10 @@ public class MyProductFragment extends Fragment {
         categoriesModelList.add(new CategoriesModel(R.drawable.banners, "Banners"));
         categoriesModelList.add(new CategoriesModel(R.drawable.customized, "Customize"));
 
-        // Initialize adapter and layout manager for categories
         categoriesAdapter = new CategoriesAdapter(requireActivity(), categoriesModelList, category -> {
             fetchProducts(category); // Fetch products for the selected category
         });
+
         categories.setAdapter(categoriesAdapter);
         categories.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.HORIZONTAL, false));
         categories.setHasFixedSize(true);
@@ -121,35 +122,63 @@ public class MyProductFragment extends Fragment {
     }
 
     private void fetchProducts(String categoryFilter) {
-        // Set up the range for categories that start with the given category filter
-        String startAt = categoryFilter;
-        String endAt = categoryFilter + "\uf8ff"; // Unicode character to include anything starting with the prefix
+        if (categoryFilter.equals("All Items")) {
+            // Fetch all products without filtering
+            productsRef
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<SellerProductModel> productsList = new ArrayList<>();
 
-        productsRef
-                .whereGreaterThanOrEqualTo("categories", startAt)
-                .whereLessThan("categories", endAt)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<SellerProductModel> productsList = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String id = document.getId();
+                                String imageUrl = document.getString("imageUrl");
+                                String name = document.getString("name");
+                                String price = document.getString("price");
+                                String description = document.getString("description");
+                                String rate = document.getString("rate");
+                                String numreviews = document.getString("numreviews");
+                                String category = document.getString("categories");
 
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String id = document.getId();
-                            String imageUrl = document.getString("imageUrl");
-                            String name = document.getString("name");
-                            String price = document.getString("price");
-                            String description = document.getString("description");
-                            String rate = document.getString("rate");
-                            String numreviews = document.getString("numreviews");
-                            String category = document.getString("categories");
+                                productsList.add(new SellerProductModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            }
 
-                            productsList.add(new SellerProductModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            productShopAdapter.updateData(productsList);
+                        } else {
+                            Log.d("Firestore", "Error getting products: ", task.getException());
                         }
+                    });
+        } else {
+            // Filter products by category
+            String startAt = categoryFilter;
+            String endAt = categoryFilter + "\uf8ff"; // Unicode character to include anything starting with the prefix
 
-                        productShopAdapter.updateData(productsList);
-                    } else {
-                        Log.d("Firestore", "Error getting products: ", task.getException());
-                    }
-                });
+            productsRef
+                    .whereGreaterThanOrEqualTo("categories", startAt)
+                    .whereLessThan("categories", endAt)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<SellerProductModel> productsList = new ArrayList<>();
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String id = document.getId();
+                                String imageUrl = document.getString("imageUrl");
+                                String name = document.getString("name");
+                                String price = document.getString("price");
+                                String description = document.getString("description");
+                                String rate = document.getString("rate");
+                                String numreviews = document.getString("numreviews");
+                                String category = document.getString("categories");
+
+                                productsList.add(new SellerProductModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            }
+
+                            productShopAdapter.updateData(productsList);
+                        } else {
+                            Log.d("Firestore", "Error getting products: ", task.getException());
+                        }
+                    });
+        }
     }
 }

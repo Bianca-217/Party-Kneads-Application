@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,6 +62,12 @@ public class VoucherSellerFragment extends Fragment {
             showConfirmVoucherDialog("₱200 Off");
         });
 
+
+        binding.btnBack.setOnClickListener(v -> {
+            // Replace the current fragment with the menu page fragment and pass the argument
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_voucherSellerFragment_to_myProductFragment);
+        });
     }
 
     // Function to display the confirmation dialog

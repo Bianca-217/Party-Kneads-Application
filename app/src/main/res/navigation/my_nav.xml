@@ -592,6 +592,9 @@
         <action
             android:id="@+id/action_voucherFragment_to_homePageFragment"
             app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_voucherFragment_to_myProductFragment"
+            app:destination="@id/myProductFragment" />
     </fragment>
     <fragment
         android:id="@+id/customizeOrderFragment"

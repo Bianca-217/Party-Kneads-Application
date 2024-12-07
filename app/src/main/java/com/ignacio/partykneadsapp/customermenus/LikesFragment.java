@@ -74,7 +74,7 @@ public class LikesFragment extends Fragment {
         // Fetch liked products based on a default category
         fetchLikedProducts("All Items");
 
-        // Setup SearchView for liked products
+
         // Setup SearchView
         likesSearchView = binding.likesearchView;  // Assuming your layout has a SearchView with this ID
         likesSearchView.setQueryHint("Search for products...");
