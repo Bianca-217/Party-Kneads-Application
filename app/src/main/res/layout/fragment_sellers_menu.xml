@@ -31,7 +31,6 @@
 
         <!-- Home Menu -->
         <LinearLayout
-            android:id="@+id/home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -39,7 +38,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/homeMenu"
+                android:id="@+id/home"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/home_filled" />
@@ -56,7 +55,6 @@
 
         <!-- Likes Menu -->
         <LinearLayout
-            android:id="@+id/orders"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -64,7 +62,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/heartMenu"
+                android:id="@+id/orders"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/order" />
@@ -98,7 +96,6 @@
 
         <!-- Notifications Menu -->
         <LinearLayout
-            android:id="@+id/notif"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -106,7 +103,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/notifMenu"
+                android:id="@+id/notif"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/notif_outline" />
@@ -123,7 +120,6 @@
 
         <!-- Profile Menu -->
         <LinearLayout
-            android:id="@+id/profile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -131,7 +127,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/profileMenu"
+                android:id="@+id/profile"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/person_outline" />

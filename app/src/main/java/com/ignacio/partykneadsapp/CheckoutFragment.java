@@ -40,10 +40,14 @@ import com.ignacio.partykneadsapp.model.CartItemModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.model.NotificationViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 public class CheckoutFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -239,16 +243,25 @@ public class CheckoutFragment extends Fragment {
 
 
     private void proceedToSaveOrder() {
-        // Generate a random reference ID
-        String orderRefId = "REF-" + System.currentTimeMillis();
+        // Generate a random reference ID in the desired format
+        String dateFormatted = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date()); // Example: 20241207
+        String timeFormatted = new SimpleDateFormat("hhmm", Locale.getDefault()).format(new Date()); // Example: 1128 (12-hour format)
+        String randomNum = String.format("%05d", new Random().nextInt(100000)); // 5 random digits, e.g., 00512
+
+        // Construct the final order reference ID: REF-YYYYMMDDHHMMRandom5Digits
+        String orderRefId = "REF-" + dateFormatted + timeFormatted + randomNum;
 
         // Create a map to store order details
         HashMap<String, Object> orderData = new HashMap<>();
         orderData.put("referenceId", orderRefId);
         orderData.put("status", "placed");
+        orderData.put("discount", discount.getText().toString());
+        orderData.put("subtotal", subTotalTextView.getText().toString());
+        orderData.put("totalPrice", totalCostTextView.getText().toString());
 
-        // Add the timestamp for the order (this is for sorting later)
-        orderData.put("timestamp", System.currentTimeMillis()); // Store the timestamp at the order level
+        // Add the timestamp for the order in the desired format
+        String timestampFormatted = new SimpleDateFormat("MMMM dd, yyyy, h:mm a", Locale.getDefault()).format(new Date()); // Example: December 07, 2024, 11:28 AM
+        orderData.put("timestamp", timestampFormatted);
 
         // Get the current user's email
         if (cUser != null) {
@@ -266,7 +279,7 @@ public class CheckoutFragment extends Fragment {
             itemData.put("productId", item.getProductId());
             itemData.put("productName", item.getProductName());
             itemData.put("quantity", item.getQuantity());
-            itemData.put("totalPrice", itemTotalTextView.getText().toString());
+            itemData.put("totalPrice", item.getTotalPrice());
             itemData.put("imageUrl", item.getImageUrl());  // Add imageUrl to the item data
             itemData.put("cakeSize", item.getCakeSize());
             itemsList.add(itemData);
@@ -294,33 +307,20 @@ public class CheckoutFragment extends Fragment {
                         if (phoneNumber != null) orderData.put("phoneNumber", phoneNumber);
                         if (userName != null) orderData.put("userName", userName);
 
-                        // Save order under the admin document's ID
-                        String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
-                        db.collection("Users")
-                                .whereEqualTo("email", adminEmail)
-                                .get()
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                        String userDocId = task.getResult().getDocuments().get(0).getId();
+                        // Save order under the user's document ID
+                        db.collection("Users").document("QqqccLchjigd0C7zf8ewPXY0KZc2").collection("Orders")
+                                .document(orderRefId)  // Use the reference ID as the document ID
+                                .set(orderData, SetOptions.merge())  // Use merge to avoid overwriting
+                                .addOnSuccessListener(documentReference -> {
+                                    Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
+                                    clearCart();
+                                    showSuccessDialog();  // Show success dialog after order placement
 
-                                        // Use document(orderRefId) to set the order data
-                                        db.collection("Users").document(userDocId).collection("Orders")
-                                                .document(orderRefId)  // Use the reference ID as the document ID
-                                                .set(orderData, SetOptions.merge())  // Use merge to avoid overwriting
-                                                .addOnSuccessListener(documentReference -> {
-                                                    Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
-                                                    clearCart();
-                                                    showSuccessDialog();  // Show success dialog after order placement
-
-                                                    // Send notification after order is successfully placed
-                                                    sendOrderNotification(cakeImageUrl[0]);  // Pass the cake image URL
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Log.w("CheckoutFragment", "Error placing order", e);
-                                                });
-                                    } else {
-                                        Log.w("CheckoutFragment", "Admin user not found or no documents returned.");
-                                    }
+                                    // Send notification after order is successfully placed
+                                    sendOrderNotification(cakeImageUrl[0]);  // Pass the cake image URL
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.w("CheckoutFragment", "Error placing order", e);
                                 });
                     } else {
                         Log.w("CheckoutFragment", "No active locations found.");
@@ -331,8 +331,6 @@ public class CheckoutFragment extends Fragment {
                     Log.w("CheckoutFragment", "Error fetching active location details", e);
                 });
     }
-
-
 
     private void sendOrderNotification(String cakeImageUrl) {
         // Admin's email address

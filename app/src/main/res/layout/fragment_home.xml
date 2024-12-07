@@ -6,7 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/plainwhitebg"
-
         tools:context=".HomePageFragment">
 
         <LinearLayout
@@ -142,6 +141,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
+            android:clipToPadding="false"
+            android:paddingBottom="10dp"
+            android:nestedScrollingEnabled="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout7">
 
@@ -199,7 +201,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="25dp"
-                    android:layout_marginBottom="5dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -211,7 +212,6 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/montserrat_bold"
                         android:text="Popular Products"
-                        android:layout_marginBottom="10dp"
                         android:textColor="@color/semiblack"
                         android:textSize="16sp" />
 

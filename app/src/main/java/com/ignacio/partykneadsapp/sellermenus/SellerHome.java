@@ -1,5 +1,6 @@
 package com.ignacio.partykneadsapp.sellermenus;
 
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,13 +15,26 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentSellerHomeBinding;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Locale;
 
 public class SellerHome extends Fragment {
 
@@ -32,7 +46,6 @@ public class SellerHome extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentSellerHomeBinding.inflate(getLayoutInflater());
         return binding.getRoot();
     }
@@ -41,7 +54,6 @@ public class SellerHome extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize Firestore
         firestore = FirebaseFirestore.getInstance();
 
         binding.myproduct.setOnClickListener(v -> {
@@ -60,26 +72,24 @@ public class SellerHome extends Fragment {
         }
 
 
-        // Check if binding is correctly initialized
         if (binding == null) {
             Log.e("SellerHome", "Binding is null");
             return;
         }
 
-        // Navigate to MyProductFragment
         binding.btnmyProduct1.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView2);
             navController.navigate(R.id.action_seller_HomePageFragment_to_myProductFragment);
         });
 
-        // Navigate to MyProductFragment
         binding.btnInventory.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView2);
             navController.navigate(R.id.action_seller_HomePageFragment_to_inventoryFragment);
         });
 
-        // Fetch total number of products from Firestore
         fetchTotalProductCount();
+        fetchPendingOrdersCount();
+        fetchTotalRevenue();
     }
 
     private void loadUserProfilePicture(String userId) {
@@ -135,4 +145,104 @@ public class SellerHome extends Fragment {
             }
         });
     }
+
+    private void fetchPendingOrdersCount() {
+        // Get the current user ID
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Reference to the user's 'Orders' collection
+        CollectionReference ordersRef = firestore.collection("Users")
+                .document(userId)
+                .collection("Orders");
+
+        // Query orders where the status is 'placed'
+        ordersRef.whereEqualTo("status", "placed").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                // Get the count of pending orders
+                int pendingOrders = task.getResult().size();
+
+                // Display the count in the TextView
+                binding.numPendingOrders.setText(String.valueOf(pendingOrders));
+
+            } else {
+                Log.e("Firestore", "Error getting pending orders: ", task.getException());
+                Toast.makeText(requireContext(), "Failed to fetch pending orders count", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchTotalRevenue() {
+        // Get today's date in the format "MMMM dd, yyyy" (e.g., "December 07, 2024")
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
+        String todayDateString = sdf.format(new Date());  // Today's date as a string
+
+        // Reference to the user's 'Orders' collection
+        CollectionReference ordersRef = firestore.collection("Users")
+                .document("QqqccLchjigd0C7zf8ewPXY0KZc2")
+                .collection("Orders");
+
+        // Query all orders (you'll filter later by the timestamp)
+        ordersRef.get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        if (task.getResult().isEmpty()) {
+                            Log.d("Firestore", "No orders found.");
+                            Toast.makeText(requireContext(), "No orders for today", Toast.LENGTH_SHORT).show();
+                        } else {
+                            double totalRevenue = 0.0;
+
+                            // Check if results are returned
+                            Log.d("Firestore", "Number of orders found: " + task.getResult().size());
+
+                            // Iterate through the results and sum the totalPrice for today's orders
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Get the timestamp string and totalPrice for each order
+                                String timestamp = document.getString("timestamp");
+                                String totalPrice = document.getString("totalPrice");
+
+                                // Debug logging to verify the timestamp and totalPrice
+                                Log.d("Firestore", "Order Timestamp: " + timestamp);
+                                Log.d("Firestore", "Order TotalPrice: " + totalPrice);
+
+                                if (timestamp != null && totalPrice != null) {
+                                    // Extract only the date part from the timestamp string (e.g., "December 07, 2024")
+                                    String orderDateString = extractDateFromTimestamp(timestamp);
+
+                                    // Compare the order date with today's date
+                                    if (orderDateString.equals(todayDateString)) {
+                                        // Remove the currency symbol and parse the price
+                                        double totalPriceDouble = Double.parseDouble(totalPrice.replace("₱", ""));
+                                        totalRevenue += totalPriceDouble;  // Add the totalPrice to the total revenue
+                                    }
+                                }
+                            }
+
+                            String formattedRevenue = String.format("₱%.2f", totalRevenue);
+                            Log.d("Firestore", "Total Revenue for today: " + formattedRevenue);
+                            binding.revenue.setText(formattedRevenue);  // Display the total revenue
+                        }
+                    } else {
+                        Log.e("Firestore", "Error getting revenue data: ", task.getException());
+                        Toast.makeText(requireContext(), "Failed to fetch total revenue", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private String extractDateFromTimestamp(String timestamp) {
+        try {
+            // Use SimpleDateFormat to parse the timestamp and format it into the desired "MMMM dd, yyyy" format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("MMMM dd, yyyy, h:mm a", Locale.ENGLISH);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
+
+            // Parse the timestamp string and reformat it to match today's date format
+            Date date = inputFormat.parse(timestamp);
+            return outputFormat.format(date);  // Return only the date part (e.g., "December 07, 2024")
+        } catch (ParseException e) {
+            Log.e("Timestamp Parsing", "Error parsing timestamp: " + timestamp, e);
+            return "";  // Return an empty string if parsing fails
+        }
+    }
+
+
+
 }

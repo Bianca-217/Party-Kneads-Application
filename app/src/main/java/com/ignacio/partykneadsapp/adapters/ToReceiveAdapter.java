@@ -199,7 +199,6 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                         firestore.collection("products").document(productId)
                                 .update(updatedProduct)
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Product sold count updated", Toast.LENGTH_SHORT).show(); // Use context here
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(context, "Failed to update sold count", Toast.LENGTH_SHORT).show(); // Use context here
@@ -335,7 +334,6 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                 });
     }
 
-
     private void showOrderDetailsDialog(String referenceId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -358,7 +356,13 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                                     if (orderSnapshot.exists()) {
                                         // Retrieve the 'items' field from the order document
                                         List<Map<String, Object>> items = (List<Map<String, Object>>) orderSnapshot.get("items");
-
+                                        String timestamp = orderSnapshot.getString("timestamp");
+                                        String location = orderSnapshot.getString("location");
+                                        String phoneNumber = orderSnapshot.getString("phoneNumber");
+                                        String userName = orderSnapshot.getString("userName");
+                                        String discountfromdb = orderSnapshot.getString("discount");
+                                        String subTotal = orderSnapshot.getString("subtotal");
+                                        String totalCost = orderSnapshot.getString("totalPrice");
                                         // Initialize the dialog
                                         Dialog dialog = new Dialog(context);
                                         dialog.setContentView(R.layout.view_order_details);
@@ -390,9 +394,21 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
 
                                         // Get references to the TextViews in the dialog
                                         TextView orderIdTextView = dialog.findViewById(R.id.OrderID);
+                                        TextView timeStamp = dialog.findViewById(R.id.timestamptv);
                                         TextView itemTotalTextView = dialog.findViewById(R.id.itemTotal);
                                         TextView totalCosttTextView = dialog.findViewById(R.id.totalCost);
+                                        TextView discounttxt = dialog.findViewById(R.id.discount);
                                         RecyclerView productsRecyclerView = dialog.findViewById(R.id.recyclerViewCart);
+
+
+                                        TextView textUserName = dialog.findViewById(R.id.txtUserName);
+                                        TextView contactNumber = dialog.findViewById(R.id.contactNum);
+                                        TextView addressLocation = dialog.findViewById(R.id.location);
+
+                                        textUserName.setText(userName);
+                                        contactNumber.setText(phoneNumber);
+                                        addressLocation.setText(location);
+                                        discounttxt.setText(discountfromdb);
 
                                         productsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -400,9 +416,12 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                                         List<OrderItemModel> productList = new ArrayList<>();
                                         OrderItemsAdapter adapter = new OrderItemsAdapter(productList, context);
                                         productsRecyclerView.setAdapter(adapter);
+                                        // Adapter for the RecyclerView
+
 
                                         // Set the OrderID TextView to the referenceId
                                         orderIdTextView.setText(referenceId);
+                                        timeStamp.setText(timestamp);
 
                                         // Variable to hold the total price sum
                                         double totalPrice = 0;
@@ -444,8 +463,8 @@ public class ToReceiveAdapter extends RecyclerView.Adapter<ToReceiveAdapter.Orde
                                             adapter.notifyDataSetChanged();
 
                                             // Set the total price to the itemTotal TextView
-                                            itemTotalTextView.setText("₱" + String.format("%.2f", totalPrice)); // Format to 2 decimal places
-                                            totalCosttTextView.setText(itemTotalTextView.getText());
+                                            itemTotalTextView.setText(subTotal); // Format to 2 decimal places
+                                            totalCosttTextView.setText(totalCost);
                                         }
 
                                         // Show the dialog after all data is set
