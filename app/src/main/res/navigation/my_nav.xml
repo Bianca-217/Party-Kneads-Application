@@ -186,6 +186,9 @@
         <action
             android:id="@+id/action_seller_HomePageFragment_to_inventoryFragment"
             app:destination="@id/inventoryFragment" />
+        <action
+            android:id="@+id/action_seller_HomePageFragment_to_analyticsFragment"
+            app:destination="@id/analyticsFragment" />
     </fragment>
 
     <fragment
@@ -624,6 +627,15 @@
         tools:layout="@layout/fragment_inventory" >
         <action
             android:id="@+id/action_inventoryFragment_to_seller_HomePageFragment"
+            app:destination="@id/seller_HomePageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="com.ignacio.partykneadsapp.sellermenus.AnalyticsFragment"
+        android:label="fragment_analytics"
+        tools:layout="@layout/fragment_analytics" >
+        <action
+            android:id="@+id/action_analyticsFragment_to_seller_HomePageFragment"
             app:destination="@id/seller_HomePageFragment" />
     </fragment>
 </navigation>

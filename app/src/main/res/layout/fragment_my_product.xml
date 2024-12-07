@@ -106,7 +106,7 @@
                     android:text="MY PRODUCT"
                     android:textAlignment="center"
                     android:textColor="@color/darkpink"
-                    android:textSize="28sp" />
+                    android:textSize="24sp" />
 
                 <Button
                     android:layout_width="0dp"

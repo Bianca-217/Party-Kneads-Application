@@ -61,6 +61,11 @@ public class SellerHome extends Fragment {
             navController.navigate(R.id.action_seller_HomePageFragment_to_myProductFragment);
         });
 
+        binding.revenueView.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_seller_HomePageFragment_to_analyticsFragment);
+        });
+
         // Initialize Firebase instances
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
