@@ -28,8 +28,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import com.google.firebase.firestore.QuerySnapshot;
+import com.ignacio.partykneadsapp.OrderFragment;
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentSellerHomeBinding;
 
@@ -95,6 +98,18 @@ public class SellerHome extends Fragment {
             return;
         }
 
+        binding.Orders.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_contseller, new OrderSellerSideFragment())
+                    .commit();
+        });
+
+        binding.completeOrders.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_contseller, new OrderSellerSideFragment())
+                    .commit();
+        });
+
         binding.btnmyProduct1.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView2);
             navController.navigate(R.id.action_seller_HomePageFragment_to_myProductFragment);
@@ -103,6 +118,32 @@ public class SellerHome extends Fragment {
         binding.btnInventory.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView2);
             navController.navigate(R.id.action_seller_HomePageFragment_to_inventoryFragment);
+        });
+
+        CollectionReference ordersRef = FirebaseFirestore.getInstance()
+                .collection("Users")
+                .document("QqqccLchjigd0C7zf8ewPXY0KZc2")
+                .collection("Orders");
+
+// Query for orders with status "Complete Order"
+        Query query = ordersRef.whereEqualTo("status", "Complete Order");
+
+// Fetch the query results asynchronously
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Get the query snapshot
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null) {
+                    // Get the number of complete orders
+                    int completeOrdersCount = querySnapshot.size();
+
+                    binding.numCompleteOrders.setText(String.valueOf(completeOrdersCount));
+                }
+            } else {
+                // Handle error if query fails
+                Log.e("Firestore", "Error fetching complete orders: ", task.getException());
+                Toast.makeText(getContext(), "Failed to fetch complete orders", Toast.LENGTH_SHORT).show();
+            }
         });
 
         fetchTotalProductCount();
@@ -200,18 +241,19 @@ public class SellerHome extends Fragment {
                 .document("QqqccLchjigd0C7zf8ewPXY0KZc2")
                 .collection("Orders");
 
-        // Query all orders (you'll filter later by the timestamp)
-        ordersRef.get()
+        // Query to fetch orders with status "Complete Order"
+        ordersRef.whereEqualTo("status", "Complete Order")
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         if (task.getResult().isEmpty()) {
-                            Log.d("Firestore", "No orders found.");
-                            Toast.makeText(requireContext(), "No orders for today", Toast.LENGTH_SHORT).show();
+                            Log.d("Firestore", "No completed orders found.");
+                            Toast.makeText(requireContext(), "No completed orders for today", Toast.LENGTH_SHORT).show();
                         } else {
                             double totalRevenue = 0.0;
 
-                            // Check if results are returned
-                            Log.d("Firestore", "Number of orders found: " + task.getResult().size());
+                            // Debug logging to verify the number of orders found
+                            Log.d("Firestore", "Number of completed orders found: " + task.getResult().size());
 
                             // Iterate through the results and sum the totalPrice for today's orders
                             for (QueryDocumentSnapshot document : task.getResult()) {
@@ -246,6 +288,7 @@ public class SellerHome extends Fragment {
                     }
                 });
     }
+
 
     private String extractDateFromTimestamp(String timestamp) {
         try {
@@ -304,8 +347,8 @@ public class SellerHome extends Fragment {
                     String productName = entry.getKey();
                     double totalRevenue = entry.getValue();
 
-                    // Add product name and revenue to the pie entry, but only display the product name inside the slice
-                    pieEntries.add(new PieEntry((float) totalRevenue, productName)); // Display only the product name
+                    // Add product name and revenue to the pie entry
+                    pieEntries.add(new PieEntry((float) totalRevenue, productName));
                 }
 
                 if (pieEntries.isEmpty()) {
@@ -313,41 +356,57 @@ public class SellerHome extends Fragment {
                     return;
                 }
 
+                // Custom pink color palette with gradient shades
+                List<Integer> pinkColors = new ArrayList<>();
+                pinkColors.add(Color.parseColor("#FFB6C1")); // Light Pink
+                pinkColors.add(Color.parseColor("#FF69B4")); // Hot Pink
+                pinkColors.add(Color.parseColor("#FF1493")); // Deep Pink
+                pinkColors.add(Color.parseColor("#DB7093")); // Pale Violet Red
+                pinkColors.add(Color.parseColor("#C71585")); // Medium Violet Red
+
                 PieDataSet pieDataSet = new PieDataSet(pieEntries, "Best Sellers");
 
-                // Custom color list to avoid color duplication
-                List<Integer> customColors = new ArrayList<>();
-                customColors.add(Color.parseColor("#FF5733")); // Orange
-                customColors.add(Color.parseColor("#33FF57")); // Green
-                customColors.add(Color.parseColor("#3357FF")); // Blue
-                customColors.add(Color.parseColor("#FF33A1")); // Pink
-                customColors.add(Color.parseColor("#FFC300")); // Yellow
+                // Apply the pink color palette
+                pieDataSet.setColors(pinkColors);
 
-                // Apply the custom color list to the PieDataSet
-                pieDataSet.setColors(customColors);
-
-                pieDataSet.setValueTextSize(12f); // Reduced text size for cleaner appearance
-                pieDataSet.setValueTextColor(Color.BLACK); // Keep value text visible inside the slice
+                // Styling configurations
+                pieDataSet.setValueTextSize(12f);
+                pieDataSet.setValueTextColor(Color.WHITE); // White text for better readability on pink backgrounds
+                pieDataSet.setSliceSpace(3f); // Add small space between pie slices
 
                 PieData pieData = new PieData(pieDataSet);
                 pieData.setValueFormatter(new ValueFormatter() {
                     @Override
                     public String getFormattedValue(float value) {
-                        return "₱" + String.format("%.2f", value); // Display the revenue with currency formatting
+                        return "₱" + String.format("%.2f", value);
                     }
                 });
 
+                // Configure pie chart appearance and animations
                 pieChart.setData(pieData);
+                pieChart.setUsePercentValues(false);
+                pieChart.setDrawHoleEnabled(true);
+                pieChart.getDescription().setEnabled(false);
+                pieChart.setHoleColor(Color.WHITE);
+                pieChart.setHoleRadius(40f); // Moderate hole in the center
+                pieChart.setTransparentCircleRadius(45f);
+                pieChart.setTransparentCircleColor(Color.parseColor("#80FFB6C1")); // Transparent light pink
 
-                // Configure pie chart appearance
-                pieChart.setDrawHoleEnabled(false); // Disable the hole in the center
-                pieChart.setTransparentCircleColor(Color.WHITE);
-                pieChart.setUsePercentValues(false); // Disable percentage values
-                pieChart.setEntryLabelColor(Color.BLACK); // Set label color to black for better contrast
-                pieChart.setEntryLabelTextSize(12f); // Adjust label text size
+                // Entry label styling
+                pieChart.setDrawEntryLabels(true);
+                pieChart.setEntryLabelColor(Color.BLACK);
+                pieChart.setEntryLabelTextSize(10f);
 
-                // Disable the legend completely (this removes the product names below the chart)
+                // Disable legend
                 pieChart.getLegend().setEnabled(false);
+
+                // Rotate and animate the pie chart
+                pieChart.setRotationAngle(0); // Start from the top
+                pieChart.animateY(1400); // Simple animation without specific easing
+
+                // Add rotation and highlight interactions
+                pieChart.setRotationEnabled(true);
+                pieChart.setHighlightPerTapEnabled(true);
 
                 // Refresh the pie chart
                 pieChart.invalidate();

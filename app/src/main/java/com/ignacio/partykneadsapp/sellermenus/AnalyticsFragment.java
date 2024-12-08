@@ -8,18 +8,25 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -29,6 +36,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -46,12 +54,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AnalyticsFragment extends Fragment {
     private FragmentAnalyticsBinding binding;
     private BarChart barChart;
-    private BarChart secondaryBarChart; // New BarChart for hourly data
     private CollectionReference ordersRef;
 
     private static final String PREFS_NAME = "AnalyticsPrefs";
@@ -71,7 +79,6 @@ public class AnalyticsFragment extends Fragment {
 
         // Initialize the bar charts
         barChart = binding.barChart;
-        secondaryBarChart = binding.secondaryBarChart;
 
         // Setup Firestore reference
         ordersRef = FirebaseFirestore.getInstance()
@@ -82,9 +89,11 @@ public class AnalyticsFragment extends Fragment {
         // Fetch daily revenue
         fetchDailyRevenue();
 
+        getCurrentDay();
+        updateChartTitle();
         // Fetch hourly revenue for a single day
         fetchHourlyRevenue();
-
+        populateTableWithOrders();
         binding.btnBack.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_analyticsFragment_to_seller_HomePageFragment);
@@ -109,7 +118,6 @@ public class AnalyticsFragment extends Fragment {
 
         if (!todayDate.equals(lastSavedDay)) {
             // Reset the hourly chart data if it's a new day
-            resetHourlyData();
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(LAST_DAY_KEY, todayDate);
             editor.apply();
@@ -160,63 +168,12 @@ public class AnalyticsFragment extends Fragment {
                     // Add the hourly revenue to the entries
                     hourlyEntries.add(new BarEntry(i, (float) hourlyRevenue));
                 }
-
-                // Update the secondary chart for hourly revenue
-                updateSecondaryBarChart(hourlyEntries, hourlyIntervals);
             } else {
                 Log.e("AnalyticsFragment", "No documents found");
             }
         });
     }
 
-    private void resetHourlyData() {
-        // Reset data for hourly chart
-        secondaryBarChart.clear();
-    }
-
-    private void updateSecondaryBarChart(List<BarEntry> entries, List<String> hourlyIntervals) {
-        // Ensure entries are sorted by X-axis values
-        entries.sort((e1, e2) -> Float.compare(e1.getX(), e2.getX()));
-
-        BarDataSet dataSet = new BarDataSet(entries, "Hourly Revenue");
-        dataSet.setColor(Color.GREEN);
-        dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setValueTextSize(10f);
-
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.9f); // Set bar width
-
-        secondaryBarChart.setData(barData);
-        secondaryBarChart.setFitBars(true);
-
-        // Disable the legend
-        secondaryBarChart.getLegend().setEnabled(false);
-
-        // Customize X-axis
-        XAxis xAxis = secondaryBarChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int index = (int) value;
-                if (index >= 0 && index < hourlyIntervals.size()) {
-                    return hourlyIntervals.get(index);
-                }
-                return "";
-            }
-        });
-
-        // Customize chart appearance
-        secondaryBarChart.getDescription().setEnabled(false);
-        secondaryBarChart.setDrawGridBackground(false);
-        secondaryBarChart.invalidate();
-
-        // Add the title showing the current day
-        String currentDay = getCurrentDay(); // Method to get the current day (e.g., "Monday, Dec 08")
-        TextView titleTextView = binding.getRoot().findViewById(R.id.chart_title_textview); // Assuming you have a TextView with id "chart_title_textview" in your layout
-        titleTextView.setText("Hourly Revenue - " + currentDay);
-    }
 
     private String getCurrentDay() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM dd", Locale.ENGLISH); // Format to display day of the week and date (e.g., "Monday, Dec 08")
@@ -329,10 +286,16 @@ public class AnalyticsFragment extends Fragment {
         // Ensure entries are sorted by X-axis values
         entries.sort((e1, e2) -> Float.compare(e1.getX(), e2.getX()));
 
+        // Use the specific pink color
+        int pinkColor = Color.parseColor("#fc6090");
+
         BarDataSet dataSet = new BarDataSet(entries, "Daily Revenue");
-        dataSet.setColor(Color.BLUE);
-        dataSet.setValueTextColor(Color.RED);
+        dataSet.setColor(pinkColor); // Set bar color to the specific pink
+        dataSet.setValueTextColor(Color.BLACK); // Changed from red to black for better readability
         dataSet.setValueTextSize(10f);
+
+        // Add gradient effect to the bars
+        dataSet.setGradientColor(pinkColor, Color.parseColor("#ff8bb4")); // Lighter shade of pink for gradient
 
         BarData barData = new BarData(dataSet);
         barData.setBarWidth(0.9f); // Set bar width
@@ -340,8 +303,17 @@ public class AnalyticsFragment extends Fragment {
         barChart.setData(barData);
         barChart.setFitBars(true);
 
-        // Disable the legend
-        barChart.getLegend().setEnabled(false);
+        // Customize Legend
+        Legend legend = barChart.getLegend();
+        legend.setEnabled(true);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+        legend.setTextColor(Color.BLACK);
+        legend.setTextSize(12f);
+        legend.setFormSize(12f);
+        legend.setXEntrySpace(10f);
 
         // Customize X-axis
         XAxis xAxis = barChart.getXAxis();
@@ -358,10 +330,45 @@ public class AnalyticsFragment extends Fragment {
             }
         });
 
+        // Customize Left Y-axis to show Revenue with Peso sign
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return "₱" + String.format("%.0f", value); // Format with no decimal places
+            }
+        });
+
+        // Remove Right Y-axis
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setEnabled(false);
+
         // Customize chart appearance
         barChart.getDescription().setEnabled(false);
         barChart.setDrawGridBackground(false);
+
+        // Add some additional styling
+        barChart.setDrawBorders(false);
+        barChart.setDrawBarShadow(true); // Add subtle shadow to bars
+        barChart.setHighlightFullBarEnabled(true);
+
+        barChart.animateY(1000); // Animate for 1 second
+
+        barChart.setExtraOffsets(0f, 0f, 0f, 20f);
+
         barChart.invalidate();
+
+    }
+
+    private void updateChartTitle() {
+        // Get the current day name
+        SimpleDateFormat dayFormat = new SimpleDateFormat("MMMM d, YYYY", Locale.ENGLISH);
+        String currentDay = dayFormat.format(new Date());
+
+        // Update the TextView
+        if (binding.chartTitleTextview != null) {
+            binding.chartTitleTextview.setText("Daily Revenue - " + currentDay);
+        }
     }
 
     private String extractDateFromTimestamp(String timestamp) {
@@ -389,4 +396,66 @@ public class AnalyticsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    private void populateTableWithOrders() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();  // Get the current user's UID
+        CollectionReference ordersRef = FirebaseFirestore.getInstance()
+                .collection("Users")
+                .document(userId)
+                .collection("Orders");
+
+        TableLayout tableLayout = binding.tableLayout;  // Reference to the TableLayout
+
+        ordersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String referenceId = document.getString("referenceId");
+                    String totalPriceStr = document.getString("totalPrice");
+
+                    if (referenceId != null && totalPriceStr != null) {
+                        // Remove currency symbol and parse the price
+                        double totalPrice = Double.parseDouble(totalPriceStr.replace("₱", ""));
+
+                        // Calculate Mark up and Vat
+                        double markUp = totalPrice * 0.272;
+                        double vat = totalPrice * 0.12;
+
+                        // Create a new TableRow
+                        TableRow tableRow = new TableRow(getContext());
+
+                        // Create TextViews for each column
+                        TextView refIdView = createTextView(referenceId);
+                        TextView totalPriceView = createTextView(String.format("₱%.2f", totalPrice));
+                        TextView markUpView = createTextView(String.format("₱%.2f", markUp));
+                        TextView vatView = createTextView(String.format("₱%.2f", vat));
+
+                        // Add TextViews to the TableRow
+                        tableRow.addView(refIdView);
+                        tableRow.addView(totalPriceView);
+                        tableRow.addView(markUpView);
+                        tableRow.addView(vatView);
+
+                        // Add the TableRow to the TableLayout
+                        tableLayout.addView(tableRow);
+                    }
+                }
+            } else {
+                Log.e("Firestore", "Error fetching orders", task.getException());
+            }
+        });
+    }
+
+    private TextView createTextView(String text) {
+        TextView textView = new TextView(getContext());
+        textView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        textView.setText(text);
+        textView.setGravity(Gravity.CENTER);
+        textView.setPadding(10, 10, 10, 10);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        textView.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.montserrat_bold));  // Ensure the font is included
+        textView.setTextColor(getResources().getColor(R.color.black));  // Adjust text color as needed
+        return textView;
+    }
+
 }
+

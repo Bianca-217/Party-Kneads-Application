@@ -154,7 +154,7 @@
                     android:layout_marginHorizontal="20dp"
                     android:text="Today's Revenue"
                     android:layout_marginTop="30dp"
-                    android:textColor="@color/pink"
+                    android:textColor="@color/semiblack"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:textSize="24sp"
                     android:textAlignment="center" />
@@ -192,7 +192,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_weight="1">
 
                     <TextView
@@ -201,8 +201,8 @@
                         android:background="@drawable/footer" />
 
                     <ImageView
-                        android:layout_width="75dp"
-                        android:layout_height="120dp"
+                        android:layout_width="50dp"
+                        android:layout_height="80dp"
                         android:layout_gravity="end|bottom"
                         android:src="@drawable/drip_lower" />
 
@@ -230,12 +230,14 @@
                         android:fontFamily="@font/montserrat_bold" />
                 </FrameLayout>
 
+
+
                     <FrameLayout
-                        android:id="@+id/myproduct"
+                        android:id="@+id/completeOrders"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginHorizontal="5dp"
                         android:layout_weight="1">
 
                         <TextView
@@ -244,8 +246,51 @@
                             android:background="@drawable/footer" />
 
                         <ImageView
-                            android:layout_width="75dp"
-                            android:layout_height="120dp"
+                            android:layout_width="50dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="end|bottom"
+                            android:src="@drawable/drip_lower" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="20dp"
+                            android:text="Num of Orders"
+                            android:layout_marginTop="20dp"
+                            android:textColor="@color/semiblack"
+                            android:fontFamily="@font/montserrat_extrabold"
+                            android:textSize="16sp"
+                            android:textAlignment="textStart" />
+
+                        <TextView
+                            android:id="@+id/num_CompleteOrders"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="viewStart"
+                            android:layout_marginTop="70dp"
+                            android:layout_marginHorizontal="20dp"
+                            android:textColor="@color/semiblack"
+                            android:text=""
+                            android:textSize="24sp"
+                            android:fontFamily="@font/montserrat_bold" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/myproduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginHorizontal="5dp"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:background="@drawable/footer" />
+
+                        <ImageView
+                            android:layout_width="50dp"
+                            android:layout_height="80dp"
                             android:layout_gravity="end|bottom"
                             android:src="@drawable/drip_lower" />
 
@@ -270,10 +315,9 @@
                             android:textColor="@color/semiblack"
                             android:text=""
                             android:textSize="24sp"
-                            android:fontFamily="@font/montserrat_bold"
-
-                            />
+                            android:fontFamily="@font/montserrat_bold" />
                     </FrameLayout>
+
                 </LinearLayout>
 
                 <Button
@@ -298,14 +342,14 @@
                     android:text="Best Seller Products"
                     android:layout_marginHorizontal="20dp"
                     android:fontFamily="@font/montserrat_semibold"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="20dp"/>
+                    android:textSize="16sp"
+                    android:layout_marginBottom="15dp"/>
 
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="350dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp" />
 
