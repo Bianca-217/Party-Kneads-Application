@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,11 +36,7 @@ import com.ignacio.partykneadsapp.model.SellerProductModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 public class MyProductFragment extends Fragment {
-
-
     private LinearLayout cl;
     private RecyclerView categories;
     private List<CategoriesModel> categoriesModelList;
@@ -50,6 +47,7 @@ public class MyProductFragment extends Fragment {
     private FirebaseFirestore db;
     CollectionReference productsRef;
     private FragmentMyProductBinding binding;
+    private SearchView searchView;  // Declare SearchView
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,6 +62,24 @@ public class MyProductFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         productsRef = db.collection("products");
+
+        // Initialize SearchView
+        searchView = binding.likesearchView;  // Reference the SearchView from the XML
+
+        // Set up SearchView listener
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchProducts(query);  // Perform search when user submits query
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchProducts(newText);  // Perform search as text changes
+                return false;
+            }
+        });
 
         // Use GridLayoutManager for 2 items in a row
         RecyclerView productsRecyclerView = binding.recyclerView;
@@ -83,7 +99,7 @@ public class MyProductFragment extends Fragment {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_myProductFragment_to_seller_HomePageFragment);
         });
-       
+
         binding.vouchers.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_myProductFragment_to_voucherSellerFragment);
@@ -95,7 +111,6 @@ public class MyProductFragment extends Fragment {
             InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         });
-
     }
 
     private void setupCategories() {
@@ -180,5 +195,42 @@ public class MyProductFragment extends Fragment {
                         }
                     });
         }
+    }
+
+    private void searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            fetchProducts("All Items");  // If no search term, load all products
+            return;
+        }
+
+        String normalizedKeyword = keyword.trim().toUpperCase();
+        Log.d("MyProductFragment", "Searching for products with keyword: " + normalizedKeyword);
+
+        // Remove default category filtering; just search based on the keyword
+        productsRef
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<SellerProductModel> filteredList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String productName = document.getString("name");
+                            if (productName != null && productName.toUpperCase().contains(normalizedKeyword)) {
+                                String id = document.getId();
+                                String imageUrl = document.getString("imageUrl");
+                                String name = document.getString("name");
+                                String price = document.getString("price");
+                                String description = document.getString("description");
+                                String rate = document.getString("rate");
+                                String numreviews = document.getString("numreviews");
+                                String category = document.getString("categories");
+
+                                filteredList.add(new SellerProductModel(id, imageUrl, name, price, description, rate, numreviews, category));
+                            }
+                        }
+                        productShopAdapter.updateData(filteredList);  // Update the adapter with the filtered list
+                    } else {
+                        Log.d("Firestore", "Error searching products: ", task.getException());
+                    }
+                });
     }
 }

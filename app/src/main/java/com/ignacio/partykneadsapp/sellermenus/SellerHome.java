@@ -1,5 +1,6 @@
 package com.ignacio.partykneadsapp.sellermenus;
 
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,15 +40,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class SellerHome extends Fragment {
-
     private FragmentSellerHomeBinding binding;
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    private PieChart pieChart;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +66,8 @@ public class SellerHome extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         firestore = FirebaseFirestore.getInstance();
+        pieChart = binding.pieChart;
+
 
         binding.myproduct.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
@@ -95,6 +108,7 @@ public class SellerHome extends Fragment {
         fetchTotalProductCount();
         fetchPendingOrdersCount();
         fetchTotalRevenue();
+        setupPieChart();
     }
 
     private void loadUserProfilePicture(String userId) {
@@ -248,6 +262,99 @@ public class SellerHome extends Fragment {
         }
     }
 
+    private void setupPieChart() {
+        CollectionReference productsRef = firestore.collection("products");
+        final HashMap<String, Double> productRevenueMap = new HashMap<>();
 
+        // Set up a real-time listener for the "products" collection
+        productsRef.addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firestore", "Error listening for updates: ", error);
+                Toast.makeText(requireContext(), "Failed to listen for product updates", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            if (value != null && !value.isEmpty()) {
+                productRevenueMap.clear();
+
+                for (QueryDocumentSnapshot document : value) {
+                    try {
+                        String productName = (String) document.get("name");
+                        Double productPrice = Double.valueOf(String.valueOf(document.get("price")));
+                        Long productSold = Long.valueOf(String.valueOf(document.get("sold"))); // Ensure 'sold' field exists
+
+                        if (productName != null && productPrice != null && productSold != null) {
+                            double totalRevenue = productPrice * productSold;
+                            productRevenueMap.put(productName, totalRevenue);
+                        }
+                    } catch (Exception e) {
+                        Log.e("Firestore", "Error parsing document: " + e.getMessage());
+                    }
+                }
+
+                // Sort products by revenue in descending order
+                List<Map.Entry<String, Double>> sortedProducts = new ArrayList<>(productRevenueMap.entrySet());
+                sortedProducts.sort((entry1, entry2) -> Double.compare(entry2.getValue(), entry1.getValue()));
+
+                // Get the top 5 products
+                List<Map.Entry<String, Double>> topProducts = sortedProducts.subList(0, Math.min(5, sortedProducts.size()));
+
+                ArrayList<PieEntry> pieEntries = new ArrayList<>();
+                for (Map.Entry<String, Double> entry : topProducts) {
+                    String productName = entry.getKey();
+                    double totalRevenue = entry.getValue();
+
+                    // Add product name and revenue to the pie entry, but only display the product name inside the slice
+                    pieEntries.add(new PieEntry((float) totalRevenue, productName)); // Display only the product name
+                }
+
+                if (pieEntries.isEmpty()) {
+                    Log.e("PieChart", "No data available for the pie chart");
+                    return;
+                }
+
+                PieDataSet pieDataSet = new PieDataSet(pieEntries, "Best Sellers");
+
+                // Custom color list to avoid color duplication
+                List<Integer> customColors = new ArrayList<>();
+                customColors.add(Color.parseColor("#FF5733")); // Orange
+                customColors.add(Color.parseColor("#33FF57")); // Green
+                customColors.add(Color.parseColor("#3357FF")); // Blue
+                customColors.add(Color.parseColor("#FF33A1")); // Pink
+                customColors.add(Color.parseColor("#FFC300")); // Yellow
+
+                // Apply the custom color list to the PieDataSet
+                pieDataSet.setColors(customColors);
+
+                pieDataSet.setValueTextSize(12f); // Reduced text size for cleaner appearance
+                pieDataSet.setValueTextColor(Color.BLACK); // Keep value text visible inside the slice
+
+                PieData pieData = new PieData(pieDataSet);
+                pieData.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return "₱" + String.format("%.2f", value); // Display the revenue with currency formatting
+                    }
+                });
+
+                pieChart.setData(pieData);
+
+                // Configure pie chart appearance
+                pieChart.setDrawHoleEnabled(false); // Disable the hole in the center
+                pieChart.setTransparentCircleColor(Color.WHITE);
+                pieChart.setUsePercentValues(false); // Disable percentage values
+                pieChart.setEntryLabelColor(Color.BLACK); // Set label color to black for better contrast
+                pieChart.setEntryLabelTextSize(12f); // Adjust label text size
+
+                // Disable the legend completely (this removes the product names below the chart)
+                pieChart.getLegend().setEnabled(false);
+
+                // Refresh the pie chart
+                pieChart.invalidate();
+            } else {
+                Log.e("Firestore", "No product data available");
+                Toast.makeText(requireContext(), "No product data available", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
