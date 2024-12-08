@@ -72,12 +72,12 @@ public class CheckoutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_checkout, container, false);
 
-        // Initialize Firestore and Auth
+
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         cUser = mAuth.getCurrentUser();
 
-        // Initialize UI elements
+
         btnBack = view.findViewById(R.id.btnBack);
         recyclerView = view.findViewById(R.id.recyclerViewCart);
         subTotalTextView = view.findViewById(R.id.subTotal);
@@ -90,10 +90,10 @@ public class CheckoutFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Retrieve selected items from arguments if provided
+
         selectedItems = getArguments() != null ? getArguments().getParcelableArrayList("selectedItems") : new ArrayList<>();
 
-        // Log received selected items for debugging
+
         if (selectedItems != null && !selectedItems.isEmpty()) {
             for (CartItemModel item : selectedItems) {
                 Log.d("CheckoutFragment", "Received Item: " + item.getProductName() + ", Quantity: " + item.getQuantity());
@@ -102,21 +102,21 @@ public class CheckoutFragment extends Fragment {
             Log.d("CheckoutFragment", "No selected items received from CartFragment.");
         }
 
-        // Set up the adapter with selected items
+
         coutAdapter = new CheckoutAdapter(selectedItems);
         recyclerView.setAdapter(coutAdapter);
 
-        // Initialize RecyclerView for locations
+
         locationRecyclerView = view.findViewById(R.id.locationRecycler);
         activeLocations = new ArrayList<>();
         locationAdapter = new CheckoutLocationAdapter(activeLocations);
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         locationRecyclerView.setAdapter(locationAdapter);
 
-        // Fetch user name and locations
+
         fetchUserNameAndLocations();
 
-        // Back button listener
+
         btnBack.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_checkoutFragment_to_cartFragment);
@@ -125,20 +125,20 @@ public class CheckoutFragment extends Fragment {
         showVouchers.setOnClickListener(v -> {
             ChooseVoucherFragment dialogFragment = new ChooseVoucherFragment();
             dialogFragment.setVoucherSelectedListener(selectedVoucher -> {
-                // Handle the selected voucher
+
                 discount.setText(selectedVoucher);
                 updateTotals();
             });
             dialogFragment.show(requireActivity().getSupportFragmentManager(), "ChooseVoucherDialog");
         });
 
-        // Checkout button listener
+
         Button btnCheckout = view.findViewById(R.id.btncheckout);
         btnCheckout.setOnClickListener(v -> {
             saveOrderToDatabase();
         });
 
-        // Update totals based on selectedItems
+
         updateTotals();
         return view;
     }
@@ -153,7 +153,7 @@ public class CheckoutFragment extends Fragment {
                 String lastName = documentSnapshot.getString("Last Name");
                 String userName = firstName + " " + lastName;
 
-                // Fetch active locations after getting the user's name
+
                 fetchActiveLocations(userName);
             }).addOnFailureListener(e -> {
                 Log.w("CheckoutFragment", "Error fetching user name", e);
@@ -165,7 +165,7 @@ public class CheckoutFragment extends Fragment {
         if (cUser != null) {
             String userId = cUser.getUid();
 
-            // Use Firestore real-time listener (addSnapshotListener)
+
             db.collection("Users")
                     .document(userId)
                     .collection("Locations")
@@ -177,26 +177,26 @@ public class CheckoutFragment extends Fragment {
                         }
 
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                            activeLocations.clear(); // Clear the list before adding new items
+                            activeLocations.clear();
 
-                            // Loop through each document in the snapshot
+
                             String userNameInLocation = "";
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 String location = document.getString("location");
                                 String phoneNumber = document.getString("phoneNumber");
-                                userNameInLocation = document.getString("userName"); // Fetch the userName
+                                userNameInLocation = document.getString("userName");
 
-                                // Check if location and phone number exist
+
                                 if (location != null && phoneNumber != null) {
-                                    // Combine location and phone number as a single string
+
                                     activeLocations.add(location + " - " + phoneNumber);
                                 }
                             }
 
-                            // Update the username in the adapter, if needed
+
                             locationAdapter.setUserName(userNameInLocation);
 
-                            // Notify the adapter that data has been updated
+
                             locationAdapter.notifyDataSetChanged();
                         } else {
                             Log.w("CheckoutFragment", "No active locations found.");
@@ -207,14 +207,14 @@ public class CheckoutFragment extends Fragment {
 
 
     private void saveOrderToDatabase() {
-        // Check for user's address and phone number first
+
         if (cUser != null) {
             String userId = cUser.getUid();
 
-            // Access the Locations sub-collection within the Users collection
+
             db.collection("Users").document(userId)
                     .collection("Locations")
-                    .limit(1) // Fetch the first document in the Locations collection
+                    .limit(1)
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
                         if (!querySnapshot.isEmpty()) {
@@ -230,7 +230,7 @@ public class CheckoutFragment extends Fragment {
                             }
                         } else {
                             Log.w("CheckoutFragment", "No documents found in Locations collection.");
-                            showAddressDialog(); // Show dialog if no document is found
+                            showAddressDialog();
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -243,15 +243,15 @@ public class CheckoutFragment extends Fragment {
 
 
     private void proceedToSaveOrder() {
-        // Generate a random reference ID in the desired format
+
         String dateFormatted = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date()); // Example: 20241207
         String timeFormatted = new SimpleDateFormat("hhmm", Locale.getDefault()).format(new Date()); // Example: 1128 (12-hour format)
         String randomNum = String.format("%05d", new Random().nextInt(100000)); // 5 random digits, e.g., 00512
 
-        // Construct the final order reference ID: REF-YYYYMMDDHHMMRandom5Digits
+
         String orderRefId = "REF-" + dateFormatted + timeFormatted + randomNum;
 
-        // Create a map to store order details
+
         HashMap<String, Object> orderData = new HashMap<>();
         orderData.put("referenceId", orderRefId);
         orderData.put("status", "placed");
@@ -259,20 +259,20 @@ public class CheckoutFragment extends Fragment {
         orderData.put("subtotal", subTotalTextView.getText().toString());
         orderData.put("totalPrice", totalCostTextView.getText().toString());
 
-        // Add the timestamp for the order in the desired format
+
         String timestampFormatted = new SimpleDateFormat("MMMM dd, yyyy, h:mm a", Locale.getDefault()).format(new Date()); // Example: December 07, 2024, 11:28 AM
         orderData.put("timestamp", timestampFormatted);
 
-        // Get the current user's email
+
         if (cUser != null) {
             orderData.put("userEmail", cUser.getEmail());
         } else {
             Log.w("CheckoutFragment", "Current user is null. Unable to retrieve email.");
         }
 
-        // List to hold item details
+
         List<HashMap<String, Object>> itemsList = new ArrayList<>();
-        final String[] cakeImageUrl = {""};  // Use an array to allow assignment within loop
+        final String[] cakeImageUrl = {""};
 
         for (CartItemModel item : selectedItems) {
             HashMap<String, Object> itemData = new HashMap<>();
@@ -280,21 +280,21 @@ public class CheckoutFragment extends Fragment {
             itemData.put("productName", item.getProductName());
             itemData.put("quantity", item.getQuantity());
             itemData.put("totalPrice", item.getTotalPrice());
-            itemData.put("imageUrl", item.getImageUrl());  // Add imageUrl to the item data
+            itemData.put("imageUrl", item.getImageUrl());
             itemData.put("cakeSize", item.getCakeSize());
             itemsList.add(itemData);
 
-            // Get the cake image URL (assuming imageUrl is stored in CartItemModel)
+
             if (!item.getImageUrl().isEmpty()) {
-                cakeImageUrl[0] = item.getImageUrl();  // Store the image URL for the notification
+                cakeImageUrl[0] = item.getImageUrl();
             }
         }
         orderData.put("items", itemsList);
 
-        // Fetch location, phone number, and user name from the active location
+
         db.collection("Users").document(cUser.getUid()).collection("Locations")
                 .whereEqualTo("status", "Active")
-                .limit(1)  // Get only one active location
+                .limit(1)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -307,24 +307,24 @@ public class CheckoutFragment extends Fragment {
                         if (phoneNumber != null) orderData.put("phoneNumber", phoneNumber);
                         if (userName != null) orderData.put("userName", userName);
 
-                        // Save order under the user's document ID
+
                         db.collection("Users").document("QqqccLchjigd0C7zf8ewPXY0KZc2").collection("Orders")
-                                .document(orderRefId)  // Use the reference ID as the document ID
-                                .set(orderData, SetOptions.merge())  // Use merge to avoid overwriting
+                                .document(orderRefId)
+                                .set(orderData, SetOptions.merge())
                                 .addOnSuccessListener(documentReference -> {
                                     Log.d("CheckoutFragment", "Order placed successfully: " + orderRefId);
                                     clearCart();
-                                    showSuccessDialog();  // Show success dialog after order placement
+                                    showSuccessDialog();
 
-                                    // Send notification after order is successfully placed
-                                    sendOrderNotification(cakeImageUrl[0]);  // Pass the cake image URL
+
+                                    sendOrderNotification(cakeImageUrl[0]);
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.w("CheckoutFragment", "Error placing order", e);
                                 });
                     } else {
                         Log.w("CheckoutFragment", "No active locations found.");
-                        showAddressDialog();  // Show dialog if no active location is found
+                        showAddressDialog();
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -333,20 +333,20 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void sendOrderNotification(String cakeImageUrl) {
-        // Admin's email address
+
         String adminEmail = "sweetkatrinabiancaignacio@gmail.com";
 
-        // Create NotificationViewModel for the order
+
         NotificationViewModel newOrderNotification = new NotificationViewModel(
                 "New Order Received",
                 "A customer has placed a new order with you! Check the order items and get them ready to go!",
                 cakeImageUrl
         );
 
-        // Save the notification to the admin's Firestore Notifications subcollection
+
         saveNotificationToAdmin(adminEmail, newOrderNotification);
 
-        // Optionally send it to the NotificationFragment (if necessary)
+
         NotificationFragment notificationFragment = (NotificationFragment) getActivity().getSupportFragmentManager()
                 .findFragmentByTag(NotificationFragment.class.getSimpleName());
 
@@ -356,29 +356,29 @@ public class CheckoutFragment extends Fragment {
         }
     }
 
-    // Helper method to save the notification in Firestore for the admin
+
     private void saveNotificationToAdmin(String adminEmail, NotificationViewModel notification) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Save the notification in the "Notifications" subcollection under the admin's document
+
         db.collection("Users")
-                .whereEqualTo("email", adminEmail)  // Find the admin document by email
-                .limit(1)  // Limit to 1 result
+                .whereEqualTo("email", adminEmail)
+                .limit(1)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
-                        // Get the admin's document ID
+
                         String adminDocId = querySnapshot.getDocuments().get(0).getId();
 
-                        // Save the notification under the admin's "Notifications" subcollection
+
                         db.collection("Users")
-                                .document(adminDocId)  // Admin's document ID
-                                .collection("Notifications")  // Notifications subcollection
+                                .document(adminDocId)
+                                .collection("Notifications")
                                 .add(new HashMap<String, Object>() {{
                                     put("orderStatus", notification.getOrderStatus());
                                     put("userRateComment", notification.getUserRateComment());
                                     put("imageUrl", notification.getCakeImageUrl());
-                                    put("timestamp", FieldValue.serverTimestamp());  // Add a timestamp
+                                    put("timestamp", FieldValue.serverTimestamp());
                                 }})
                                 .addOnSuccessListener(documentReference -> {
                                     Log.d("Notification", "Notification saved successfully for admin: " + adminEmail);
@@ -409,7 +409,7 @@ public class CheckoutFragment extends Fragment {
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Make sure the dialog is not dismissible by tapping outside
+
         alertDialog.setCancelable(false);
 
         btnContinue.setOnClickListener(v -> {
@@ -424,7 +424,7 @@ public class CheckoutFragment extends Fragment {
             Bundle args = new Bundle();
             args.putBoolean("loadShop", true);
 
-            // Replace the current fragment with the menu page fragment and pass the argument
+
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_checkoutFragment_to_homePageFragment, args);
         });
@@ -436,12 +436,12 @@ public class CheckoutFragment extends Fragment {
     private void showAddressDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.addressdialog, null);
         Button btnFinishSetup = dialogView.findViewById(R.id.btnFinishsetup);
-        Button btnCancel = dialogView.findViewById(R.id.btnCancel); // Make sure this ID matches your layout
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView);
         AlertDialog alertDialog = builder.create();
 
-        // Set the dialog background to transparent
+
         if (alertDialog.getWindow() != null) {
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -453,35 +453,35 @@ public class CheckoutFragment extends Fragment {
         });
 
         btnCancel.setOnClickListener(v -> {
-            alertDialog.dismiss(); // Just dismiss the dialog
+            alertDialog.dismiss();
         });
 
         alertDialog.show();
     }
 
     private void updateTotals() {
-        double subTotal = 0;   // This will hold the total price of items before discount
-        String discountText = discount.getText().toString();  // Get discount as text from TextView
+        double subTotal = 0;
+        String discountText = discount.getText().toString();
 
-        double discountValue = 0;  // Variable to hold the discount value in numeric form
+        double discountValue = 0;
 
-        // Check if the discount string is not null or empty
+
         if (discountText != null && !discountText.isEmpty()) {
-            // If discount is in the format "20%" (percentage)
+
             if (discountText.endsWith("%")) {
                 try {
-                    // Extract the numeric part and convert to a percentage (e.g., "20%" -> 20)
+
                     double discountPercentage = Double.parseDouble(discountText.replace("%", ""));
-                    discountValue = discountPercentage / 100; // Convert percentage to a decimal (e.g., 20% -> 0.20)
+                    discountValue = discountPercentage / 100;
                 } catch (NumberFormatException e) {
-                    // Handle cases where the discount format is incorrect
+
                     Log.e("updateTotals", "Invalid discount format (percentage)");
                 }
             }
-            // If the discount is a fixed amount (e.g., "₱100")
+
             else if (discountText.startsWith("₱")) {
                 try {
-                    // Extract the numeric part and convert to a fixed value (e.g., "₱100" -> 100)
+
                     discountValue = Double.parseDouble(discountText.replace("₱", ""));
                 } catch (NumberFormatException e) {
                     Log.e("updateTotals", "Invalid discount format (fixed amount)");
@@ -489,28 +489,28 @@ public class CheckoutFragment extends Fragment {
             }
         }
 
-        // Sum the total price of all selected items to get subTotal
+
         for (CartItemModel item : selectedItems) {
-            subTotal += item.getTotalPriceAsDouble();  // Assuming getTotalPriceAsDouble() works correctly
+            subTotal += item.getTotalPriceAsDouble();
         }
 
-        // If the discount is a percentage, apply it to the subtotal
+
         if (discountText.endsWith("%") && discountValue > 0) {
-            discountValue *= subTotal;  // Apply percentage discount to subtotal
+            discountValue *= subTotal;
         }
 
-        // itemTotal is the total after applying the discount
+
         double itemTotal = subTotal - discountValue;
 
-        // Ensure itemTotal is not negative, set it to 0 if negative
+
         if (itemTotal < 0) {
             itemTotal = 0;
         }
 
-        // totalCost will be used for the total cost after discounts
+
         double totalCost = itemTotal;
 
-        // Update the TextViews with the calculated totals
+
         if (subTotalTextView != null) {
             subTotalTextView.setText("₱" + String.format("%.2f", subTotal));  // Display subtotal
         }
@@ -523,7 +523,7 @@ public class CheckoutFragment extends Fragment {
             totalCostTextView.setText("₱" + String.format("%.2f", totalCost));  // Display total cost after discount
         }
 
-        // Toggle TextView visibility depending on whether there are items in the cart
+
         toggleTextViewVisibility(!selectedItems.isEmpty());
     }
 
@@ -544,37 +544,37 @@ public class CheckoutFragment extends Fragment {
     }
 
     private void clearCart() {
-        // Get the current user
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // Get the current user's document ID
+
             String currentUserId = currentUser.getUid();
 
-            // Reference to the cart items collection for the current user
+
             db.collection("Users")
                     .document(currentUserId)
                     .collection("cartItems")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            // Loop through the cart items and delete the ones that match the checked-out product IDs, cakeSize, productName, and totalPrice
+
                             for (CartItemModel item : selectedItems) {
                                 String productIdToDelete = item.getProductId();
-                                String cakeSizeToDelete = item.getCakeSize();  // Get the cakeSize from selected item
-                                String productNameToDelete = item.getProductName();  // Get the productName from selected item
-                                String totalPriceToDelete = item.getTotalPrice();  // Get the totalPrice from selected item
+                                String cakeSizeToDelete = item.getCakeSize();
+                                String productNameToDelete = item.getProductName();
+                                String totalPriceToDelete = item.getTotalPrice();
 
-                                // Check if the productId, cakeSize, productName, and totalPrice match any in the cart
+
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     CartItemModel cartItem = document.toObject(CartItemModel.class);
 
-                                    // Match the productId, cakeSize, productName, and totalPrice
+
                                     if (cartItem.getProductId().equals(productIdToDelete) &&
                                             cartItem.getCakeSize().equals(cakeSizeToDelete) &&
                                             cartItem.getProductName().equals(productNameToDelete) &&
                                             cartItem.getTotalPrice().equals(totalPriceToDelete)) {
 
-                                        // Delete the matching cart item
+
                                         document.getReference().delete()
                                                 .addOnSuccessListener(aVoid -> Log.d("CheckoutFragment", "Cart item deleted successfully"))
                                                 .addOnFailureListener(e -> Log.w("CheckoutFragment", "Error deleting cart item", e));
