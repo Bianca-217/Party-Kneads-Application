@@ -238,8 +238,10 @@ public class AnalyticsFragment extends Fragment {
                         if (document.exists()) {
                             String timestamp = document.getString("timestamp");
                             String totalPrice = document.getString("totalPrice");
+                            String status = document.getString("status"); // Fetch the order status
 
-                            if (timestamp != null && totalPrice != null) {
+                            // Process only orders with status "Complete Order"
+                            if (status != null && status.equalsIgnoreCase("Complete Order") && timestamp != null && totalPrice != null) {
                                 String orderDateString = extractDateFromTimestamp(timestamp);
 
                                 if (orderDateString.equals(day)) {
