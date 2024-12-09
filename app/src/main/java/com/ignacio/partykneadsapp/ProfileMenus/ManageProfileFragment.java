@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -27,7 +28,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.ignacio.partykneadsapp.ChangePasswordDialogFragment;
 import com.ignacio.partykneadsapp.R;
 import com.ignacio.partykneadsapp.databinding.FragmentManageProfileBinding;
-
 
 public class ManageProfileFragment extends Fragment {
 
@@ -44,11 +44,20 @@ public class ManageProfileFragment extends Fragment {
         // Inflate the layout using ViewBinding
         binding = FragmentManageProfileBinding.inflate(inflater, container, false);
 
-        // Assuming you have a method to get the user ID (this can be passed via the Bundle or from FirebaseAuth)
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Fetch user data
-        retrieveUserInfo(userId);
+        // Get the current user
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // If the user is logged in, retrieve their ID
+            String userId = currentUser.getUid();
+            // Fetch user data
+            retrieveUserInfo(userId);
+        } else {
+            // Handle the case where there is no authenticated user
+            Toast.makeText(getActivity(), "No user is logged in", Toast.LENGTH_SHORT).show();
+            // Optionally, navigate to the login screen or handle appropriately
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
+        }
 
         return binding.getRoot();
     }
@@ -72,7 +81,7 @@ public class ManageProfileFragment extends Fragment {
             dialogFragment.show(getParentFragmentManager(), "ChangePasswordDialog");
         });
 
-// Save changes button listener
+        // Save changes button listener
         binding.btnSaveChanges.setOnClickListener(v -> {
             String updatedFirstName = binding.userFName.getText().toString().trim();
             String updatedLastName = binding.userLname.getText().toString().trim();
@@ -106,8 +115,16 @@ public class ManageProfileFragment extends Fragment {
 
             // Proceed only if all inputs are valid
             if (isValid) {
-                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                updateUserInfo(userId, updatedFirstName, updatedLastName);
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (currentUser != null) {
+                    String userId = currentUser.getUid();
+                    updateUserInfo(userId, updatedFirstName, updatedLastName);
+                } else {
+                    Toast.makeText(getActivity(), "No user is logged in", Toast.LENGTH_SHORT).show();
+                    // Optionally, navigate to the login screen
+                    NavController navController = Navigation.findNavController(requireView());
+                    navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
+                }
             }
         });
 
@@ -143,49 +160,58 @@ public class ManageProfileFragment extends Fragment {
     private void deleteUserAccount() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        String userId = auth.getCurrentUser().getUid();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
 
-        // List of known collections
-        String[] collections = {"Locations", "cartItems", "Likes", "Notifications", "Vouchers"};
+            // List of known collections
+            String[] collections = {"Locations", "cartItems", "Likes", "Notifications", "Vouchers"};
 
-        try {
-            // Fetch and delete each collection if it exists
-            for (String collectionName : collections) {
-                deleteCollection(firestore.collection("Users").document(userId).collection(collectionName));
+            try {
+                // Fetch and delete each collection if it exists
+                for (String collectionName : collections) {
+                    deleteCollection(firestore.collection("Users").document(userId).collection(collectionName));
+                }
+
+                // Delete the user's Firestore document after all collections are deleted
+                firestore.collection("Users").document(userId).delete()
+                        .addOnSuccessListener(aVoid -> {
+                            try {
+                                // After Firestore deletion, proceed to delete the user's Firebase Authentication account
+                                auth.getCurrentUser().delete()
+                                        .addOnSuccessListener(authVoid -> {
+                                            // On successful deletion, show a success message
+                                            Toast.makeText(getActivity(), "Account deleted successfully", Toast.LENGTH_SHORT).show();
+
+                                            // Navigate to the login or home screen
+                                            NavController navController = Navigation.findNavController(requireView());
+                                            navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
+                                        })
+                                        .addOnFailureListener(authError -> {
+                                            // Handle any failure in deleting the user from Firebase Authentication
+                                            Toast.makeText(getActivity(), "Failed to delete authentication account: " + authError.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            } catch (Exception e) {
+                                // Handle any errors that occur during the Firebase Authentication deletion
+                                Toast.makeText(getActivity(), "Unexpected error during authentication deletion", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
+                        })
+                        .addOnFailureListener(firestoreError -> {
+                            // Handle any failure in deleting the Firestore data
+                            Toast.makeText(getActivity(), "Failed to delete Firestore data: " + firestoreError.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+            } catch (Exception e) {
+                // Catch any unexpected errors and display a toast message
+                Toast.makeText(getActivity(), "An unexpected error occurred while deleting the account", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
-
-            // Delete the user's Firestore document after all collections are deleted
-            firestore.collection("Users").document(userId).delete()
-                    .addOnSuccessListener(aVoid -> {
-                        try {
-                            // After Firestore deletion, proceed to delete the user's Firebase Authentication account
-                            auth.getCurrentUser().delete()
-                                    .addOnSuccessListener(authVoid -> {
-                                        // On successful deletion, show a success message
-                                        Toast.makeText(getActivity(), "Account deleted successfully", Toast.LENGTH_SHORT).show();
-
-                                        // Navigate to the login or home screen
-                                        NavController navController = Navigation.findNavController(requireView());
-                                        navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
-                                    })
-                                    .addOnFailureListener(authError -> {
-                                        // Handle any failure in deleting the user from Firebase Authentication
-                                        Toast.makeText(getActivity(), "Failed to delete authentication account: " + authError.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
-                        } catch (Exception e) {
-                            // Handle any errors that occur during the Firebase Authentication deletion
-                            Toast.makeText(getActivity(), "Unexpected error during authentication deletion", Toast.LENGTH_SHORT).show();
-                            e.printStackTrace();
-                        }
-                    })
-                    .addOnFailureListener(firestoreError -> {
-                        // Handle any failure in deleting the Firestore data
-                        Toast.makeText(getActivity(), "Failed to delete Firestore data: " + firestoreError.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        } catch (Exception e) {
-            // Catch any unexpected errors and display a toast message
-            Toast.makeText(getActivity(), "An unexpected error occurred while deleting the account", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+        } else {
+            // Handle the case where the user is not authenticated
+            Toast.makeText(getActivity(), "No user is logged in", Toast.LENGTH_SHORT).show();
+            // Optionally, navigate to the login screen
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_manageProfileFragment_to_loginFragment);
         }
     }
 
@@ -210,8 +236,6 @@ public class ManageProfileFragment extends Fragment {
                     Toast.makeText(getActivity(), "Error accessing collection: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 
     private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
