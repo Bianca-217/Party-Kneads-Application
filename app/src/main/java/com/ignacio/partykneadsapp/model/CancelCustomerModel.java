@@ -7,14 +7,16 @@ public class CancelCustomerModel {
     private String totalPrice;
     private String imageUrl;
     private String status;  // This will be "Order has been Cancelled"
+    private String reason;  // This will be "Order has been Cancelled"
 
-    public CancelCustomerModel(String productName, String cakeSize, int quantity, String totalPrice, String imageUrl, String status) {
+    public CancelCustomerModel(String productName, String cakeSize, int quantity, String totalPrice, String imageUrl, String status, String reason) {
         this.productName = productName;
         this.cakeSize = cakeSize;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.imageUrl = imageUrl;
         this.status = status;
+        this.reason = reason;
     }
 
     public String getProductName() {
@@ -39,5 +41,9 @@ public class CancelCustomerModel {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:backgroundTint="@color/footerpink"
     android:layout_marginBottom="20dp"
-    android:layout_height="160dp">
+    android:layout_height="180dp">
 
     <FrameLayout
         android:layout_width="65dp"
@@ -95,6 +95,15 @@
                 android:textColor="@color/semiblack"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="" />
+
+            <TextView
+                android:id="@+id/reason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="16sp"
+                android:textColor="@color/grey"
+                android:text="Reason for cancelling" />
         </LinearLayout>
     </LinearLayout>
 

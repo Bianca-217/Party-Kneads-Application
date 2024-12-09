@@ -10,9 +10,10 @@ public class CancelledOrderModel {
     private String totalPrice;
     private String status;
     private String imageUrl;
+    private String reason;
 
     // Constructor
-    public CancelledOrderModel(String userName, String contactNum, String location, String productName, String cakeSize, int quantity, String totalPrice, String status, String imageUrl) {
+    public CancelledOrderModel(String userName, String contactNum, String location, String productName, String cakeSize, int quantity, String totalPrice, String status, String imageUrl, String reason) {
         this.userName = userName;
         this.contactNum = contactNum;
         this.location = location;
@@ -22,6 +23,8 @@ public class CancelledOrderModel {
         this.totalPrice = totalPrice;
         this.status = status;
         this.imageUrl = imageUrl;
+        this.reason = reason;
+
     }
 
     // Getters and Setters
@@ -96,4 +99,10 @@ public class CancelledOrderModel {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public String getReason() { return reason; }
+
+    public void setReason(String reason) { this.reason = reason; }
+
+
 }

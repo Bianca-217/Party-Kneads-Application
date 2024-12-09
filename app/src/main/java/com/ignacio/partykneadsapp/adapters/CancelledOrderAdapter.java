@@ -47,6 +47,7 @@ public class CancelledOrderAdapter extends RecyclerView.Adapter<CancelledOrderAd
         holder.quantity.setText(String.valueOf(order.getQuantity()));
         holder.totalPrice.setText(order.getTotalPrice());
         holder.status.setText(order.getStatus());
+        holder.reason.setText(order.getReason());
 
         // Set image using Glide
         Glide.with(context).load(order.getImageUrl()).placeholder(R.drawable.placeholder).into(holder.cakeImage);
@@ -59,7 +60,7 @@ public class CancelledOrderAdapter extends RecyclerView.Adapter<CancelledOrderAd
 
     // ViewHolder class to hold individual views
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtUserName, contactNum, location, productName, cakeSize, quantity, totalPrice, status;
+        TextView txtUserName, contactNum, location, productName, cakeSize, quantity, totalPrice, status, reason;
         ImageView cakeImage;
 
         public ViewHolder(@NonNull View itemView) {
@@ -68,6 +69,7 @@ public class CancelledOrderAdapter extends RecyclerView.Adapter<CancelledOrderAd
             txtUserName = itemView.findViewById(R.id.txtUserName);
             contactNum = itemView.findViewById(R.id.contactNum);
             location = itemView.findViewById(R.id.location);
+            reason = itemView.findViewById(R.id.reason);
             productName = itemView.findViewById(R.id.productName);
             cakeSize = itemView.findViewById(R.id.cakeSize);
             quantity = itemView.findViewById(R.id.quantity);

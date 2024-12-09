@@ -63,15 +63,20 @@ public class CancelledOrderFragment extends Fragment {
         CollectionReference ordersRef = db.collection("Users").document(uid).collection("Orders");
 
         ordersRef.whereEqualTo("status", "Cancelled").get().addOnCompleteListener(task -> {
+
+
             if (task.isSuccessful()) {
                 cancelledOrdersList.clear(); // Clear the list before adding new data
 
                 for (QueryDocumentSnapshot document : task.getResult()) {
+
+                    String reason = document.getString("reason");
+
                     List<Map<String, Object>> items = (List<Map<String, Object>>) document.get("items");
 
                     if (items != null && !items.isEmpty()) {
                         Map<String, Object> firstItem = items.get(0); // Get the first item
-                        processOrder(firstItem, document); // Process and add to the list
+                        processOrder(firstItem, document, reason); // Process and add to the list
                     } else {
                         Log.d("CancelledOrderFragment", "No items found for order " + document.getId());
                     }
@@ -84,7 +89,7 @@ public class CancelledOrderFragment extends Fragment {
         });
     }
 
-    private void processOrder(Map<String, Object> item, QueryDocumentSnapshot doc) {
+    private void processOrder(Map<String, Object> item, QueryDocumentSnapshot doc, String reason) {
         String userName = doc.getString("userName");
         String contactNum = doc.getString("phoneNumber");
         String location = doc.getString("location");
@@ -93,6 +98,10 @@ public class CancelledOrderFragment extends Fragment {
         long quantity = (long) item.get("quantity");
         String totalPrice = (String) item.get("totalPrice");
         String imageUrl = (String) item.get("imageUrl");
+
+        if (reason == null) {
+            reason = "Others";
+        }
 
         // Format totalPrice with ₱ sign and convert to numeric value if needed
         String formattedPrice = "₱" + cleanTotalPrice(totalPrice);
@@ -107,7 +116,8 @@ public class CancelledOrderFragment extends Fragment {
                 (int) quantity,
                 formattedPrice,
                 "Cancelled",
-                imageUrl
+                imageUrl,
+                reason
         );
         cancelledOrdersList.add(order);
     }

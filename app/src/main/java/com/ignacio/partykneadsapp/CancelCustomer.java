@@ -82,8 +82,9 @@ public class CancelCustomer extends Fragment {
                                     canceledOrdersList.clear();  // Clear the existing list before adding new orders
                                     for (QueryDocumentSnapshot doc : orderSnapshots) {
                                         String status = doc.getString("status");
+                                        String reason = doc.getString("reason");
                                         String referenceId = doc.getId();
-                                        fetchFirstItemFromOrder(doc, referenceId, status);
+                                        fetchFirstItemFromOrder(doc, referenceId, status, reason);
                                     }
                                     adapter.notifyDataSetChanged();  // Update the adapter after data is loaded
                                 })
@@ -93,7 +94,7 @@ public class CancelCustomer extends Fragment {
                 .addOnFailureListener(e -> Log.e("Firestore Error", e.getMessage()));
     }
 
-    private void fetchFirstItemFromOrder(QueryDocumentSnapshot doc, String referenceId, String status) {
+    private void fetchFirstItemFromOrder(QueryDocumentSnapshot doc, String referenceId, String status, String reason) {
         List<Map<String, Object>> items = (List<Map<String, Object>>) doc.get("items");
 
         if (items != null && !items.isEmpty()) {
@@ -115,6 +116,10 @@ public class CancelCustomer extends Fragment {
                 }
             }
 
+            if (reason == null) {
+                reason = "Others";
+            }
+
             // Format the price with currency symbol
             String formattedPrice = String.format("₱%.2f", parsedPrice);
 
@@ -125,7 +130,8 @@ public class CancelCustomer extends Fragment {
                     (int) quantity,
                     formattedPrice,
                     imageUrl,
-                    status  // Use the status as "Cancelled"
+                    status,
+                    reason
             );
 
             // Add the order to the list
