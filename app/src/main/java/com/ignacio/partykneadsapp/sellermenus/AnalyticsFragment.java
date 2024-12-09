@@ -408,7 +408,8 @@ public class AnalyticsFragment extends Fragment {
 
         TableLayout tableLayout = binding.tableLayout;  // Reference to the TableLayout
 
-        ordersRef.get().addOnCompleteListener(task -> {
+        // Query to fetch only orders with a status of "Complete Order"
+        ordersRef.whereEqualTo("status", "Complete Order").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     String referenceId = document.getString("referenceId");
@@ -446,6 +447,7 @@ public class AnalyticsFragment extends Fragment {
             }
         });
     }
+
 
     private TextView createTextView(String text) {
         TextView textView = new TextView(getContext());

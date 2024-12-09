@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,7 +50,7 @@ import java.util.List;
 public class Cupcake_Description extends Fragment {
 
     private TextView productName, productPrice, productDescription;
-    private ImageView productImage, btnBack;
+    private ImageView productImage, btnBack, like;
     private Button btnAddtoCart, btnBuyNow; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
     private FirebaseFirestore firestore;
@@ -78,6 +79,7 @@ public class Cupcake_Description extends Fragment {
         productPrice = view.findViewById(R.id.productPrice);
         productDescription = view.findViewById(R.id.productDescription);
         btnBack = view.findViewById(R.id.btnBack);
+        like = view.findViewById(R.id.like);
         // Initialize quantity controls
         btnAddtoCart = view.findViewById(R.id.btnAddtoCart); // Initialize Add to Cart button
         btnBuyNow = view.findViewById(R.id.btnBuyNow); // Initialize Buy Now button
@@ -330,6 +332,25 @@ public class Cupcake_Description extends Fragment {
                     productDescription.setText(description);
                     productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
                 }
+            }
+        });
+
+        String userUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        CollectionReference likesRef = firestore.collection("Users").document(userUID).collection("Likes");
+
+        // Check if the productId exists in the Likes collection
+        likesRef.document(productId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                if (task.getResult().exists()) {
+                    // If productId exists in the Likes collection, update the heart image
+                    like.setImageResource(R.drawable.pink_heart_filled);
+                } else {
+                    // If productId does not exist, show the default heart image
+                    like.setImageResource(R.drawable.heart_pink);
+                }
+            } else {
+                // Handle the error or fallback
+                like.setImageResource(R.drawable.heart_pink);
             }
         });
     }

@@ -347,10 +347,16 @@ public class NewAddressFragment extends DialogFragment {
 
     private boolean validateFields() {
         boolean isValid = true;
-
-        if (binding.txtUserName.getText().toString().trim().isEmpty()) {
+        // Validate Full Name
+        String fullName = binding.txtUserName.getText().toString().trim();
+        if (fullName.isEmpty()) {
             binding.txtUserName.setError("Full Name is required");
             isValid = false;
+        } else {
+            if (!fullName.matches("[a-zA-Z. ]+")) { // Only letters, spaces, and periods
+                binding.txtUserName.setError("Full Name can only contain letters, spaces, and periods");
+                isValid = false;
+            }
         }
         if (binding.contactNum.getText().toString().trim().isEmpty()) {
             binding.contactNum.setError("Phone Number is required");

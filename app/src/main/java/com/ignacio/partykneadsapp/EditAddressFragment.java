@@ -375,15 +375,24 @@ public class EditAddressFragment extends DialogFragment {
         binding.postalCode.setError(null);
         binding.houseNum.setError(null);
 
-        if (binding.txtUserName.getText().toString().trim().isEmpty()) {
+        // Validate Full Name
+        String fullName = binding.txtUserName.getText().toString().trim();
+        if (fullName.isEmpty()) {
             binding.txtUserName.setError("Full Name is required");
             isValid = false;
+        } else {
+            if (!fullName.matches("[a-zA-Z. ]+")) { // Regex to allow letters, spaces, and periods
+                binding.txtUserName.setError("Full Name can only contain letters, spaces, and periods");
+                isValid = false;
+            }
         }
-        if (binding.contactNum.getText().toString().trim().isEmpty()) {
+
+        // Validate Phone Number
+        String phoneNumber = binding.contactNum.getText().toString().trim();
+        if (phoneNumber.isEmpty()) {
             binding.contactNum.setError("Phone Number is required");
             isValid = false;
         } else {
-            String phoneNumber = binding.contactNum.getText().toString().trim();
             try {
                 Long.parseLong(phoneNumber); // Check if it's numeric
 
@@ -397,18 +406,26 @@ public class EditAddressFragment extends DialogFragment {
                 isValid = false;
             }
         }
+
+        // Validate City
         if (binding.cities.getText().toString().trim().isEmpty()) {
             binding.cities.setError("City is required");
             isValid = false;
         }
+
+        // Validate Barangay
         if (binding.barangays.getText().toString().trim().isEmpty()) {
             binding.barangays.setError("Barangay is required");
             isValid = false;
         }
+
+        // Validate Postal Code
         if (binding.postalCode.getText().toString().trim().isEmpty()) {
             binding.postalCode.setError("Postal Code is required");
             isValid = false;
         }
+
+        // Validate House Number
         if (binding.houseNum.getText().toString().trim().isEmpty()) {
             binding.houseNum.setError("House Number is required");
             isValid = false;
@@ -416,6 +433,7 @@ public class EditAddressFragment extends DialogFragment {
 
         return isValid;
     }
+
 
     public void numberMaxDigit() {
         binding.contactNum.addTextChangedListener(new TextWatcher() {

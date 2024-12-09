@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,7 +48,7 @@ import java.util.List;
 public class Cake_Description extends Fragment {
 
     private TextView productName, productPrice, productDescription, ratePercent, numReviews;
-    private ImageView productImage, btnBack; // Added btnLike
+    private ImageView productImage, btnBack, like; // Added btnLike
     private TextView minusButton, quantityTextView, plusButton; // Quantity controls
     private Button btnAddtoCart, btnBuyNow, btnLike; // Add to Cart and Buy Now buttons
     private ProductShopModel productShopModel;
@@ -94,6 +95,7 @@ public class Cake_Description extends Fragment {
         productDescription = view.findViewById(R.id.productDescription);
         btnBack = view.findViewById(R.id.btnBack);
         btnLike = view.findViewById(R.id.btnLike); // Initialize btnLike
+        like = view.findViewById(R.id.like); // Initialize btnLike
         // Initialize quantity controls
         minusButton = view.findViewById(R.id.minus);
         quantityTextView = view.findViewById(R.id.quantity);
@@ -371,30 +373,49 @@ public class Cake_Description extends Fragment {
     }
 
     private void loadProductDetails(String productId) {
+        // Reference to the product in the "products" collection
         DocumentReference productRef = firestore.collection("products").document(productId);
 
-        productListener = productRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                if (e != null) {
-                    // Handle the error
-                    return;
-                }
+        // Listener to fetch product details
+        productListener = productRef.addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                // Handle the error
+                return;
+            }
 
-                if (documentSnapshot != null && documentSnapshot.exists()) {
-                    // Fetch and display product details
-                    String imageUrl = documentSnapshot.getString("imageUrl"); // Fetch the imageUrl
-                    String name = documentSnapshot.getString("name");
-                    String description = documentSnapshot.getString("description");
-                    String rate = documentSnapshot.getString("rate");
-                    String numReviewsStr = documentSnapshot.getString("numreviews");
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                // Fetch and display product details
+                String imageUrl = documentSnapshot.getString("imageUrl"); // Fetch the imageUrl
+                String name = documentSnapshot.getString("name");
+                String description = documentSnapshot.getString("description");
+                String rate = documentSnapshot.getString("rate");
+                String numReviewsStr = documentSnapshot.getString("numreviews");
 
-                    // Populate the views with data
-                    Glide.with(Cake_Description.this).load(imageUrl).into(productImage); // Load image with Glide
-                    productName.setText(name);
-                    productDescription.setText(description);
-                    productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
+                // Populate the views with data
+                Glide.with(Cake_Description.this).load(imageUrl).into(productImage); // Load image with Glide
+                productName.setText(name);
+                productDescription.setText(description);
+                productShopModel.setimageUrl(imageUrl); // Save image URL to productShopModel
+            }
+        });
+
+        // Reference to the "Likes" collection for the current user
+        String userUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        CollectionReference likesRef = firestore.collection("Users").document(userUID).collection("Likes");
+
+        // Check if the productId exists in the Likes collection
+        likesRef.document(productId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                if (task.getResult().exists()) {
+                    // If productId exists in the Likes collection, update the heart image
+                    like.setImageResource(R.drawable.pink_heart_filled);
+                } else {
+                    // If productId does not exist, show the default heart image
+                    like.setImageResource(R.drawable.heart_pink);
                 }
+            } else {
+                // Handle the error or fallback
+                like.setImageResource(R.drawable.heart_pink);
             }
         });
     }
